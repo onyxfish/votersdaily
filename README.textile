@@ -1,0 +1,6 @@
+<h1>Voters Daily</h1>
+
+<h3>Description</h3>
+Votersdaily is an attempt to scrape the contents of government schedules and combine that event data into a single datastore.  The intention is that this data can then be used to build web applications and mashups which will increase the level of transparency between government entities and the public on time-sensitive issues.  
+
+For more information, please see the "project wiki":http://wiki.github.com/bouvard/votersdaily.
