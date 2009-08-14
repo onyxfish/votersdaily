@@ -5,8 +5,8 @@ import sys
 
 from dateutil.parser import parse
 import html5lib
-        
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from pyutils.events import *
 
 class HouseScheduleScraper(EventScraper):

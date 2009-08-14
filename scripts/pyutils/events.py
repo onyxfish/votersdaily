@@ -1,4 +1,5 @@
 import datetime
+import hashlib
 import os
 import sys
 import urllib2
@@ -21,10 +22,10 @@ class EventScraper(object):
     EventScraper.__init__().
     """
     
-    # CouchDB setup
-    server_uri = 'http://localhost:5984/'
-    event_db_name = 'vd_events'
-    log_db_name = 'vd_log'
+    # CouchDB config
+    SERVER_URI = 'http://localhost:5984/'
+    EVENT_DB_NAME = 'vd_events'
+    LOG_DB_NAME = 'vd_log'
     
     # The user agent used for requests (this will show up in the host's logs):
     user_agent = 'robot: http://wiki.github.com/bouvard/votersdaily'
@@ -42,23 +43,21 @@ class EventScraper(object):
         if not hasattr(self, 'url'):
             raise Exception('EventScrapers must have a url attribute')
         
-        self._init_couchdb()
-        
     def _init_couchdb(self):
         """
         Setup CouchDB.  Encapsulated for clarity.
         """
-        self.server = couchdb.Server(self.server_uri)
+        self.server = couchdb.Server(self.SERVER_URI)
         
-        if self.event_db_name not in self.server:
-            self.server.create(self.event_db_name)
+        if self.EVENT_DB_NAME not in self.server:
+            self.server.create(self.EVENT_DB_NAME)
             
-        self.event_db = self.server[self.event_db_name]
+        self.event_db = self.server[self.EVENT_DB_NAME]
         
-        if self.log_db_name not in self.server:
-            self.server.create(self.log_db_name)
+        if self.LOG_DB_NAME not in self.server:
+            self.server.create(self.LOG_DB_NAME)
             
-        self.log_db = self.server[self.log_db_name]     
+        self.log_db = self.server[self.LOG_DB_NAME]
 
     def urlopen(self, url):
         """
@@ -73,20 +72,33 @@ class EventScraper(object):
         """
         pass
 
-    # TODO - add params
     def add_event(self, event):
         """
         Add scraped Event object data to the database.
-        """
-        # TODO - duplicate checking
         
+        A CouchDB id is automatically generated for each Event by generating
+        a hash from the datetime, title, and entity fields.  This id is also
+        used to verify that duplicate Events are not committed to the database.
+        """        
         # Append parser properties to event
         event['parser_name'] = self.name
         event['parser_version'] = self.version
         
+        # Compute md5 hash/fingerprint
+        hash = hashlib.md5()
+        hash.update(event['datetime'])
+        hash.update(event['title'])
+        hash.update(event['entity'])
+        
+        event.id = hash.hexdigest()
+        
+        # Skip duplicates
+        if event.id in self.event_db:
+            return
+        
         event.store(self.event_db)
     
-    def add_log(self):
+    def add_log(self, scrape_log):
         """
         Add a scrape attempt to the database.
         """
@@ -97,6 +109,8 @@ class EventScraper(object):
         """
         Run this scraper and log the results.
         """
+        self._init_couchdb()
+        
         #try:
         self.scrape()
             # TODO - self.add_log(...)
@@ -121,4 +135,17 @@ class Event(Document):
     entity = TextField()
     source_url = TextField()
     source_text = TextField()
-    access_datetime = DateTimeField()    
+    access_datetime = DateTimeField()
+    
+class ScrapeLog(Document):
+    """
+    A couchdb-python document schema for the log of a scraping attempt.
+    """
+    
+    parser_name = TextField()
+    parser_version = TextField()
+    source_url = TextField()
+    source_text = TextField()
+    access_datetime = DateTimeField()
+    result = TextField()
+    error_text = TextField()
