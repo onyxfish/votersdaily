@@ -1,7 +1,6 @@
-#!/usr/bin/php -q
 <?php
 
-require '../phputils/votersdaily.php';
+//require '../phputils/votersdaily.php';
 
 class HouseSchedule extends VotersDaily_Abstract
 {
@@ -18,7 +17,7 @@ class HouseSchedule extends VotersDaily_Abstract
     public function run()
     {
         $events = $this->parse();
-        $this->save($events, '../data/houseschedule.csv');
+        $this->save($events, 'data/houseschedule.csv');
     }
 
     protected function parse()
@@ -87,6 +86,6 @@ class HouseSchedule extends VotersDaily_Abstract
     }
 }
 
-$parser = new HouseSchedule;
-$parser->run();
+//$parser = new HouseSchedule;
+//$parser->run();
 ?>

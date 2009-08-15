@@ -1,7 +1,6 @@
-#!/usr/bin/php -q
 <?php
 
-require '../phputils/votersdaily.php';
+//require '../phputils/votersdaily.php';
 
 class SenateRollCallVotes extends VotersDaily_Abstract
 {
@@ -19,7 +18,7 @@ class SenateRollCallVotes extends VotersDaily_Abstract
     {
         $events = $this->parse();
         //print_r($events);
-        $this->save($events, '../data/senaterollcallvotes.csv');
+        $this->save($events, 'data/senaterollcallvotes.csv');
     }
 
     protected function parse()
@@ -81,5 +80,5 @@ class SenateRollCallVotes extends VotersDaily_Abstract
     }
 }
 
-$parser = new SenateRollCallVotes();
-$parser->run();
+//$parser = new SenateRollCallVotes();
+//$parser->run();
