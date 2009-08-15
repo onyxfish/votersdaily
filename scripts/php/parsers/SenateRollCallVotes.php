@@ -4,20 +4,20 @@
 
 class SenateRollCallVotes extends VotersDaily_Abstract
 {
-    protected $db = null;
     protected $url = 'http://www.senate.gov/legislative/LIS/roll_call_lists/vote_menu_111_1.xml';
-    protected $parser_name = 'VotersDaily_PHP';
+    protected $parser_name = 'Senate Roll Call Votes Scraper';
     protected $parser_version = '0.1';
+    protected $parser_frequency = '6.0';
     protected $fields = array('start_time','end_time','title','description','branch','entity','source_url','source_text','access_datetime','parser_name','person_version');
     
     public function __construct()
     {
+        parent::__construct();
     }
 
     public function run()
     {
         $events = $this->parse();
-        //print_r($events);
         $this->save($events, 'data/senaterollcallvotes.csv');
     }
 
@@ -26,7 +26,7 @@ class SenateRollCallVotes extends VotersDaily_Abstract
         $events = array();
         $access_time = time();
         
-        $xml = file_get_contents($this->url);
+        $xml = $this->urlopen($this->url);
         $response = simplexml_load_string($xml);
         
         $votes = $response->votes->vote;

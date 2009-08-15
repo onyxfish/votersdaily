@@ -14,8 +14,9 @@ class ScraperScheduler {
             list($name,$ext) = explode('.',$_file_str);
             $className = ucfirst($name);
             
+            //let make sure this Scraper meets the base requirements
+
             // Instanciate new parser class. 
-            // execute run method
             eval ( '$'.$name.' =& new '.$className.'(null);' );
             if(method_exists(${$name}, 'run')) {
                 echo 'Start to run the ' . $name . ' parser'."\n";

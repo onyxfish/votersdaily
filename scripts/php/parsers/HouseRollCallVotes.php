@@ -3,10 +3,10 @@
 
 class HouseRollCallVotes extends VotersDaily_Abstract
 {
-    protected $db = null;
     protected $url = 'http://clerk.house.gov/evs/2009/index.asp';
-    protected $parser_name = 'VotersDaily_PHP';
+    protected $parser_name = 'House Roll Call Votes Scraper';
     protected $parser_version = '0.1';
+    protected $parser_frequency = '6.0';
     protected $fields = array('start_time','end_time','title','description','branch','entity','source_url','source_text','access_datetime','parser_name','person_version');
 
     public function __construct()
@@ -22,7 +22,8 @@ class HouseRollCallVotes extends VotersDaily_Abstract
     
     protected function parse()
     {
-        $response = file_get_contents($this->url);
+        $response = $this->urlopen($this->url);
+
         $access_time = time();
         preg_match_all('#<A HREF="ROLL(.*?)">#is',$response, $otherLinks);
 
