@@ -2,6 +2,7 @@ import datetime
 import hashlib
 import os
 import sys
+import traceback
 import urllib2
 
 import couchdb
@@ -27,21 +28,25 @@ class EventScraper(object):
     EVENT_DB_NAME = 'vd_events'
     LOG_DB_NAME = 'vd_log'
     
+    # These values should be set when urlopen() is called,
+    # but might not be if the scraper errors out before it completes
+    source_url = None
+    access_datetime = None
+    source_text = None
+    
     # The user agent used for requests (this will show up in the host's logs):
     user_agent = 'robot: http://wiki.github.com/bouvard/votersdaily'
 
     def __init__(self):
         """
-        Verify that proper attributes have been set in derived classes.
+        Verify that the name, and version attributes have been set in the
+        derived class.
         """
         if not hasattr(self, 'name'):
             raise Exception('EventScrapers must have a state attribute')
 
         if not hasattr(self, 'version'):
             raise Exception('EventScrapers must have a version attribute')
-        
-        if not hasattr(self, 'url'):
-            raise Exception('EventScrapers must have a url attribute')
         
     def _init_couchdb(self):
         """
@@ -59,51 +64,51 @@ class EventScraper(object):
             
         self.log_db = self.server[self.LOG_DB_NAME]
 
-    def urlopen(self, url):
+    def urlopen(self, url, is_root):
         """
-        Retrieve a url, specifying necessary headers.
+        Retrieve a url, specifying necessary headers.  If this is the root,
+        or first, page to be scraped then additional properties of the source
+        are recorded for logging.
         """
+        if is_root:
+            self.source_url = url
+            self.access_datetime = datetime.datetime.now()
+        
         request = urllib2.Request(url, headers={'User-Agent': self.user_agent})
-        return urllib2.urlopen(request).read()
+        source_text = urllib2.urlopen(request).read()
+        
+        if is_root:
+            self.source_text = source_text
+            
+        return source_text
 
     def scrape(self):
         """
-        This method must be overriden by each derived scraoverridenper.
+        This method must be overriden by each derived scraper.
         """
         pass
 
     def add_event(self, event):
         """
-        Add scraped Event object data to the database.
-        
-        A CouchDB id is automatically generated for each Event by generating
-        a hash from the datetime, title, and entity fields.  This id is also
-        used to verify that duplicate Events are not committed to the database.
+        Add scraped Event object to the database.
         """        
         # Append parser properties to event
-        event['parser_name'] = self.name
-        event['parser_version'] = self.version
-        
-        # Compute md5 hash/fingerprint
-        hash = hashlib.md5()
-        hash.update(event['datetime'])
-        hash.update(event['title'])
-        hash.update(event['entity'])
-        
-        event.id = hash.hexdigest()
-        
-        # Skip duplicates
-        if event.id in self.event_db:
-            return
+        event.parser_name = self.name
+        event.parser_version = self.version
         
         event.store(self.event_db)
     
     def add_log(self, scrape_log):
         """
-        Add a scrape attempt to the database.
-        """
-        # TODO
-        pass
+        Add a ScrapeLog object to the database.
+        """        
+        scrape_log.parser_name = self.name
+        scrape_log.parser_version = self.version
+        scrape_log.source_url = self.source_url
+        scrape_log.source_text = self.source_text
+        scrape_log.access_datetime = self.access_datetime
+        
+        scrape_log.store(self.log_db)
             
     def run(self):
         """
@@ -111,20 +116,26 @@ class EventScraper(object):
         """
         self._init_couchdb()
         
-        #try:
-        self.scrape()
-            # TODO - self.add_log(...)
-        #except:
-            #TODO - self.add_log(...)
-            #pass
+        try:
+            self.scrape()
+            self.add_log(
+                ScrapeLog(
+                    result='success'))
+        except:
+            # Log exception to the database
+            cls, exc, trace = sys.exc_info()
+            scrape_log = ScrapeLog(result=cls.__name__)
+            scrape_log['traceback'] = traceback.format_tb(trace)
+            self.add_log(scrape_log)
+            
+            # Make exception visible on command line
+            raise
         
         
 class Event(Document):
     """
     A couchdb-python document schema for an event.  Properties that are
-    expected to be set by the scraper are defined as fields.  Additional
-    properties may be stored by appending them to the event as though it
-    were a dictionary.  See EventScraper.add_event for an example of this.
+    expected to be set by the scraper are defined as fields.
     """
     
     datetime = DateTimeField()
@@ -137,6 +148,22 @@ class Event(Document):
     source_text = TextField()
     access_datetime = DateTimeField()
     
+    def store(self, database):
+        """
+        Generate a unique id for this event, verify that it is not a duplicate,
+        and store it in the database.
+        """
+        self.id = '%s - %s - %s - %s' % (
+            self['datetime'], 
+            self['branch'], 
+            self['entity'],
+            self['title'])
+        
+        if self.id in database:
+            return
+        
+        Document.store(self, database) 
+    
 class ScrapeLog(Document):
     """
     A couchdb-python document schema for the log of a scraping attempt.
@@ -148,4 +175,18 @@ class ScrapeLog(Document):
     source_text = TextField()
     access_datetime = DateTimeField()
     result = TextField()
-    error_text = TextField()
+    
+    def store(self, database):
+        """
+        Generate a unique id for this log entry, verify that it is not a 
+        duplicate, and store it in the database.
+        """
+        self.id = '%s - %s - %s' % (
+            self['access_datetime'], 
+            self['parser_name'], 
+            self['result']) 
+        
+        if self.id in database:
+            return
+        
+        Document.store(self, database)

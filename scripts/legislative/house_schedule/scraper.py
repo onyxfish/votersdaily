@@ -23,7 +23,6 @@ class HouseScheduleScraper(EventScraper):
         """
         self.name = 'House Schedule Scraper'
         self.version = '0.0.1'
-        self.url = 'http://www.house.gov/house/House_Calendar.shtml'
         
         EventScraper.__init__(self)
 
@@ -31,15 +30,15 @@ class HouseScheduleScraper(EventScraper):
         """
         Pull down the schedule and parse its event data.
         """
-        soup = self.parser.parse(self.urlopen(self.url))
-        access_datetime = datetime.datetime.now()
+        url =  'http://www.house.gov/house/House_Calendar.shtml'
+        soup = self.parser.parse(self.urlopen(url, True))
         
         primary_div = soup.find('div', id='primary')
         
         if str(primary_div).find('111th Congress') > 0:
             year = 2009
         else:
-            raise Exception(
+            raise ScrapeError(
                 'This script needs to be updated for a new congress.')
         
         rows = primary_div.findAll('tr')
@@ -94,9 +93,9 @@ class HouseScheduleScraper(EventScraper):
                 end_datetime=end_datetime,
                 branch='Legislative',
                 entity='House of Representatives',
-                source_url=self.url,
+                source_url=url,
                 source_text=str(row),
-                access_datetime=access_datetime)
+                access_datetime=self.access_datetime)
             
             self.add_event(new_event)
                 
