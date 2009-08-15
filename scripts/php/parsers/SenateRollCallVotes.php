@@ -17,11 +17,11 @@ class SenateRollCallVotes extends VotersDaily_Abstract
 
     public function run()
     {
-        $events = $this->parse();
-        $this->save($events, 'data/senaterollcallvotes.csv');
+        $events = $this->scrape();
+        $this->add_events($events, 'data/senaterollcallvotes.csv');
     }
 
-    protected function parse()
+    protected function scrape()
     {
         $events = array();
         $access_time = time();
@@ -60,7 +60,7 @@ class SenateRollCallVotes extends VotersDaily_Abstract
         
     }
 
-    protected function save($arr, $fn)
+    protected function add_events($arr, $fn)
     {
         $lines = array();
         foreach($arr as $v) {
@@ -79,6 +79,3 @@ class SenateRollCallVotes extends VotersDaily_Abstract
         fclose($fp);        
     }
 }
-
-//$parser = new SenateRollCallVotes();
-//$parser->run();

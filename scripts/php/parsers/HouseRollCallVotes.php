@@ -15,12 +15,11 @@ class HouseRollCallVotes extends VotersDaily_Abstract
 
     public function run()
     {
-        $events = $this->parse();
-        //print_r($events);
-        $this->save($events, 'data/houserollcallvotes.csv');
+        $events = $this->scrape();
+        $this->add_events($events, 'data/houserollcallvotes.csv');
     }
     
-    protected function parse()
+    protected function scrape()
     {
         $response = $this->urlopen($this->url);
 
@@ -62,7 +61,8 @@ class HouseRollCallVotes extends VotersDaily_Abstract
                 else if($event_arr[6] == 'P') {
                     $status = 'Passed';
                 }
-
+                
+                //NOTICE: this block of code is causing notices $event_arr index .. 
                 $description_str = 'Roll Call # '.$event_arr[0] . ' ' . $event_arr[3] . ' - ' . $event_arr[5] . ' ' . $event_arr[7] .' ('.$status.')';
                 $description_str .= ' Links:  http://clerk.house.gov/cgi-bin/vote.asp?year=2009&rollnumber='.$event_arr[0];
                 $bill_str = str_replace(' ','.',$event_arr[3]);
@@ -84,7 +84,7 @@ class HouseRollCallVotes extends VotersDaily_Abstract
         return $events;
     }
 
-    protected function save($arr, $fn)
+    protected function add_events($arr, $fn)
     {
         $lines = array();
         foreach($arr as $v) {
@@ -106,6 +106,3 @@ class HouseRollCallVotes extends VotersDaily_Abstract
     }
     
 }
-
-//$parser = new HouseRollCallVotes;
-//$parser->run();

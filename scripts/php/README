@@ -8,3 +8,4 @@ CHANGELOG
 - initial import of HouseRollCallVotes.php parser - http://clerk.house.gov/evs/2009/index.asp
 - initial import of SenateRollCallVotes.php parser - http://www.senate.gov/legislative/LIS/roll_call_lists/vote_menu_111_1.xml
 - modified code so all parser(s) are executed by ScraperScheduler
+

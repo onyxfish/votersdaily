@@ -17,11 +17,11 @@ class HouseSchedule extends VotersDaily_Abstract
 
     public function run()
     {
-        $events = $this->parse();
-        $this->save($events, 'data/houseschedule.csv');
+        $events = $this->scrape();
+        $this->add_events($events, 'data/houseschedule.csv');
     }
 
-    protected function parse()
+    protected function scrape()
     {
         $response = $this->urlopen($this->url);
 
@@ -34,7 +34,7 @@ class HouseSchedule extends VotersDaily_Abstract
         foreach($data[1] as $event) {
 
             $event = str_replace(array("\r\n",'  :  ',' :  '),':',strip_tags(trim($event)));
-            list($date, $text_str) = explode(':', $event);
+            list($date, $text_str) = explode(':', $event); //causing warning
             $date_str = explode('-',trim($date));
 
             //start getting required data
@@ -64,7 +64,7 @@ class HouseSchedule extends VotersDaily_Abstract
         return $events;
     }
 
-    protected function save($arr, $fn)
+    protected function add_events($arr, $fn)
     {
         //print_r($arr);
         $lines = array();

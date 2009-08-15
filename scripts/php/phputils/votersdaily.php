@@ -29,8 +29,8 @@ abstract class VotersDaily_Abstract
     }
     
     abstract public function run();
-    abstract protected function parse();
-    abstract protected function save($arr, $fn);
+    abstract protected function scrape();
+    abstract protected function add_events($arr, $fn);
     
 }
 
