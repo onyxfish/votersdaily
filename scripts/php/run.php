@@ -3,7 +3,7 @@ require 'phputils/votersdaily.php';
 
 class ScraperScheduler {
 
-    public function run()
+    public static function run()
     {
         
         $files = glob('parsers/*.php');
@@ -13,8 +13,7 @@ class ScraperScheduler {
             $_file_str = str_replace('parsers/','',$file);
             list($name,$ext) = explode('.',$_file_str);
             $className = ucfirst($name);
-        
-
+            
             // Instanciate new parser class. 
             // execute run method
             eval ( '$'.$name.' =& new '.$className.'(null);' );
@@ -33,5 +32,4 @@ class ScraperScheduler {
     }        
 }
 
-$scraper = new ScraperScheduler();
-$scraper->run();
+ScraperScheduler::run();
