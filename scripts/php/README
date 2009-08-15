@@ -1,0 +1,8 @@
+Attempt to help Votersdaily an attempt to scrape the contents of government schedules and combine that event data into a single datastore. 
+Lang: PHP 5.2.x
+Author: Chauncey Thorn chaunceyt@gmail.com
+
+CHANGELOG
+08-15-2009 
+- initial import of HouseSchedule.php parser - http://www.house.gov/house/House_Calendar.shtml
+- initial import of HouseRollCallVotes.php parser - http://clerk.house.gov/evs/2009/index.asp

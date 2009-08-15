@@ -87,6 +87,6 @@ class HouseSchedule extends VotersDaily_Abstract
     }
 }
 
-$houseSchedule = new HouseSchedule;
-$houseSchedule->run();
+$parser = new HouseSchedule;
+$parser->run();
 ?>
