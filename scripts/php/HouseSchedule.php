@@ -7,7 +7,6 @@ class HouseSchedule extends VotersDaily_Abstract
 {
     protected $db = null;
     protected $url = 'http://www.house.gov/house/House_Calendar.shtml';
-    protected $dbFile = 'houseschedule.db';
     protected $parser_name = 'VotersDaily_PHP';
     protected $parser_version = '0.1';
     protected $fields = array('start_time','end_time','title','description','branch','entity','source_url','source_text','access_datetime','parser_name','person_version');
@@ -25,7 +24,6 @@ class HouseSchedule extends VotersDaily_Abstract
     protected function parse()
     {
         $response = file_get_contents($this->url);
-        $clean_response = strip_tags($response, '<table><tr><td>');
 
         preg_match('#<table[^>]*>(.+?)<\/table>#is',$response,$matches);
         preg_match_all('#<tr>(.+?)<\/tr>#is',$matches[1],$data);
