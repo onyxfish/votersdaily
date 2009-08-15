@@ -39,14 +39,16 @@ class EventScraper(object):
 
     def __init__(self):
         """
-        Verify that the name, and version attributes have been set in the
-        derived class.
+        Verify that required attributes have been set in the derived class.
         """
         if not hasattr(self, 'name'):
             raise Exception('EventScrapers must have a state attribute')
 
         if not hasattr(self, 'version'):
             raise Exception('EventScrapers must have a version attribute')
+
+        if not hasattr(self, 'frequency'):
+            raise Exception('EventScrapers must have a frequency attribute')
         
     def _init_couchdb(self):
         """
@@ -118,9 +120,7 @@ class EventScraper(object):
         
         try:
             self.scrape()
-            self.add_log(
-                ScrapeLog(
-                    result='success'))
+            self.add_log(ScrapeLog(result='success'))
         except:
             # Log exception to the database
             cls, exc, trace = sys.exc_info()
@@ -178,15 +178,11 @@ class ScrapeLog(Document):
     
     def store(self, database):
         """
-        Generate a unique id for this log entry, verify that it is not a 
-        duplicate, and store it in the database.
+        Generate a unique id for this log entry and store it in the database.
         """
         self.id = '%s - %s - %s' % (
             self['access_datetime'], 
             self['parser_name'], 
-            self['result']) 
-        
-        if self.id in database:
-            return
+            self['result'])
         
         Document.store(self, database)

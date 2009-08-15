@@ -13,18 +13,13 @@ class HouseScheduleScraper(EventScraper):
     """
     An EventScraper for the House Schedule maintained on www.house.gov.
     """
+        
+    name = 'House Schedule Scraper'
+    version = '0.0.1'
+    frequency = 6.0
 
     parser = html5lib.HTMLParser(
         tree=html5lib.treebuilders.getTreeBuilder('beautifulsoup'))
-    
-    def __init__(self):
-        """
-        Set required properties and intialize this scraper.
-        """
-        self.name = 'House Schedule Scraper'
-        self.version = '0.0.1'
-        
-        EventScraper.__init__(self)
 
     def scrape(self):
         """
