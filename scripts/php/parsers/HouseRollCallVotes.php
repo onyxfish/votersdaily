@@ -1,6 +1,6 @@
 #!/usr/bin/php -q
 <?php
-require 'votersdaily.php';
+require '../phputils/votersdaily.php';
 
 class HouseRollCallVotes extends VotersDaily_Abstract
 {
@@ -18,7 +18,7 @@ class HouseRollCallVotes extends VotersDaily_Abstract
     {
         $events = $this->parse();
         //print_r($events);
-        $this->save($events, 'data/houserollcallvotes.csv');
+        $this->save($events, '../data/houserollcallvotes.csv');
     }
     
     protected function parse()
