@@ -1,3 +1,4 @@
+#!/usr/bin/php -q
 <?php
 ini_set("display_errors", true);
 error_reporting(E_ALL & ~E_NOTICE);
@@ -7,7 +8,14 @@ class ScraperScheduler {
 
     public static function run()
     {
-        
+        if(!is_dir('parsers')) {
+            throw new Exception('parsers folder does not exist');
+        }
+
+        if((!is_dir('data')) && !is_writable('data')) {
+            throw new Exception('data directory does not exists or is not writeable');
+        }
+
         $files = glob('parsers/*.php');
 
         foreach($files as $file) {
@@ -21,17 +29,18 @@ class ScraperScheduler {
             // Instanciate new parser class. 
             eval ( '$'.$name.' =& new '.$className.'(null);' );
             if(method_exists(${$name}, 'run')) {
-                echo 'Start to run the ' . $name . ' parser'."\n";
+                echo 'Start to run the ' . $name . ' parser...'."\n";
                 $parser = new $className;
                 $parser->run();
-                echo 'Finished'."\n";
+                echo 'Finished'."\n\n";
             }
             else {
                 echo 'The following parser did not execute: ' . $className."\n";
                 //return false;
             }
-        
+            unset($parser);
         }
+        unset($files);
     }        
 }
 
