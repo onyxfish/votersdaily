@@ -52,7 +52,8 @@ class StorageEngine {
         //var_dump($resp);
         foreach($arr as $data) {
             $_data = json_encode($data);
-            $id = md5(uniqid(mt_rand(), true));;
+            //$id = md5(uniqid(mt_rand(), true));
+            $id = md5($data['start_datetime'].'-'.$data['branch'].'-'.$data['entity'].'-'.$data['title']);
             $resp = $couchDB->send("PUT", "/".$dbname."/".$id, $_data);
             //var_dump($resp);
 
