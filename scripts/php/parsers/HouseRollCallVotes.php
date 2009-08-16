@@ -19,7 +19,7 @@ class HouseRollCallVotes extends VotersDaily_Abstract
     public function run()
     {
         $events = $this->scrape();
-        $this->add_events($events, 'data/houserollcallvotes.csv');
+        $this->add_events($events, $this->couchdbName);
     }
     
     protected function scrape()
@@ -89,23 +89,24 @@ class HouseRollCallVotes extends VotersDaily_Abstract
 
     protected function add_events($arr, $fn)
     {
-        $lines = array();
-        foreach($arr as $v) {
-           $lines[] = "\"" . implode ('","', $v). "\"\n";
+        $options['host'] = "localhost";
+        $options['port'] = 5984;
+
+        $couchDB = new CouchDbSimple($options);
+        //$resp = $couchDB->send("DELETE", "/".$fn."/");
+
+        $resp = $couchDB->send("PUT", "/".$fn);
+        //var_dump($resp);
+        foreach($arr as $data) {
+            $_data = json_encode($data);
+            $id = md5(uniqid(mt_rand(), true));; 
+            $resp = $couchDB->send("PUT", "/".$fn."/".$id, $_data);
+            //var_dump($resp);
+            
         }
- 
-        $fp = fopen($fn, 'w');
-        if(!$fp) {
-            echo 'Unable to open $fn for output';
-            exit();
-        }
-        fwrite($fp, implode(',', $this->fields)."\n");
-        foreach($lines as $line) {
-            fwrite($fp, $line);
-        }
-        fclose($fp);
- 
-       // print_r($lines);
+
     }
-    
+
 }
+//$parser = new HouseRollCallVotes;
+//$parser->run();

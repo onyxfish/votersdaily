@@ -18,7 +18,7 @@ class PresidentialRemarks extends VotersDaily_Abstract
     {
         $events = $this->scrape();
         //print_r($events); 
-        $this->add_events($events, 'data/presidenticalremarks.csv');
+        $this->add_events($events, $this->couchdbName);
     }
 
     protected function scrape()
@@ -51,24 +51,22 @@ class PresidentialRemarks extends VotersDaily_Abstract
 
     protected function add_events($arr, $fn)
     {
-        //print_r($arr);
-        $lines = array();
-        foreach($arr as $v) {
-           $lines[] =  "\"" . implode ('","', $v). "\"\n";
-        }
 
-        $fp = fopen($fn, 'w');
-        if(!$fp) {
-            echo 'Unable to open $fn for output';
-            exit();
-        }
-        fwrite($fp, implode(',', $this->fields)."\n");
-        foreach($lines as $line) {
-            fwrite($fp, $line);
-        }
-        fclose($fp);
+        $options['host'] = "localhost";
+        $options['port'] = 5984;
 
-       // print_r($lines);
+        $couchDB = new CouchDbSimple($options);
+        //$resp = $couchDB->send("DELETE", "/".$fn."/");
+
+        $resp = $couchDB->send("PUT", "/".$fn);
+        //var_dump($resp);
+        foreach($arr as $data) {
+            $_data = json_encode($data);
+            $id = md5(uniqid(mt_rand(), true));;
+            $resp = $couchDB->send("PUT", "/".$fn."/".$id, $_data);
+            //var_dump($resp);
+
+        }
         
     }
 }

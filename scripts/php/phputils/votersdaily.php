@@ -3,6 +3,7 @@ abstract class VotersDaily_Abstract
 {
     protected $parser_version;
     protected $parser_name;
+    protected $couchdbName = 'phpvotedailydb';
 
     public function __construct()
     {

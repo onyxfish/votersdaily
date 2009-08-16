@@ -3,6 +3,7 @@
 ini_set("display_errors", true);
 error_reporting(E_ALL & ~E_NOTICE);
 require 'phputils/votersdaily.php';
+require 'phputils/couchdb.php';
 
 class ScraperScheduler {
 
