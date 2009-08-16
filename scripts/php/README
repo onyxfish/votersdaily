@@ -2,7 +2,9 @@ Attempt to help Votersdaily an attempt to scrape the contents of government sche
 Lang: PHP 5.2.x
 Author: Chauncey Thorn chaunceyt@gmail.com
 
+NOTE: Work in progress!
 CHANGELOG
+
 08-15-2009 
 - initial import of HouseSchedule.php parser - http://www.house.gov/house/House_Calendar.shtml
 - initial import of HouseRollCallVotes.php parser - http://clerk.house.gov/evs/2009/index.asp
@@ -12,3 +14,5 @@ CHANGELOG
 08-16-2009
 - initial import of SenateCalendar.php http://democrats.senate.gov/calendar/2009-08.html
 - inital import of PresidentialActions.php http://www.whitehouse.gov/briefing_room/PresidentialActions/
+- initial support for couchdb (using: http://wiki.apache.org/couchdb/Getting_started_with_PHP)
+
