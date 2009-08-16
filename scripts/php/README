@@ -9,3 +9,6 @@ CHANGELOG
 - initial import of SenateRollCallVotes.php parser - http://www.senate.gov/legislative/LIS/roll_call_lists/vote_menu_111_1.xml
 - modified code so all parser(s) are executed by ScraperScheduler
 
+08-16-2009
+- initial import of SenateCalendar.php http://democrats.senate.gov/calendar/2009-08.html
+
