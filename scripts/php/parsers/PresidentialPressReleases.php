@@ -7,7 +7,8 @@ class PresidentialPressReleases extends VotersDaily_Abstract
     protected $parser_name = 'Presidential Press Releases Scraper';
     protected $parser_version = '0.1';
     protected $parser_frequency = '6.0';
-    protected $fields = array('start_time','end_time','title','description','branch','entity','source_url','source_text','access_datetime','parser_name','person_version');
+    protected $csv_filename = 'data/presidentialpressreleases.csv';
+    //protected $fields = array('start_time','end_time','title','description','branch','entity','source_url','source_text','access_datetime','parser_name','person_version');
 
     public function __construct()
     {
@@ -51,22 +52,16 @@ class PresidentialPressReleases extends VotersDaily_Abstract
 
     protected function add_events($arr, $fn)
     {
-        $options['host'] = "localhost";
-        $options['port'] = 5984;
-
-        $couchDB = new CouchDbSimple($options);
-        //$resp = $couchDB->send("DELETE", "/".$fn."/");
-
-        $resp = $couchDB->send("PUT", "/".$fn);
-        //var_dump($resp);
-        foreach($arr as $data) {
-            $_data = json_encode($data);
-            $id = md5(uniqid(mt_rand(), true));;
-            $resp = $couchDB->send("PUT", "/".$fn."/".$id, $_data);
-            //var_dump($resp);
-
+        switch($this->storageEngine) {
+            case 'couchdb' :
+                StorageEngine::couchDbStore($arr, $fn);
+                break;
+            default :
+                unset($fn);
+                $fn = $this->csv_filename;
+                StorageEngine::csvStore($arr, $fn);
+                break;
         }
-        
     }
 }
 

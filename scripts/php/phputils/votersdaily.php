@@ -3,6 +3,7 @@ abstract class VotersDaily_Abstract
 {
     protected $parser_version;
     protected $parser_name;
+    protected $storageEngine = 'couchdb';
     protected $couchdbName = 'phpvotedailydb';
 
     public function __construct()
@@ -28,10 +29,52 @@ abstract class VotersDaily_Abstract
         $response = file_get_contents($this->url,false,$context);
         return $response;
     }
-    
+
     abstract public function run();
     abstract protected function scrape();
     abstract protected function add_events($arr, $fn);
     
 }
 
+
+class StorageEngine {
+    protected static $fields = array('start_time','end_time','title','description','branch','entity','source_url','source_text','access_datetime','parser_name','person_version');
+
+    public static function couchDbStore($arr, $dbname)
+    {
+        $options['host'] = "localhost";
+        $options['port'] = 5984;
+
+        $couchDB = new CouchDbSimple($options);
+        //$resp = $couchDB->send("DELETE", "/".$dbname."/");
+
+        $resp = $couchDB->send("PUT", "/".$dbname);
+        //var_dump($resp);
+        foreach($arr as $data) {
+            $_data = json_encode($data);
+            $id = md5(uniqid(mt_rand(), true));;
+            $resp = $couchDB->send("PUT", "/".$dbname."/".$id, $_data);
+            //var_dump($resp);
+
+        }        
+    }
+    
+    public static function csvStore($arr, $fn)
+    {
+        $lines = array();
+
+        foreach($arr as $v) {
+            $lines[] = "\"" . implode ('","', $v). "\"\n";
+        }
+        $fp = fopen($fn, 'w');
+        if(!$fp) {
+            echo 'Unable to open $fn for output';
+            exit();
+        }
+        fwrite($fp, implode(',', self::$fields)."\n");
+
+        foreach($lines as $line) {
+            fwrite($fp, $line);
+        }        
+    }
+}
