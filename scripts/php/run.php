@@ -1,5 +1,12 @@
 #!/usr/bin/php -q
 <?php
+function microtime_float()
+{
+    list($utime, $time) = explode(" ", microtime());
+    return ((float)$utime + (float)$time);
+}
+
+$script_start = microtime_float();
 ini_set("display_errors", true);
 error_reporting(E_ALL & ~E_NOTICE);
 require 'phputils/votersdaily.php';
@@ -30,10 +37,14 @@ class ScraperScheduler {
             // Instanciate new parser class. 
             eval ( '$'.$name.' =& new '.$className.'(null);' );
             if(method_exists(${$name}, 'run')) {
-                echo 'Start to run the ' . $name . ' parser...'."\n";
+                echo 'Running Parser: ' . $name . '...'."\n";
+                $scrape_start = microtime_float();
+
                 $parser = new $className;
                 $parser->run();
-                echo 'Finished'."\n\n";
+
+                $script_end = microtime_float();
+                echo "Parse completed in ".bcsub($script_end, $script_start, 4)." seconds."."\n\n";                
             }
             else {
                 echo 'The following parser did not execute: ' . $className."\n";
@@ -45,4 +56,11 @@ class ScraperScheduler {
     }        
 }
 
+
+
+
 ScraperScheduler::run();
+
+$script_end = microtime_float();
+echo "Script executed in ".bcsub($script_end, $script_start, 4)." seconds."."\n\n";
+

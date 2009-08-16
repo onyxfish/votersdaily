@@ -9,10 +9,12 @@ CHANGELOG
 - initial import of HouseSchedule.php parser - http://www.house.gov/house/House_Calendar.shtml
 - initial import of HouseRollCallVotes.php parser - http://clerk.house.gov/evs/2009/index.asp
 - initial import of SenateRollCallVotes.php parser - http://www.senate.gov/legislative/LIS/roll_call_lists/vote_menu_111_1.xml
-- modified code so all parser(s) are executed by ScraperScheduler
+- modified code so all parser(s) are executed by ScraperScheduler (run.php)
 
 08-16-2009
 - initial import of SenateCalendar.php http://democrats.senate.gov/calendar/2009-08.html
 - inital import of PresidentialActions.php http://www.whitehouse.gov/briefing_room/PresidentialActions/
-- initial support for couchdb (using: http://wiki.apache.org/couchdb/Getting_started_with_PHP)
+- initial support for couchdb using: http://wiki.apache.org/couchdb/Getting_started_with_PHP
+- initial import of SupremeCountCourtOrders.php http://www.supremecourtus.gov/orders/08ordersofthecourt.html
+- support for couchdb and csv 
 
