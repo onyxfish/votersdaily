@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import datetime
 import hashlib
 import os
@@ -46,9 +48,6 @@ class EventScraper(object):
 
         if not hasattr(self, 'version'):
             raise Exception('EventScrapers must have a version attribute')
-
-        if not hasattr(self, 'frequency'):
-            raise Exception('EventScrapers must have a frequency attribute')
         
     def _init_couchdb(self):
         """
