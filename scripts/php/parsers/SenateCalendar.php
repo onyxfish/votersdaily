@@ -74,7 +74,7 @@ class SenateCalendar extends VotersDaily_Abstract
         //print_r($arr);
         $lines = array();
         foreach($arr as $v) {
-           $lines[] =  "\"" . implode ('","', $v). "\"\r\n";
+           $lines[] =  "\"" . implode ('","', $v). "\"\n";
         }
 
         $fp = fopen($fn, 'w');

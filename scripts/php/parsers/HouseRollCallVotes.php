@@ -3,6 +3,7 @@
 
 class HouseRollCallVotes extends VotersDaily_Abstract
 {
+    
     protected $url = 'http://clerk.house.gov/evs/2009/index.asp';
     protected $parser_name = 'House Roll Call Votes Scraper';
     protected $parser_version = '0.1';
@@ -11,6 +12,8 @@ class HouseRollCallVotes extends VotersDaily_Abstract
 
     public function __construct()
     {
+        parent::__construct();
+        $this->year = date("Y");
     }
 
     public function run()
@@ -50,7 +53,7 @@ class HouseRollCallVotes extends VotersDaily_Abstract
                 $event_arr = explode(':', $event);
                 list($day, $month) = explode('-', $event_arr[1]);
                 //format date
-                $date_str = $month . ' '. $day.' 2009';
+                $date_str = $month . ' '. $day.' '.$this->year ;
                 $events[$i]['start_date'] = date('Y-m-d', strtotime($date_str));
                 $events[$i]['end_data'] = '';
                 $events[$i]['title'] = $title[1];
@@ -88,7 +91,7 @@ class HouseRollCallVotes extends VotersDaily_Abstract
     {
         $lines = array();
         foreach($arr as $v) {
-           $lines[] = "\"" . implode ('","', $v). "\"\r\n";
+           $lines[] = "\"" . implode ('","', $v). "\"\n";
         }
  
         $fp = fopen($fn, 'w');
