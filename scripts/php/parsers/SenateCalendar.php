@@ -90,7 +90,3 @@ class SenateCalendar extends VotersDaily_Abstract
     }
     
 }
-
-$parser = new SenateCalendar;
-$parser->run();
-?>
