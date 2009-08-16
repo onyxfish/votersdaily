@@ -23,9 +23,11 @@ class SenateCalendar extends VotersDaily_Abstract
 
     protected function scrape()
     {
-        $response = $this->urlopen($this->url);
-
         $events = array();
+
+        $response = $this->urlopen($this->url);
+        $access_time = time();
+
 
         preg_match_all('#<table[^>]*>(.+?)<\/table>#is',$response,$matches);
         //print_r($matches);
