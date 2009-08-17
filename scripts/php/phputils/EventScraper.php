@@ -104,16 +104,15 @@ class StorageEngine {
 
     public static function icalStore($arr, $fn)
     {
-       // print_r($arr);
-        
         $ical_events = '';
+
         foreach($arr as $event) {
             $start_time = date('Ymd\THis', strtotime($event['start_time']));
             if(trim($arr['end_time']) != ' ') {
-                $end_time = date('Ymd\THis', strtotime($event['end_time']));
+                $end_time = date('Ymd\THis', $event['end_time']);
             }
             $summary = $event['title'];
-            $content = 'Branch: ' . $event['branch'] ."\n Enitity:  ". $event['entity'] ."\n " . $event['description'];
+            $content = $event['description'];
             $ical_events .=<<<ICAL_EVENT
 BEGIN:VEVENT
 DTSTART:$start_time
@@ -123,8 +122,6 @@ DESCRIPTION:$content
 END:VEVENT
 
 ICAL_EVENT;
-
-
                 
         }
         $ical_content = <<<CONTENT
@@ -143,7 +140,5 @@ CONTENT;
         $open_ical_file = fopen($fn, "w");
         fwrite($open_ical_file, $ical_content);
         fclose($open_ical_file);
-        //echo $ical_content;
-       
     }
 }
