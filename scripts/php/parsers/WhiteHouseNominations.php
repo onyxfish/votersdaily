@@ -40,8 +40,10 @@ class WhiteHouseNominations extends EventScraper_Abstract
         for($i=0; $i < $total_nominations; $i++) {
             $description_str = 'Nomination: ' .$nominations->row[$i]->name . ' ' . $nominations->row[$i]->agency->attributes()->description;
             $description_str .= $nominations->row[$i]->position . ' confirmed: (' . $nominations->row[$i]->confirmed . ') holdover:  (' . $nominations->row[$i]->holdover.')';
-            
-            $events[$i]['start_time'] = (string) $nominations->row[$i]->formal_nomination_date;
+           
+            $_date_str = (string) $nominations->row[$i]->formal_nomination_date;
+            list($_month,$_day,$_year) = explode('/', $_date_str);
+            $events[$i]['start_time'] = $_year .'-'.$_month.'-'.$_day;
             $events[$i]['end_data'] = (string) $nominations->row[$i]->confirmation_vote;
             $events[$i]['title'] = 'Nomination: ' . $nominations->row[$i]->position;
             $events[$i]['description'] = $description_str;
