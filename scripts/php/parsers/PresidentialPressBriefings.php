@@ -49,19 +49,4 @@ class PresidentialPressBriefings extends VotersDaily_Abstract
         }
         return $events;
     }
-
-    protected function add_events($arr, $fn)
-    {
-        switch($this->storageEngine) {
-            case 'couchdb' :
-                StorageEngine::couchDbStore($arr, $fn);
-                break;
-            default :
-                unset($fn);
-                $fn = $this->csv_filename;
-                StorageEngine::csvStore($arr, $fn);
-                break;
-        }
-        
-    }
 }

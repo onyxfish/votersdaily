@@ -30,9 +30,23 @@ abstract class VotersDaily_Abstract
         return $response;
     }
 
+    protected function add_events($arr, $fn)
+    {
+        switch($this->storageEngine) {
+            case 'couchdb' :
+                StorageEngine::couchDbStore($arr, $fn);
+                break;
+            default :
+                unset($fn);
+                $fn = $this->csv_filename;
+                StorageEngine::csvStore($arr, $fn);
+                break;
+        }
+        
+    }
+    
     abstract public function run();
     abstract protected function scrape();
-    abstract protected function add_events($arr, $fn);
     
 }
 
