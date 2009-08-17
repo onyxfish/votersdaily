@@ -27,4 +27,9 @@ CHANGELOG
 08-17-2009
 - initial import of SenateLegislativeSchedule.php http://www.senate.gov/pagelayout/legislative/one_item_and_teasers/2009_schedule.htm
     buggy end_date - having to deal with May 25-29 and un 29-Jul 3 as start - end dates.
-- initial import of ical feed support    
+- initial import of ical feed support
+    using http://severinghaus.org/projects/icv/ to validate .ics files generated.
+    i.e. 
+        Filename:      presidentialactions.ics    
+        Size:          10956 bytes
+        Congratulations; your calendar validated!
