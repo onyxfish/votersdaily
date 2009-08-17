@@ -21,3 +21,5 @@ CHANGELOG
     using the API http://www.socrata.com/views/n5m4-mism/rows.xml?accessType=API 
 - changed VotersDaily to EventScraper
 - support for cli argv couchdb or csv (default: couchdb)
+- initial import of http://www.whitehouse.gov/weekly_address/ 
+    using    
