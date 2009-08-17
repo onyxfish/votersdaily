@@ -1,5 +1,5 @@
 <?php
-//require '../phputils/votersdaily.php';
+//require '../phputils/EventScraper.php';
 
 class PresidentialActions extends EventScraper_Abstract
 {
@@ -8,7 +8,6 @@ class PresidentialActions extends EventScraper_Abstract
     protected $parser_version = '0.1';
     protected $parser_frequency = '6.0';
     protected $csv_filename = 'data/presidentialactions.csv';
-    //protected $fields = array('start_time','end_time','title','description','branch','entity','source_url','source_text','access_datetime','parser_name','person_version');
 
     public function __construct()
     {
@@ -18,8 +17,7 @@ class PresidentialActions extends EventScraper_Abstract
     public function run()
     {
         $events = $this->scrape();
-        //print_r($events); 
-        $this->add_events($events, $this->couchdbName);
+        $this->add_events($events);
     }
 
     protected function scrape()
@@ -50,6 +48,3 @@ class PresidentialActions extends EventScraper_Abstract
         return $events;
     }
 }
-
-//$parser = new PresidentialActions;
-//$parser->run();

@@ -1,5 +1,5 @@
 <?php
-//require '../phputils/votersdaily.php';
+//require '../phputils/EventScraper.php';
 
 class SenateCalendar extends EventScraper_Abstract
 {
@@ -8,7 +8,6 @@ class SenateCalendar extends EventScraper_Abstract
     protected $parser_version = '0.1';
     protected $parser_frequency = '6.0';
     protected $csv_filename = 'data/senatecalendar.csv';
-    //protected $fields = array('start_time','end_time','title','description','branch','entity','source_url','source_text','access_datetime','parser_name','person_version');
 
     public function __construct()
     {
@@ -18,7 +17,6 @@ class SenateCalendar extends EventScraper_Abstract
     public function run()
     {
         $events = $this->scrape();
-        //print_r($events); 
         $this->add_events($events, $this->couchdbName);
     }
 
@@ -31,7 +29,6 @@ class SenateCalendar extends EventScraper_Abstract
 
 
         preg_match_all('#<table[^>]*>(.+?)<\/table>#is',$response,$matches);
-        //print_r($matches);
        
         foreach($matches as $data) {
             $i=0;

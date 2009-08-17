@@ -1,5 +1,5 @@
 <?php
-//require '../phputils/votersdaily.php';
+//require '../phputils/EventScrapper.php';
 
 class HouseRollCallVotes extends EventScraper_Abstract
 {
@@ -21,7 +21,7 @@ class HouseRollCallVotes extends EventScraper_Abstract
     public function run()
     {
         $events = $this->scrape();
-        $this->add_events($events, $this->couchdbName);
+        $this->add_events($events);
     }
     
     protected function scrape()

@@ -1,5 +1,5 @@
 <?php
-//require '../phputils/votersdaily.php';
+//require '../phputils/EventScraper.php';
 
 class WhiteHouseNominations extends EventScraper_Abstract
 {
@@ -20,7 +20,6 @@ class WhiteHouseNominations extends EventScraper_Abstract
     public function run()
     {
         $events = $this->scrape();
-        //print_r($events);
         $this->add_events($events, $this->couchdbName);
     }
     
@@ -30,7 +29,6 @@ class WhiteHouseNominations extends EventScraper_Abstract
         $access_time = time();
         $string = $this->urlopen($this->url);
         $xml = new SimpleXMLElement($string);
-        //print_r($xml);
         
         $nominations = $xml->rows;
         $total_nominations = sizeof($nominations->row);
@@ -55,6 +53,3 @@ class WhiteHouseNominations extends EventScraper_Abstract
         return $events;
     }
 }
-
-//$parser = new WhiteHouseNominations;
-//$parser->run();

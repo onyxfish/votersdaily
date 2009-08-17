@@ -4,7 +4,7 @@ abstract class EventScraper_Abstract
     protected $parser_version;
     protected $parser_name;
     public $storageEngine = 'couchdb';
-    protected $couchdbName = 'phpvotedailydb';
+    public $couchdbName = 'phpvotedailydb';
 
     public function __construct()
     {
@@ -30,14 +30,14 @@ abstract class EventScraper_Abstract
         return $response;
     }
 
-    protected function add_events($arr, $fn)
+    protected function add_events($arr)
     {
         switch($this->storageEngine) {
             case 'couchdb' :
+                $fn = $this->couchdbName;
                 StorageEngine::couchDbStore($arr, $fn);
                 break;
             default :
-                unset($fn);
                 $fn = $this->csv_filename;
                 StorageEngine::csvStore($arr, $fn);
                 break;

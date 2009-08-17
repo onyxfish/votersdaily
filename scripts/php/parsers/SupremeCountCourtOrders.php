@@ -1,5 +1,5 @@
 <?php
-//require '../phputils/votersdaily.php';
+//require '../phputils/EventScraper.php';
 
 class SupremeCountCourtOrders extends EventScraper_Abstract
 {
@@ -17,7 +17,6 @@ class SupremeCountCourtOrders extends EventScraper_Abstract
     public function run()
     {
         $events = $this->scrape();
-        //print_r($events); 
         $this->add_events($events, $this->couchdbName);
     }
 
@@ -28,9 +27,7 @@ class SupremeCountCourtOrders extends EventScraper_Abstract
         $response = $this->urlopen($this->url);
         $access_time = time();
 
-
         preg_match_all('#<table[^>]*>(.+?)<\/table>#is',$response,$matches);
-        //print_r($matches);
        
         foreach($matches as $data) {
             $i=0;
@@ -39,10 +36,9 @@ class SupremeCountCourtOrders extends EventScraper_Abstract
 
                  preg_match('#<TABLE[^>]*>(.+?)<\/TABLE>#is',$row,$matches);
                  preg_match_all('#<TR[^>]*>(.+?)<\/TR>#is', $matches[1], $trRows);
-                   //print_r($trRows[1]);
+                 
                  foreach($trRows[1] as $row) {
-                     preg_match_all('#<TD[^>]*>(.*?)</TD>#is',$row, $data);
-                     //print_r($data[1]);
+                    preg_match_all('#<TD[^>]*>(.*?)</TD>#is',$row, $data);
                     $_date_tmp = str_replace('/','-',trim($data[1][0]));
                     list($month,$day,$year) = explode('-',$_date_tmp);
 
@@ -68,13 +64,8 @@ class SupremeCountCourtOrders extends EventScraper_Abstract
                     $events[$i]['parser_version'] = $this->parser_version;
                     $i++;
                  }
-
-
             }
         }
         return $events;
     }
 }
-//$parser = new SupremeCountCourtOrders;
-//$parser->run();
-

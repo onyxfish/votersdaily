@@ -1,5 +1,5 @@
 <?php
-// require '../phputils/votersdaily.php';
+// require '../phputils/EventScraper.php';
 
 class SenateLegislativeSchedule extends EventScraper_Abstract
 {
@@ -20,7 +20,6 @@ class SenateLegislativeSchedule extends EventScraper_Abstract
     public function run()
     {
         $events = $this->scrape();
-        //print_r($events);
         $this->add_events($events, $this->couchdbName);
     }
     
@@ -29,11 +28,10 @@ class SenateLegislativeSchedule extends EventScraper_Abstract
         $events = array();
         $access_time = time();
         $response = $this->urlopen($this->url);
-        //preg_match('#<!-- BEGIN MAIN -->(.*?)<!-- END MAIN -->#is',$response, $matches);
+        
         preg_match('#<table border="1" align="left">(.+?)<\/table>#is',$response,$data);
         preg_match_all('#<tr>(.+?)<\/tr>#is',$data[1],$tdData);
 
-        //print_r($tdData[1]);
         $i=0;
         foreach($tdData[1] as $row) {
             preg_match_all('#<td[^>]*>(.+?)<\/td>#is',$row,$tdTmp);
@@ -43,8 +41,6 @@ class SenateLegislativeSchedule extends EventScraper_Abstract
             if(!empty($start_str) && $start_str != 'TBD') {
                 $start_date = $start_str.' 2009';
                 list($start_month, $start_day) = explode(' ', $start_str);
-            
-
 
                 if(isset($end_str) && !empty($end_str)) {
                     list($month, $day) = explode(' ',trim($end_str));

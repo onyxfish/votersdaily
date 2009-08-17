@@ -1,5 +1,5 @@
 <?php
-//require '../phputils/votersdaily.php';
+//require '../phputils/EventScraper.php';
 
 class PresidentWeeklyAddress extends EventScraper_Abstract
 {
@@ -20,7 +20,6 @@ class PresidentWeeklyAddress extends EventScraper_Abstract
     public function run()
     {
         $events = $this->scrape();
-        //print_r($events);
         $this->add_events($events, $this->couchdbName);
     }
     
@@ -68,6 +67,3 @@ class PresidentWeeklyAddress extends EventScraper_Abstract
     }
 
 }
-
-//$parser = new PresidentWeeklyAddress;
-//$parser->run();
