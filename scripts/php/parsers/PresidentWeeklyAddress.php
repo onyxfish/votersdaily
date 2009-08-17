@@ -46,7 +46,7 @@ class PresidentWeeklyAddress extends EventScraper_Abstract
             $events[$i]['access_datetime'] = $access_time;
             $events[$i]['parser_name'] = $this->parser_name;
             $events[$i]['parser_version'] = $this->parser_version;             
-            print_r($weeklyaddress);
+            //print_r($weeklyaddress);
             $i++;
         }
 
