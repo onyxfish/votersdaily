@@ -17,4 +17,5 @@ CHANGELOG
 - initial support for couchdb using: http://wiki.apache.org/couchdb/Getting_started_with_PHP
 - initial import of SupremeCountCourtOrders.php http://www.supremecourtus.gov/orders/08ordersofthecourt.html
 - support for couchdb and csv 
-
+- initial import of http://www.whitehouse.gov/briefing_room/nominations_and_appointments/ 
+    using the API http://www.socrata.com/views/n5m4-mism/rows.xml?accessType=API 
