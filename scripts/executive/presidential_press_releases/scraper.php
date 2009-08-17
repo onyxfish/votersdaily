@@ -1,5 +1,18 @@
+#!/usr/bin/php -q
 <?php
-//require '../phputils/EventScraper.php';
+$PATH_TO_INCLUDES = dirname(dirname(dirname(__FILE__)));
+require $PATH_TO_INCLUDES.'/phputils/EventScraper.php';
+require $PATH_TO_INCLUDES.'/phputils/couchdb.php';
+function microtime_float()
+{
+        list($utime, $time) = explode(" ", microtime());
+            return ((float)$utime + (float)$time);
+}
+ 
+//$script_start = microtime_float();
+
+ini_set("display_errors", true);
+error_reporting(E_ALL & ~E_NOTICE);
 
 class PresidentialPressReleases extends EventScraper_Abstract
 {
@@ -50,4 +63,41 @@ class PresidentialPressReleases extends EventScraper_Abstract
         }
         return $events;
     }
+}//end of class
+
+// execute code
+$engine_options = array('couchdb','csv', 'ical');
+if(isset($argv[1]) && in_array($argv[1], $engine_options)) {
+        $engine= $argv[1];
+            echo "Using ".$engine." as Storage Engine...\n\n";
 }
+else {
+        $engine=null;
+}
+
+
+$parser = new PresidentialPressReleases;
+
+echo "\n\n".'Running Parser: ' . $parser->parser_name . '...'."\n";
+
+//setup loggin array
+$scrape_log['parser_name'] = $parser->parser_name;
+$scrape_log['parser_version'] = $parser->parser_version;
+
+
+if($engine) {
+        $parser->storageEngine = $engine;
+}
+
+$scrape_start = microtime_float();
+$parser->run();
+$scrape_end = microtime_float();
+
+//value available only after scrape
+$scrape_log['url'] = $parser->source_url;
+$scrape_log['source_text'] = null;
+$scrape_log['access_datetime'] = $parser->access_time;
+
+//deal with logging here
+
+echo "Parse completed in ".bcsub($scrape_end, $scrape_start, 4)." seconds."."\n\n";
