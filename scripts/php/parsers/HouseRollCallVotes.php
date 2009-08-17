@@ -1,7 +1,7 @@
 <?php
 //require '../phputils/votersdaily.php';
 
-class HouseRollCallVotes extends VotersDaily_Abstract
+class HouseRollCallVotes extends EventScraper_Abstract
 {
     
     protected $url = 'http://clerk.house.gov/evs/2009/index.asp';

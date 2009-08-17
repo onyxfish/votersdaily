@@ -2,7 +2,7 @@
 
 //require '../phputils/votersdaily.php';
 
-class SenateRollCallVotes extends VotersDaily_Abstract
+class SenateRollCallVotes extends EventScraper_Abstract
 {
     protected $url = 'http://www.senate.gov/legislative/LIS/roll_call_lists/vote_menu_111_1.xml';
     protected $parser_name = 'Senate Roll Call Votes Scraper';

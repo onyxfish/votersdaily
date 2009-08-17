@@ -1,7 +1,7 @@
 <?php
 //require '../phputils/votersdaily.php';
 
-class SupremeCountCourtOrders extends VotersDaily_Abstract
+class SupremeCountCourtOrders extends EventScraper_Abstract
 {
     protected $url = 'http://www.supremecourtus.gov/orders/08ordersofthecourt.html';
     protected $parser_name = 'Supreme Court 2008 Court Orders Scraper';

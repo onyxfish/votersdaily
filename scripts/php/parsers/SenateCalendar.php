@@ -1,7 +1,7 @@
 <?php
 //require '../phputils/votersdaily.php';
 
-class SenateCalendar extends VotersDaily_Abstract
+class SenateCalendar extends EventScraper_Abstract
 {
     protected $url = 'http://democrats.senate.gov/calendar/2009-08.html';
     protected $parser_name = 'Senate Calendar Scraper';

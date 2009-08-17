@@ -1,7 +1,7 @@
 <?php
 //require '../phputils/votersdaily.php';
 
-class PresidentialActions extends VotersDaily_Abstract
+class PresidentialActions extends EventScraper_Abstract
 {
     protected $url = 'http://www.whitehouse.gov/briefing_room/PresidentialActions/';
     protected $parser_name = 'Presidential Action Scraper';

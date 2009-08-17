@@ -14,7 +14,7 @@ require 'phputils/couchdb.php';
 
 class ScraperScheduler {
 
-    public static function run()
+    public static function run($engine = null)
     {
         if(!is_dir('parsers')) {
             throw new Exception('parsers folder does not exist');
@@ -41,6 +41,11 @@ class ScraperScheduler {
                 $scrape_start = microtime_float();
 
                 $parser = new $className;
+
+                if($engine) {
+                    $parser->storageEngine = $engine;
+                }
+
                 $parser->run();
 
                 $script_end = microtime_float();
@@ -57,9 +62,14 @@ class ScraperScheduler {
 }
 
 
-
-
-ScraperScheduler::run();
+$engine_options = array('couchdb','csv');
+if(isset($argv[1]) && in_array($argv[1], $engine_options)) {
+    $engine= $argv[1];
+}
+else {
+    $engine=null;
+}
+ScraperScheduler::run($engine);
 
 $script_end = microtime_float();
 echo "Script executed in ".bcsub($script_end, $script_start, 4)." seconds."."\n\n";

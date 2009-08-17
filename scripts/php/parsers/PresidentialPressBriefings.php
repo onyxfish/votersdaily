@@ -1,7 +1,7 @@
 <?php
 //require '../phputils/votersdaily.php';
 
-class PresidentialPressBriefings extends VotersDaily_Abstract
+class PresidentialPressBriefings extends EventScraper_Abstract
 {
     protected $url = 'http://www.whitehouse.gov/briefing_room/PressBriefings/';
     protected $parser_name = 'Presidential Press Briefings Scraper';

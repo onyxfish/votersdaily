@@ -2,7 +2,7 @@
 
 //require '../phputils/votersdaily.php';
 
-class HouseSchedule extends VotersDaily_Abstract
+class HouseSchedule extends EventScraper_Abstract
 {
     protected $url = 'http://www.house.gov/house/House_Calendar.shtml';
     protected $parser_name = 'House Schedule Scraper';

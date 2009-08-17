@@ -1,9 +1,9 @@
 <?php
-abstract class VotersDaily_Abstract
+abstract class EventScraper_Abstract
 {
     protected $parser_version;
     protected $parser_name;
-    protected $storageEngine = 'couchdb';
+    public $storageEngine = 'couchdb';
     protected $couchdbName = 'phpvotedailydb';
 
     public function __construct()

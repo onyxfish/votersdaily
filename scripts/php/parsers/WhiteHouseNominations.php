@@ -1,7 +1,7 @@
 <?php
 //require '../phputils/votersdaily.php';
 
-class WhiteHouseNominations extends VotersDaily_Abstract
+class WhiteHouseNominations extends EventScraper_Abstract
 {
     
     protected $url = 'http://www.socrata.com/views/n5m4-mism/rows.xml?accessType=API';
