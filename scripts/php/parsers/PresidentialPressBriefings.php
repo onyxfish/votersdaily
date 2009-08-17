@@ -4,9 +4,9 @@
 class PresidentialPressBriefings extends EventScraper_Abstract
 {
     protected $url = 'http://www.whitehouse.gov/briefing_room/PressBriefings/';
-    protected $parser_name = 'Presidential Press Briefings Scraper';
-    protected $parser_version = '0.1';
-    protected $parser_frequency = '6.0';
+    public $parser_name = 'Presidential Press Briefings Scraper';
+    public $parser_version = '0.1';
+    public $parser_frequency = '6.0';
     protected $csv_filename = 'data/presidentialpressbriefings.csv';
 
     public function __construct()
@@ -23,8 +23,10 @@ class PresidentialPressBriefings extends EventScraper_Abstract
     protected function scrape()
     {
         $events = array();
+
         $response = $this->urlopen($this->url);
-        $access_time = time();
+        $this->source_url = $this->url;
+        $this->access_time = time();
 
         preg_match_all('#<div class="timeStamp smaller">(.+?)<\/div>#is',$response,$_timestamps);
         preg_match_all('#<h4 class="modhdgblue">(.+?)<\/h4>#is',$response,$_events);

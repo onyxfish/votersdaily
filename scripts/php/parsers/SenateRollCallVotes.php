@@ -5,9 +5,9 @@
 class SenateRollCallVotes extends EventScraper_Abstract
 {
     protected $url = 'http://www.senate.gov/legislative/LIS/roll_call_lists/vote_menu_111_1.xml';
-    protected $parser_name = 'Senate Roll Call Votes Scraper';
-    protected $parser_version = '0.1';
-    protected $parser_frequency = '6.0';
+    public $parser_name = 'Senate Roll Call Votes Scraper';
+    public $parser_version = '0.1';
+    public $parser_frequency = '6.0';
     protected $csv_filename = 'data/senaterollcallvotes.csv';
     
     public function __construct()
@@ -18,15 +18,17 @@ class SenateRollCallVotes extends EventScraper_Abstract
     public function run()
     {
         $events = $this->scrape();
-        $this->add_events($events, $this->couchdbName);
+        $this->add_events($events);
     }
 
     protected function scrape()
     {
         $events = array();
-        $access_time = time();
-        
+
+        $this->source_url = $this->url;        
         $xml = $this->urlopen($this->url);
+        $this->access_time = time();
+
         $response = simplexml_load_string($xml);
         
         $votes = $response->votes->vote;
@@ -50,7 +52,7 @@ class SenateRollCallVotes extends EventScraper_Abstract
             $events[$i]['entity'] = 'Senate';
             $events[$i]['source_url'] = $this->url;
             $events[$i]['source_text'] = '';
-            $events[$i]['access_datetime'] = $access_time;
+            $events[$i]['access_datetime'] = $this->access_time;
             $events[$i]['parser_name'] = $this->parser_name;
             $events[$i]['parser_version'] = $this->parser_version;            
         }

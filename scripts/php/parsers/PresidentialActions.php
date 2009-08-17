@@ -4,9 +4,9 @@
 class PresidentialActions extends EventScraper_Abstract
 {
     protected $url = 'http://www.whitehouse.gov/briefing_room/PresidentialActions/';
-    protected $parser_name = 'Presidential Action Scraper';
-    protected $parser_version = '0.1';
-    protected $parser_frequency = '6.0';
+    public $parser_name = 'Presidential Action Scraper';
+    public $parser_version = '0.1';
+    public $parser_frequency = '6.0';
     protected $csv_filename = 'data/presidentialactions.csv';
 
     public function __construct()
@@ -23,8 +23,9 @@ class PresidentialActions extends EventScraper_Abstract
     protected function scrape()
     {
         $events = array();
+        $this->source_url = $this->url;
         $response = $this->urlopen($this->url);
-        $access_time = time();
+        $this->access_time = time();
 
         preg_match_all('#<div class="timeStamp smaller">(.+?)<\/div>#is',$response,$_timestamps);
         preg_match_all('#<h4 class="modhdgblue">(.+?)<\/h4>#is',$response,$_events);
@@ -41,7 +42,7 @@ class PresidentialActions extends EventScraper_Abstract
             $events[$i]['entity'] = 'President';
             $events[$i]['source_url'] = $this->url;
             $events[$i]['source_text'] = '';
-            $events[$i]['access_datetime'] = $access_time;
+            $events[$i]['access_datetime'] = $this->access_time;
             $events[$i]['parser_name'] = $this->parser_name;
             $events[$i]['parser_version'] = $this->parser_version;
         }

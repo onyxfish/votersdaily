@@ -1,8 +1,11 @@
 <?php
 abstract class EventScraper_Abstract
 {
-    protected $parser_version;
-    protected $parser_name;
+    public $parser_version;
+    public $parser_name;
+    public $access_time;
+    public $source_url;
+    public $parser_frequency;
     public $storageEngine = 'couchdb';
     public $couchdbName = 'phpvotedailydb';
 

@@ -4,9 +4,9 @@
 class SenateCalendar extends EventScraper_Abstract
 {
     protected $url = 'http://democrats.senate.gov/calendar/2009-08.html';
-    protected $parser_name = 'Senate Calendar Scraper';
-    protected $parser_version = '0.1';
-    protected $parser_frequency = '6.0';
+    public $parser_name = 'Senate Calendar Scraper';
+    public $parser_version = '0.1';
+    public $parser_frequency = '6.0';
     protected $csv_filename = 'data/senatecalendar.csv';
 
     public function __construct()
@@ -17,16 +17,16 @@ class SenateCalendar extends EventScraper_Abstract
     public function run()
     {
         $events = $this->scrape();
-        $this->add_events($events, $this->couchdbName);
+        $this->add_events($events);
     }
 
     protected function scrape()
     {
         $events = array();
 
+        $this->source_url = $this->url;
         $response = $this->urlopen($this->url);
-        $access_time = time();
-
+        $this->access_time = time();
 
         preg_match_all('#<table[^>]*>(.+?)<\/table>#is',$response,$matches);
        
@@ -34,6 +34,8 @@ class SenateCalendar extends EventScraper_Abstract
             $i=0;
             foreach($data as $row) {
                 $row = trim($row);
+                //this could cause problems need to monitor
+                //hopefully I'll get a bug notice
                 if(preg_match('/Convenes: /is',$row)) {
 
                     preg_match('#<table[^>]*>(.+?)<\/table>#is',$row,$matches);
@@ -54,7 +56,7 @@ class SenateCalendar extends EventScraper_Abstract
                         $events[$i]['entity'] = 'Senate';
                         $events[$i]['source_url'] = $this->url;
                         $events[$i]['source_text'] = $event;
-                        $events[$i]['access_datetime'] = '';
+                        $events[$i]['access_datetime'] = $this->access_time;
                         $events[$i]['parser_name'] = $this->parser_name;
                         $events[$i]['parser_version'] = $this->parser_version;
 

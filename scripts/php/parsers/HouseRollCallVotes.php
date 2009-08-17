@@ -5,12 +5,10 @@ class HouseRollCallVotes extends EventScraper_Abstract
 {
     
     protected $url = 'http://clerk.house.gov/evs/2009/index.asp';
-    protected $parser_name = 'House Roll Call Votes Scraper';
-    protected $parser_version = '0.1';
-    protected $parser_frequency = '6.0';
+    public $parser_name = 'House Roll Call Votes Scraper';
+    public $parser_version = '0.1';
+    public $parser_frequency = '6.0';
     protected $csv_filename = 'data/houserollcallvotes.csv';
-
-    //protected $fields = array('start_time','end_time','title','description','branch','entity','source_url','source_text','access_datetime','parser_name','person_version');
 
     public function __construct()
     {
@@ -26,9 +24,12 @@ class HouseRollCallVotes extends EventScraper_Abstract
     
     protected function scrape()
     {
+        $events = array();
+        $this->source_url = $this->url;
         $response = $this->urlopen($this->url);
 
-        $access_time = time();
+        //$access_time = time();
+        $this->access_time = time();
         preg_match_all('#<A HREF="ROLL(.*?)">#is',$response, $otherLinks);
 
         $voteLinks[] = $this->url;
@@ -36,9 +37,6 @@ class HouseRollCallVotes extends EventScraper_Abstract
              $voteLinks[] = 'http://clerk.house.gov/evs/2009/ROLL'.$otherLink;
         }
         asort($voteLinks);
-        //print_r($voteLinks);
-        $events = array();
-        //echo $response;
 
         foreach($voteLinks as $voteLink) {
             $page_response = file_get_contents($voteLink);
@@ -48,7 +46,6 @@ class HouseRollCallVotes extends EventScraper_Abstract
             preg_match('#<TABLE[^>]*>(.+?)<\/TABLE>#is',$page_response,$matches);
             preg_match_all('#<TR>(.+?)<\/TR>#is',$matches[1],$data);
 
-            //print_r($data[1]);
             $i=0;
             foreach($data[1] as $event) {
                 $event = str_replace(array("\r\n",'  :  ',' :  '),':',strip_tags(trim($event)));
@@ -81,13 +78,9 @@ class HouseRollCallVotes extends EventScraper_Abstract
                 $events[$i]['access_datetime'] = $access_time;
                 $events[$i]['parser_name'] = $this->parser_name;
                 $events[$i]['parser_version'] = $this->parser_version;
-                //print_r($event_arr);
-
                 $i++;
             }
         }
         return $events;
     }
 }
-//$parser = new HouseRollCallVotes;
-//$parser->run();

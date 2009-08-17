@@ -4,9 +4,9 @@
 class SupremeCountCourtOrders extends EventScraper_Abstract
 {
     protected $url = 'http://www.supremecourtus.gov/orders/08ordersofthecourt.html';
-    protected $parser_name = 'Supreme Court 2008 Court Orders Scraper';
-    protected $parser_version = '0.1';
-    protected $parser_frequency = '6.0';
+    public $parser_name = 'Supreme Court 2008 Court Orders Scraper';
+    public $parser_version = '0.1';
+    public $parser_frequency = '6.0';
     protected $csv_filename = 'data/supremecourtcourtorders.csv';
 
     public function __construct()
@@ -17,15 +17,16 @@ class SupremeCountCourtOrders extends EventScraper_Abstract
     public function run()
     {
         $events = $this->scrape();
-        $this->add_events($events, $this->couchdbName);
+        $this->add_events($events);
     }
 
     protected function scrape()
     {
         $events = array();
 
+        $this->source_url = $this->url;
         $response = $this->urlopen($this->url);
-        $access_time = time();
+        $this->access_time = time();
 
         preg_match_all('#<table[^>]*>(.+?)<\/table>#is',$response,$matches);
        
@@ -59,7 +60,7 @@ class SupremeCountCourtOrders extends EventScraper_Abstract
                     $events[$i]['entity'] = 'Supreme Court';
                     $events[$i]['source_url'] = $this->url;
                     $events[$i]['source_text'] = $event;
-                    $events[$i]['access_datetime'] = $access_time;
+                    $events[$i]['access_datetime'] = $this->access_time;
                     $events[$i]['parser_name'] = $this->parser_name;
                     $events[$i]['parser_version'] = $this->parser_version;
                     $i++;

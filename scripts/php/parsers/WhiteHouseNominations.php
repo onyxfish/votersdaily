@@ -5,9 +5,9 @@ class WhiteHouseNominations extends EventScraper_Abstract
 {
     
     protected $url = 'http://www.socrata.com/views/n5m4-mism/rows.xml?accessType=API';
-    protected $parser_name = 'White House Nominations Scraper';
-    protected $parser_version = '0.1';
-    protected $parser_frequency = '6.0';
+    public $parser_name = 'White House Nominations Scraper';
+    public $parser_version = '0.1';
+    public $parser_frequency = '6.0';
     protected $csv_filename = 'data/whitehousenominations.csv';
 
 
@@ -20,15 +20,18 @@ class WhiteHouseNominations extends EventScraper_Abstract
     public function run()
     {
         $events = $this->scrape();
-        $this->add_events($events, $this->couchdbName);
+        $this->add_events($events);
     }
     
     protected function scrape()
     {
         $events = array();
-        $access_time = time();
-        $string = $this->urlopen($this->url);
-        $xml = new SimpleXMLElement($string);
+
+        $this->source_url = $this->url;
+        $response = $this->urlopen($this->url);
+        $this->access_time = time();
+
+        $xml = new SimpleXMLElement($response);
         
         $nominations = $xml->rows;
         $total_nominations = sizeof($nominations->row);
@@ -45,7 +48,7 @@ class WhiteHouseNominations extends EventScraper_Abstract
             $events[$i]['entity'] = 'President WhiteHouse';
             $events[$i]['source_url'] = $this->url;
             $events[$i]['source_text'] = $event;
-            $events[$i]['access_datetime'] = $access_time;
+            $events[$i]['access_datetime'] = $this->access_time;
             $events[$i]['parser_name'] = $this->parser_name;
             $events[$i]['parser_version'] = $this->parser_version;            
         }

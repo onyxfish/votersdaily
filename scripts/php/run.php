@@ -37,16 +37,28 @@ class ScraperScheduler {
             // Instanciate new parser class. 
             eval ( '$'.$name.' =& new '.$className.'(null);' );
             if(method_exists(${$name}, 'run')) {
-                echo 'Running Parser: ' . $name . '...'."\n";
                 $scrape_start = microtime_float();
-
                 $parser = new $className;
+
+                echo 'Running Parser: ' . $parser->parser_name . '...'."\n";
+
+                //setup loggin array
+                $scrape_log['parser_name'] = $parser->parser_name;
+                $scrape_log['parser_version'] = $parser->parser_version;
+
 
                 if($engine) {
                     $parser->storageEngine = $engine;
                 }
 
                 $parser->run();
+
+                //value available only after scrape
+
+                $scrape_log['url'] = $parser->source_url;
+                $scrape_log['source_text'] = null;
+                $scrape_log['access_datetime'] = $parser->access_time;
+                //deal with logging here
 
                 $script_end = microtime_float();
                 echo "Parse completed in ".bcsub($script_end, $script_start, 4)." seconds."."\n\n";                

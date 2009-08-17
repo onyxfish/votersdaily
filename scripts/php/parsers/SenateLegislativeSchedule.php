@@ -5,9 +5,9 @@ class SenateLegislativeSchedule extends EventScraper_Abstract
 {
     
     protected $url = 'http://www.senate.gov/pagelayout/legislative/one_item_and_teasers/2009_schedule.htm';
-    protected $parser_name = 'Senate Legislative Schedule Scraper';
-    protected $parser_version = '0.1';
-    protected $parser_frequency = '6.0';
+    public $parser_name = 'Senate Legislative Schedule Scraper';
+    public $parser_version = '0.1';
+    public $parser_frequency = '6.0';
     protected $csv_filename = 'data/senatelegislativeschedule.csv';
 
 
@@ -20,14 +20,16 @@ class SenateLegislativeSchedule extends EventScraper_Abstract
     public function run()
     {
         $events = $this->scrape();
-        $this->add_events($events, $this->couchdbName);
+        $this->add_events($events);
     }
     
     protected function scrape()
     {
         $events = array();
-        $access_time = time();
+
+        $this->source_url = $this->url;
         $response = $this->urlopen($this->url);
+        $this->access_time = time();
         
         preg_match('#<table border="1" align="left">(.+?)<\/table>#is',$response,$data);
         preg_match_all('#<tr>(.+?)<\/tr>#is',$data[1],$tdData);
@@ -65,7 +67,7 @@ class SenateLegislativeSchedule extends EventScraper_Abstract
             $events[$i]['entity'] = 'Senate';
             $events[$i]['source_url'] = $this->url;
             $events[$i]['source_text'] = '';
-            $events[$i]['access_datetime'] = $access_time;
+            $events[$i]['access_datetime'] = $this->access_time;
             $events[$i]['parser_name'] = $this->parser_name;
             $events[$i]['parser_version'] = $this->parser_version;            
             $i++;

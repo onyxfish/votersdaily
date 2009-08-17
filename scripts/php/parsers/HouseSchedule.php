@@ -5,11 +5,10 @@
 class HouseSchedule extends EventScraper_Abstract
 {
     protected $url = 'http://www.house.gov/house/House_Calendar.shtml';
-    protected $parser_name = 'House Schedule Scraper';
-    protected $parser_version = '0.1';
-    protected $parser_frequency = '6.0';
+    public $parser_name = 'House Schedule Scraper';
+    public $parser_version = '0.1';
+    public $parser_frequency = '6.0';
     protected $csv_filename = 'data/houseschedule.csv';
-    //protected $fields = array('start_time','end_time','title','description','branch','entity','source_url','source_text','access_datetime','parser_name','person_version');
 
     public function __construct()
     {
@@ -24,12 +23,17 @@ class HouseSchedule extends EventScraper_Abstract
 
     protected function scrape()
     {
+        
+        $events = array();
+        
         $response = $this->urlopen($this->url);
+
+        $this->source_url = $this->url;
+        $this->access_time = time();
 
         preg_match('#<table[^>]*>(.+?)<\/table>#is',$response,$matches);
         preg_match_all('#<tr>(.+?)<\/tr>#is',$matches[1],$data);
 
-        $events = array();
         $i=0;
 
         foreach($data[1] as $event) {
@@ -55,7 +59,7 @@ class HouseSchedule extends EventScraper_Abstract
             $events[$i]['entity'] = 'House of Representatives';
             $events[$i]['source_url'] = $this->url;
             $events[$i]['source_text'] = $event;
-            $events[$i]['access_datetime'] = '';
+            $events[$i]['access_datetime'] = $this->access_time;
             $events[$i]['parser_name'] = $this->parser_name;
             $events[$i]['parser_version'] = $this->parser_version;
 
