@@ -9,7 +9,7 @@ function microtime_float()
 $script_start = microtime_float();
 ini_set("display_errors", true);
 error_reporting(E_ALL & ~E_NOTICE);
-require 'phputils/votersdaily.php';
+require 'phputils/EventScraper.php';
 require 'phputils/couchdb.php';
 
 class ScraperScheduler {
