@@ -65,10 +65,12 @@ class ScraperScheduler {
 $engine_options = array('couchdb','csv');
 if(isset($argv[1]) && in_array($argv[1], $engine_options)) {
     $engine= $argv[1];
+    echo "Using ".$engine." as Storage Engine...\n\n";
 }
 else {
     $engine=null;
 }
+
 ScraperScheduler::run($engine);
 
 $script_end = microtime_float();
