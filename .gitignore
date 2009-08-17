@@ -2,4 +2,4 @@
 *.pydevproject
 *.pyc
 *~
-*.scripts/php/*
+*.cthorn
