@@ -2,4 +2,4 @@
 *.pydevproject
 *.pyc
 *~
-*.cthorn
+*.cthorn_dev
