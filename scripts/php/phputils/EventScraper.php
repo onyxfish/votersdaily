@@ -105,14 +105,14 @@ class StorageEngine {
     public static function icalStore($arr, $fn)
     {
         $ical_events = '';
-
+        $space = '    ';
         foreach($arr as $event) {
             $start_time = date('Ymd\THis', strtotime($event['start_time']));
             if(trim($arr['end_time']) != ' ') {
                 $end_time = date('Ymd\THis', $event['end_time']);
             }
             $summary = $event['title'];
-            $content = $event['description'];
+            $content = str_replace(',', '\,', str_replace('\\', '\\\\', str_replace(array("\n","\r"), "\n" . $space, strip_tags($event['description']))));
             $ical_events .=<<<ICAL_EVENT
 BEGIN:VEVENT
 DTSTART:$start_time

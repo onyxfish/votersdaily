@@ -47,12 +47,12 @@ class SenateCalendar extends EventScraper_Abstract
                     if(!empty($calendar_day[1])) {
                         $description = strip_tags($matches[1], '<a>');
                         $description = strip_tags($description, '<a>');
-                        $description = str_replace(array('<a name='.$calendar_day[1].'></a>','\r'),'',$description);
+                        $description = str_replace(array('<a name='.$calendar_day[1].'></a>','\r','\n'),' ',$description);
 
                         $events[$i]['start_date'] = $date_str.'-'.$calendar_day[1];
                         $events[$i]['end_date'] = null;
                         $events[$i]['title'] = 'Senate Calendar';
-                        $events[$i]['description'] = str_replace(array("\r\n"), ' ', substr($description,1));
+                        $events[$i]['description'] = str_replace(array("\r\n",':'), ' ', substr($description,1));
                         $events[$i]['branch'] = 'Legislative';
                         $events[$i]['entity'] = 'Senate';
                         $events[$i]['source_url'] = $this->url;
