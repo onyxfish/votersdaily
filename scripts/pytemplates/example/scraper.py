@@ -43,7 +43,8 @@ class ExampleScraper(EventScraper):
     # Canonical name for this scraper
     name = 'Example Scraper'
     # Should be incremented each time the format of the scrapped data changes
-    version = '0.0.1' 
+    # Should be set to 1.0 for the first fully functional commit
+    version = '0.1' 
 
     parser = html5lib.HTMLParser(
         tree=html5lib.treebuilders.getTreeBuilder('beautifulsoup'))

@@ -4,18 +4,21 @@ import datetime
 import hashlib
 import os
 import sys
+import time
 import traceback
 import urllib2
 
 import couchdb
 from couchdb.schema import *
 
+
 class ScrapeError(Exception):
     """
     Base class for scrape errors.
     """
     pass
-
+    
+    
 class EventScraper(object):
     """
     The base class for an scraper, which provides generic url and data
@@ -82,34 +85,49 @@ class EventScraper(object):
             self.source_text = source_text
             
         return source_text
+    
+    def event_exists(self, event):
+        """
+        Return True if a specified event already exists in the events database.
+        
+        Note: helper method for scraper writers.
+        """
+        if event.exists(self.event_db):
+            return True
+        
+        return False
+
+    def add_event(self, event):
+        """
+        Add scraped Event object to the database.
+        """
+        event['parser_name'] = self.name
+        event['parser_version'] = self.version
+        
+        event.store(self.event_db)
+    
+    def add_log(self, result, traceback=None):
+        """
+        Add a log entry to the database.
+        """
+        scrape_log = ScrapeLog(
+            self.name,
+            self.version,
+            self.source_url,
+            self.source_text,
+            self.access_datetime,
+            result)
+        
+        if traceback:
+            scrape_log['traceback'] = traceback
+        
+        scrape_log.store(self.log_db)
 
     def scrape(self):
         """
         This method must be overriden by each derived scraper.
         """
         pass
-
-    def add_event(self, event):
-        """
-        Add scraped Event object to the database.
-        """        
-        # Append parser properties to event
-        event.parser_name = self.name
-        event.parser_version = self.version
-        
-        event.store(self.event_db)
-    
-    def add_log(self, scrape_log):
-        """
-        Add a ScrapeLog object to the database.
-        """        
-        scrape_log.parser_name = self.name
-        scrape_log.parser_version = self.version
-        scrape_log.source_url = self.source_url
-        scrape_log.source_text = self.source_text
-        scrape_log.access_datetime = self.access_datetime
-        
-        scrape_log.store(self.log_db)
             
     def run(self):
         """
@@ -119,69 +137,141 @@ class EventScraper(object):
         
         try:
             self.scrape()
-            self.add_log(ScrapeLog(result='success'))
+            self.add_log(result='success')
         except:
             # Log exception to the database
             cls, exc, trace = sys.exc_info()
-            scrape_log = ScrapeLog(result=cls.__name__)
-            scrape_log['traceback'] = traceback.format_tb(trace)
-            self.add_log(scrape_log)
+            self.add_log(cls.__name__, traceback.format_tb(trace))
             
             # Make exception visible on command line
             raise
-        
-        
-class Event(Document):
+
+
+class CouchDBDict(dict):
     """
-    A couchdb-python document schema for an event.  Properties that are
-    expected to be set by the scraper are defined as fields.
+    A subclass of dict that provides utility functions to encode datetime
+    objects in such a way that they can safely be used with couchdb-python.
     """
     
-    datetime = DateTimeField()
-    title = TextField()
-    description = TextField()
-    end_datetime = DateTimeField()
-    branch = TextField()
-    entity = TextField()
-    source_url = TextField()
-    source_text = TextField()
-    access_datetime = DateTimeField()
+    def _encode(self):
+        """
+        Work around couchdb-python's lack of support for datetime's by pre-
+        encoding them to strings.
+        """
+        copy_self = {}
+        
+        for k, v in self.items():
+            if isinstance(v, datetime.datetime):
+                copy_self[k] = self._encode_datetime(v)
+            else:
+                copy_self[k] = v
+        
+        return copy_self
     
-    def store(self, database):
+    def _encode_datetime(self, value):
+        return value.replace(microsecond=0).isoformat() + 'Z'
+
+        
+class Event(CouchDBDict):
+    """
+    A representaion of an Event to be stored in the database backend.  Required
+    attributes are defined in __init__, but as as subclass of dict additional
+    attributes may be added at anytime with event[key] = value syntax.
+    """
+    
+    def __init__(self, datetime, branch, entity, title, **kwargs):
         """
-        Generate a unique id for this event, verify that it is not a duplicate,
-        and store it in the database.
+        Setup attribute defaults.
         """
-        self.id = '%s - %s - %s - %s' % (
-            self['datetime'], 
+        self['datetime'] = datetime
+        self['branch'] = branch
+        self['entity'] = entity
+        self['title'] = title
+        self['end_datetime'] = None
+        self['description'] = None
+        self['source_url'] = None
+        self['source_text'] = None
+        self['access_datetime'] = None
+        self.update(kwargs)
+        
+        self.id = self._id()
+        
+    def _id(self):
+        """
+        Return an id for this document which is unique to it by concatenating
+        together its significant attributes.
+        """
+        return '%s - %s - %s - %s' % (
+            self._encode_datetime(self['datetime']), 
             self['branch'], 
             self['entity'],
             self['title'])
         
+    def exists(self, database):
+        """
+        Return True if this document already exists in the given database.
+        """
         if self.id in database:
-            return
+            return True
         
-        Document.store(self, database) 
+        return False
     
-class ScrapeLog(Document):
-    """
-    A couchdb-python document schema for the log of a scraping attempt.
-    """
-    
-    parser_name = TextField()
-    parser_version = TextField()
-    source_url = TextField()
-    source_text = TextField()
-    access_datetime = DateTimeField()
-    result = TextField()
+    def validate(self):
+        """
+        Raises an AttributeError exception if all required fields have not been
+        populated.
+        """
+        for attr in ['datetime', 'branch', 'entity', 'title', 'source_url',
+                     'source_text', 'access_datetime']:
+            if not self[attr]:
+                raise AttributeError(
+                    '%s is a required attribute for every Event.')
     
     def store(self, database):
         """
-        Generate a unique id for this log entry and store it in the database.
+        Validate this document and then store it in the database.
         """
-        self.id = '%s - %s - %s' % (
-            self['access_datetime'], 
+        if self.exists(database):
+            return
+        
+        self.validate()
+        
+        database[self.id] = self._encode()
+        
+    
+class ScrapeLog(CouchDBDict):
+    """
+    A represenation of a scrape attempt log entry for storage in the database.
+    """
+    
+    def __init__(self, parser_name, parser_version, source_url, source_text,
+                 access_datetime, result, **kwargs):
+        """
+        Setup attribute defaults.
+        """
+        self['parser_name'] = parser_name
+        self['parser_version'] = parser_version
+        self['source_url'] = source_url
+        self['source_text'] = source_text
+        self['access_datetime'] = access_datetime
+        self['result'] = result
+        self.update(kwargs)
+        
+        # Compute a unique id
+        self.id = self._id()
+        
+    def _id(self):
+        """
+        Return an id for this document which is unique to it by concatenating
+        together its significant attributes.
+        """        
+        return '%s - %s - %s' % (
+            self._encode_datetime(self['access_datetime']), 
             self['parser_name'], 
             self['result'])
-        
-        Document.store(self, database)
+    
+    def store(self, database):
+        """
+        Store this entry in the database.
+        """        
+        database[self.id] = self._encode()

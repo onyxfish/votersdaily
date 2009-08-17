@@ -1,7 +1,7 @@
 [Scraper]
 name: Example Scraper
 language: python
-version: 0.0.1
+version: 0.1
 # Frequency at which scraping attempts should be made, in hours.
 # (please be kind to government servers and don't get our robot blocked)
 # You may enter a fractional value if there is a good reason to parse
