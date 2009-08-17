@@ -9,6 +9,7 @@ class HouseSchedule extends EventScraper_Abstract
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
     protected $csv_filename = 'data/houseschedule.csv';
+    protected $ical_filename = 'data/houseschedule.ics';
 
     public function __construct()
     {

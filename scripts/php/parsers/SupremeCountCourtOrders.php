@@ -8,6 +8,7 @@ class SupremeCountCourtOrders extends EventScraper_Abstract
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
     protected $csv_filename = 'data/supremecourtcourtorders.csv';
+    protected $ical_filename = 'data/supremecourtcourtorders.ics';
 
     public function __construct()
     {

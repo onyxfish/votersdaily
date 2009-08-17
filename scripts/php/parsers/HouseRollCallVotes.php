@@ -9,6 +9,7 @@ class HouseRollCallVotes extends EventScraper_Abstract
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
     protected $csv_filename = 'data/houserollcallvotes.csv';
+    protected $ical_filename = 'data/houserollcallvotes.ics';
 
     public function __construct()
     {

@@ -74,7 +74,7 @@ class ScraperScheduler {
 }
 
 
-$engine_options = array('couchdb','csv');
+$engine_options = array('couchdb','csv', 'ical');
 if(isset($argv[1]) && in_array($argv[1], $engine_options)) {
     $engine= $argv[1];
     echo "Using ".$engine." as Storage Engine...\n\n";

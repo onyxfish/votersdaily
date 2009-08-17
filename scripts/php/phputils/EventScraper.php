@@ -40,6 +40,12 @@ abstract class EventScraper_Abstract
                 $fn = $this->couchdbName;
                 StorageEngine::couchDbStore($arr, $fn);
                 break;
+
+            case 'ical' :
+                $fn = $this->ical_filename;
+                StorageEngine::icalStore($arr, $fn);
+                break;
+
             default :
                 $fn = $this->csv_filename;
                 StorageEngine::csvStore($arr, $fn);
@@ -94,5 +100,50 @@ class StorageEngine {
         foreach($lines as $line) {
             fwrite($fp, $line);
         }        
+    }
+
+    public static function icalStore($arr, $fn)
+    {
+       // print_r($arr);
+        
+        $ical_events = '';
+        foreach($arr as $event) {
+            $start_time = date('Ymd\THis', strtotime($event['start_time']));
+            if(trim($arr['end_time']) != ' ') {
+                $end_time = date('Ymd\THis', strtotime($event['end_time']));
+            }
+            $summary = $event['title'];
+            $content = 'Branch: ' . $event['branch'] ."\n Enitity:  ". $event['entity'] ."\n " . $event['description'];
+            $ical_events .=<<<ICAL_EVENT
+BEGIN:VEVENT
+DTSTART:$start_time
+DTEND:$end_time
+SUMMARY:$summary
+DESCRIPTION:$content
+END:VEVENT
+
+ICAL_EVENT;
+
+
+                
+        }
+        $ical_content = <<<CONTENT
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//EventScraper//NONSGML v1.0//EN
+X-WR-CALNAME:EventScraper'&#8217;s Results
+X-WR-TIMEZONE:US/Eastern
+X-ORIGINAL-URL:{$source_url}
+X-WR-CALDESC:Events from {$parser_name}
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+{$ical_events}END:VCALENDAR
+CONTENT;
+       
+        $open_ical_file = fopen($fn, "w");
+        fwrite($open_ical_file, $ical_content);
+        fclose($open_ical_file);
+        //echo $ical_content;
+       
     }
 }

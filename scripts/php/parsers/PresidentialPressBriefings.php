@@ -8,6 +8,7 @@ class PresidentialPressBriefings extends EventScraper_Abstract
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
     protected $csv_filename = 'data/presidentialpressbriefings.csv';
+    protected $ical_filename = 'data/presidentialpressbriefings.ics';
 
     public function __construct()
     {

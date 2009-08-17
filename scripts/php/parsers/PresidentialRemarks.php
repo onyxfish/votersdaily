@@ -8,6 +8,7 @@ class PresidentialRemarks extends EventScraper_Abstract
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
     protected $csv_filename = 'data/presidentialremarks.csv';
+    protected $ical_filename = 'data/presidentialremarks.ics';
 
     public function __construct()
     {

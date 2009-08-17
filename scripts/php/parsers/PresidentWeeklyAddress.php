@@ -9,6 +9,7 @@ class PresidentWeeklyAddress extends EventScraper_Abstract
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
     protected $csv_filename = 'data/presidentweeklyaddress.csv';
+    protected $ical_filename = 'data/presidentweeklyaddress.ics';
 
 
     public function __construct()
