@@ -45,6 +45,7 @@ class WhiteHouseNominations extends EventScraper_Abstract
         $this->source_url = $this->url;
         $response = $this->urlopen($this->url);
         $this->access_time = time();
+        $this->source_text = $response;
 
         $xml = new SimpleXMLElement($response);
         

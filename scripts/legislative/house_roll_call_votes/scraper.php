@@ -42,6 +42,7 @@ class HouseRollCallVotes extends EventScraper_Abstract
         $events = array();
         $this->source_url = $this->url;
         $response = $this->urlopen($this->url);
+        $this->source_text = $response;
 
         //$access_time = time();
         $this->access_time = time();

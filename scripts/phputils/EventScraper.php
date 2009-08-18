@@ -5,6 +5,7 @@ abstract class EventScraper_Abstract
     public $parser_name;
     public $access_time;
     public $source_url;
+    public $source_text;
     public $parser_frequency;
     public $storageEngine = 'couchdb';
     public $couchdbName = 'phpvotedailydb';

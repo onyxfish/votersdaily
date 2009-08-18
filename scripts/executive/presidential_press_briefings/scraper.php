@@ -42,6 +42,7 @@ class PresidentialPressBriefings extends EventScraper_Abstract
         $response = $this->urlopen($this->url);
         $this->source_url = $this->url;
         $this->access_time = time();
+        $this->source_text = $response;
 
         preg_match_all('#<div class="timeStamp smaller">(.+?)<\/div>#is',$response,$_timestamps);
         preg_match_all('#<h4 class="modhdgblue">(.+?)<\/h4>#is',$response,$_events);

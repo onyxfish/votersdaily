@@ -41,6 +41,7 @@ class SenateRollCallVotes extends EventScraper_Abstract
         $this->source_url = $this->url;        
         $xml = $this->urlopen($this->url);
         $this->access_time = time();
+        $this->source_text = $xml;
 
         $response = simplexml_load_string($xml);
         

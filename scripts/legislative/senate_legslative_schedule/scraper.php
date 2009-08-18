@@ -44,7 +44,9 @@ class SenateLegislativeSchedule extends EventScraper_Abstract
         $this->source_url = $this->url;
         $response = $this->urlopen($this->url);
         $this->access_time = time();
-        
+        $this->source_text = $response;
+       
+
         preg_match('#<table border="1" align="left">(.+?)<\/table>#is',$response,$data);
         preg_match_all('#<tr>(.+?)<\/tr>#is',$data[1],$tdData);
 
