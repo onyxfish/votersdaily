@@ -1,6 +1,6 @@
 #!/usr/bin/php -q
 <?php
-$PATH_TO_INCLUDES = dirname(dirname(dirname(dirname(__FILE__))));
+$PATH_TO_INCLUDES = dirname(dirname(dirname(__FILE__)));
 require $PATH_TO_INCLUDES.'/phputils/EventScraper.php';
 require $PATH_TO_INCLUDES.'/phputils/couchdb.php';
 function microtime_float()
