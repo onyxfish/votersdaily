@@ -55,7 +55,7 @@ class HouseRollCallVotes extends EventScraper_Abstract
         asort($voteLinks);
 
         foreach($voteLinks as $voteLink) {
-            $page_response = file_get_contents($voteLink);
+            $page_response = $this->urlopen($voteLink);
             //get title
             preg_match('#<TITLE>(.*?)<\/TITLE>#is',$page_response, $title);
 
