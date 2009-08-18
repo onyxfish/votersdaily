@@ -34,7 +34,6 @@ class HouseRollCallVotes extends EventScraper_Abstract
     public function run()
     {
         $events = $this->scrape();
-        print_r($events);
         $this->add_events($events);
     }
     

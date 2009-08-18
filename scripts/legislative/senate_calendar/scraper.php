@@ -71,7 +71,7 @@ class SenateCalendar extends EventScraper_Abstract
                         $events[$i]['branch'] = 'Legislative';
                         $events[$i]['entity'] = 'Senate';
                         $events[$i]['source_url'] = $this->url;
-                        $events[$i]['source_text'] = $event;
+                        $events[$i]['source_text'] = (string) trim($matches[0]);
                         $events[$i]['access_datetime'] = $this->access_time;
                         $events[$i]['parser_name'] = $this->parser_name;
                         $events[$i]['parser_version'] = $this->parser_version;

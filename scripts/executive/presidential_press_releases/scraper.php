@@ -57,7 +57,7 @@ class PresidentialPressReleases extends EventScraper_Abstract
             $events[$i]['branch'] = 'Executive';
             $events[$i]['entity'] = 'President';
             $events[$i]['source_url'] = $this->url;
-            $events[$i]['source_text'] = (string) trim($title[0]);
+            $events[$i]['source_text'] = (string) $title[0];
             $events[$i]['access_datetime'] = $this->access_time;
             $events[$i]['parser_name'] = $this->parser_name;
             $events[$i]['parser_version'] = $this->parser_version;

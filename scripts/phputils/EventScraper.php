@@ -86,8 +86,6 @@ class StorageEngine {
         $i=1; //FYI:$i is being used to ensure we have a unique id. 
         foreach($arr as $data) {
             $_data = json_encode($data);
-            //$id = md5(uniqid(mt_rand(), true));
-            //list($_title, $_date_comma) = explode(',', $data['title']);
             $id = (string) $data['datetime'].' '.$i.'-'.$data['branch'].'-'.$data['entity'].'-'. $data['title'];
             $resp = $couchDB->send("PUT", "/".$dbname."/".urlencode($id), $_data);
            

@@ -51,8 +51,12 @@ class PresidentialRemarks extends EventScraper_Abstract
         $total_timestamps = sizeof($data_arr[0]['timestamp']);
         for($i=0; $i < $total_timestamps; $i++) {
             preg_match('#<a[^>]*>(.*?)</a>#is', $data_arr[0]['description'][$i], $title);
-            $events[$i]['start_date'] = $this->_vd_date_format($data_arr[0]['timestamp'][$i]); //issue
-            $events[$i]['end_date'] = '';
+            $data_arr[0]['timestamp'][$i];
+            list($month, $day, $year) = explode('/',$data_arr[0]['timestamp'][$i]);
+            
+            $_date_str = strftime('%Y-%m-%dT%H:%M:%SZ', mktime(0, 0, 0, $month, $day, $year));
+            $events[$i]['datetime'] = $_date_str; //issue
+            $events[$i]['end_datetime'] = '';
             $events[$i]['title'] = (string) trim($title[1]);
             $events[$i]['description'] = (string) trim($data_arr[0]['description'][$i]);
             $events[$i]['branch'] = 'Executive';

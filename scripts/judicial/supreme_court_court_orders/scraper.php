@@ -60,26 +60,34 @@ class SupremeCourtOrders extends EventScraper_Abstract
                     list($month,$day,$year) = explode('-',$_date_tmp);
 
                     //$date_str = '20'.$year.'-'.$month.'-'.$day;
-                    $date_str = $month . '-' . $day . '-20'.$year;
-                    $title_url = $data[1][1];
-                    $title = strip_tags($data[1][1]);
-                    
-                    $description = strip_tags($matches[1], '<a>');
-                    $description = strip_tags($description, '<a>');
-                    $description = str_replace(array('<a name='.$calendar_day[1].'></a>','\r'),'',$description);
+                    //FIX: for some reason $year may contain 20www.supremecourtus.gov
+                    if(ctype_digit($year)) {
 
-                    $events[$i]['datetime'] = $this->_vd_date_format($date_str);
-                    $events[$i]['end_datetime'] = null;
-                    $events[$i]['title'] = (string) trim($title);
-                    $events[$i]['description'] = (string) trim($title_url);
-                    $events[$i]['branch'] = 'Judicial';
-                    $events[$i]['entity'] = 'Supreme Court';
-                    $events[$i]['source_url'] = $this->url;
-                    $events[$i]['source_text'] = (string) trim($data[0]);
-                    $events[$i]['access_datetime'] = $this->access_time;
-                    $events[$i]['parser_name'] = $this->parser_name;
-                    $events[$i]['parser_version'] = $this->parser_version;
-                    $i++;
+                        $_year_tmp = (int) '20'.$year;
+                        $date_str = strftime('%Y-%m-%dT%H:%M:%SZ', mktime(0, 0, 0, $month, $day, $_year_tmp));
+
+                        $title_url = $data[1][1];
+                        $title = strip_tags($data[1][1]);
+                    
+                        $description = strip_tags($matches[1], '<a>');
+                        $description = strip_tags($description, '<a>');
+                        $description = str_replace(array('<a name='.$calendar_day[1].'></a>','\r'),'',$description);
+
+                        $events[$i]['datetime'] = (string) $date_str;
+                        $events[$i]['end_datetime'] = null;
+                        $events[$i]['title'] = (string) trim($title);
+                        $events[$i]['description'] = (string) trim($title_url);
+                        $events[$i]['branch'] = 'Judicial';
+                        $events[$i]['entity'] = 'Supreme Court';
+                        $events[$i]['source_url'] = $this->url;
+                        $events[$i]['source_text'] = null;
+                        $events[$i]['access_datetime'] = $this->access_time;
+                        $events[$i]['parser_name'] = $this->parser_name;
+                        $events[$i]['parser_version'] = $this->parser_version;
+                    
+                        $i++;
+                    }//end if ctype_digit check
+
                  }
             }
         }
