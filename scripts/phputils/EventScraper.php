@@ -79,7 +79,6 @@ class StorageEngine {
             //$id = md5(uniqid(mt_rand(), true));
             list($_title, $_date_comma) = explode(',', $data['title']);
             $id = (string)  $data['start_time'].'-'.$data['branch'].'-'.$data['entity'].'-'. urlencode($data['title']);
-            echo $id ."\n";
             $resp = $couchDB->send("PUT", "/".$dbname."/".addslashes($id), $_data);
             //var_dump($resp);
 
