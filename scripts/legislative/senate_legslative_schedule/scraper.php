@@ -75,10 +75,10 @@ class SenateLegislativeSchedule extends EventScraper_Abstract
                     $end_date = null;
                 }
             }
-            $events[$i]['datetime'] = date('Y-m-d', strtotime($start_date));
+            $events[$i]['datetime'] = $this->_vd_date_format($start_date);
             $events[$i]['end_datetime'] = $end_date;
-            $events[$i]['title'] = (string) $tdTmp[1][1] . ' ' . $tdTmp[2];
-            $events[$i]['description'] = '';
+            $events[$i]['title'] = (string) trim($tdTmp[1][1] . ' ' . $tdTmp[2]);
+            $events[$i]['description'] = null;
             $events[$i]['branch'] = 'Legislative';
             $events[$i]['entity'] = 'Senate';
             $events[$i]['source_url'] = $this->url;

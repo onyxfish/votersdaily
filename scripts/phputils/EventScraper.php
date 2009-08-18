@@ -8,7 +8,7 @@ abstract class EventScraper_Abstract
     public $source_text;
     public $parser_frequency;
     public $storageEngine = 'couchdb';
-    public $couchdbName = 'phpvotedailydb';
+    public $couchdbName = 'vd_events';
 
     public function __construct()
     {
@@ -54,6 +54,12 @@ abstract class EventScraper_Abstract
         }
         
     }
+
+    protected function _vd_date_format($date_str)
+    {
+        return strftime('%Y-%m-%dT%H:%M:%SZ',strtotime($date_str));
+    }
+
     
     abstract public function run();
     abstract protected function scrape();
@@ -72,16 +78,22 @@ class StorageEngine {
         $couchDB = new CouchDbSimple($options);
         //$resp = $couchDB->send("DELETE", "/".$dbname."/");
 
+        //need to check to see if couchDB database is available before excuting
+        //Chris and I talked about run.py being able to handle db 
         $resp = $couchDB->send("PUT", "/".$dbname);
         //var_dump($resp);
+
+        $i=1; //FYI:$i is being used to ensure we have a unique id. 
         foreach($arr as $data) {
             $_data = json_encode($data);
             //$id = md5(uniqid(mt_rand(), true));
-            list($_title, $_date_comma) = explode(',', $data['title']);
-            $id = (string)  $data['start_time'].'-'.$data['branch'].'-'.$data['entity'].'-'. urlencode($data['title']);
-            $resp = $couchDB->send("PUT", "/".$dbname."/".addslashes($id), $_data);
+            //list($_title, $_date_comma) = explode(',', $data['title']);
+            $id = (string) $data['datetime'].' '.$i.'-'.$data['branch'].'-'.$data['entity'].'-'. $data['title'];
+            $resp = $couchDB->send("PUT", "/".$dbname."/".urlencode($id), $_data);
+           
+            //for debug will remove once we have all data inserting as expected.
             //var_dump($resp);
-
+        $i++;
         }        
     }
     

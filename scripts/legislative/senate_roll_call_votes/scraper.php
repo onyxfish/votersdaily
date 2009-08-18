@@ -57,17 +57,23 @@ class SenateRollCallVotes extends EventScraper_Abstract
             $start_date = (string) $votes[$i]->vote_date;
             list($day, $month) = explode('-', $start_date);
             $date_str = $month . ' '. $day.' 2009';
-            $events[$i]['datetime'] = date('Y-m-d', strtotime($date_str));
+            $events[$i]['datetime'] = $this->_vd_date_format($date_str);
             $events[$i]['end_datetime'] = null;
-            $events[$i]['title'] = (string) $votes[$i]->title;
-            $events[$i]['description'] = $description_str;
+            $events[$i]['title'] = (string) trim($votes[$i]->title);
+            $events[$i]['description'] = trim($description_str);
             $events[$i]['branch'] = 'Legislative';
             $events[$i]['entity'] = 'Senate';
+            $events[$i]['vote_number'] = $votes[$i]->vote_number;
+            $events[$i]['vote_issue'] = $votes[$i]->issue->A;
+            $events[$i]['vote_question'] = $votes[$i]->question;
+            $events[$i]['vote_result'] = $votes[$i]->result;
+            $events[$i]['yes_votes'] = $votes[$i]->vote_tally->yeas;
+            $events[$i]['no_votes'] = $votes[$i]->vote_tally->nays;
             $events[$i]['source_url'] = $this->url;
             $events[$i]['source_text'] = '';
             $events[$i]['access_datetime'] = $this->access_time;
             $events[$i]['parser_name'] = $this->parser_name;
-            $events[$i]['parser_version'] = $this->parser_version;            
+            $events[$i]['parser_version'] = $this->parser_version; 
         }
         return $events;
     }

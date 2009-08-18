@@ -54,18 +54,22 @@ class WhiteHouseNominations extends EventScraper_Abstract
 
         for($i=0; $i < $total_nominations; $i++) {
             $description_str = 'Nomination: ' .$nominations->row[$i]->name . ' ' . $nominations->row[$i]->agency->attributes()->description;
-            $description_str .= $nominations->row[$i]->position . ' confirmed: (' . $nominations->row[$i]->confirmed . ') holdover:  (' . $nominations->row[$i]->holdover.')';
+            $description_str .= $nominations->row[$i]->position . ' confirmed: (' . $nominations->row[$i]->confirmed . ')';
+            $description_str .= ' holdover:  (' . $nominations->row[$i]->holdover.')';
            
             $_date_str = (string) $nominations->row[$i]->formal_nomination_date;
             list($_month,$_day,$_year) = explode('/', $_date_str);
-            $events[$i]['datetime'] = $_year .'-'.$_month.'-'.$_day;
-            $events[$i]['end_datetime'] = (string) $nominations->row[$i]->confirmation_vote;
-            $events[$i]['title'] = 'Nomination: ' . $nominations->row[$i]->position;
-            $events[$i]['description'] = $description_str;
+            $events[$i]['datetime'] = (string) $this->_vd_date_format($_year .'-'.$_month.'-'.$_day);
+            $events[$i]['end_datetime'] = (string) $this->_vd_date_format($nominations->row[$i]->confirmation_vote);
+            $events[$i]['title'] = (string) 'Nomination: ' . trim($nominations->row[$i]->position);
+            $events[$i]['description'] = (string) trim($description_str);
             $events[$i]['branch'] = 'Executive';
             $events[$i]['entity'] = 'President WhiteHouse';
+            $events[$i]['nominee'] = (string) $nominations->row[$i]->name;
+            $events[$i]['is_confirmed'] = (string) $nominations->row[$i]->confirmed;
+            $events[$i]['is_holdover'] = (string) $nominations->row[$i]->holdover;
             $events[$i]['source_url'] = $this->url;
-            $events[$i]['source_text'] = $event;
+            $events[$i]['source_text'] = (string) trim($nominations->row[$i]);
             $events[$i]['access_datetime'] = $this->access_time;
             $events[$i]['parser_name'] = $this->parser_name;
             $events[$i]['parser_version'] = $this->parser_version;            

@@ -34,6 +34,7 @@ class HouseRollCallVotes extends EventScraper_Abstract
     public function run()
     {
         $events = $this->scrape();
+        print_r($events);
         $this->add_events($events);
     }
     
@@ -69,9 +70,9 @@ class HouseRollCallVotes extends EventScraper_Abstract
                 list($day, $month) = explode('-', $event_arr[1]);
                 //format date
                 $date_str = $month . ' '. $day.' '.$this->year ;
-                $events[$i]['datetime'] = date('Y-m-d', strtotime($date_str));
+                $events[$i]['datetime'] = (string) $this->_vd_date_format($date_str);
                 $events[$i]['end_datetime'] = null;
-                $events[$i]['title'] = $title[1];
+                $events[$i]['title'] = (string) $title[1];
             
                 if($event_arr[6] == 'F') {
                     $status = 'Failed';
@@ -86,12 +87,12 @@ class HouseRollCallVotes extends EventScraper_Abstract
                 $bill_str = str_replace(' ','.',$event_arr[3]);
                 $description_str .= ' http://thomas.loc.gov/cgi-bin/bdquery/z?d111:'.strtolower($bill_str).':';
 
-                $events[$i]['description'] = $description_str;
+                $events[$i]['description'] = (string) $description_str;
                 $events[$i]['branch'] = 'Legislative';
                 $events[$i]['entity'] = 'House of Representatives';
                 $events[$i]['source_url'] = $this->url;
                 $events[$i]['source_text'] = $event;
-                $events[$i]['access_datetime'] = $access_time;
+                $events[$i]['access_datetime'] = $this->access_time;
                 $events[$i]['parser_name'] = $this->parser_name;
                 $events[$i]['parser_version'] = $this->parser_version;
                 $i++;
