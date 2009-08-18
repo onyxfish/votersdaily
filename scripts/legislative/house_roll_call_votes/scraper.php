@@ -114,8 +114,6 @@ else {
 
 $parser = new HouseRollCallVotes;
 
-echo "\n\n".'Running Parser: ' . $parser->parser_name . '...'."\n";
-
 //setup loggin array
 $scrape_log['parser_name'] = $parser->parser_name;
 $scrape_log['parser_version'] = $parser->parser_version;
@@ -136,4 +134,4 @@ $scrape_log['access_datetime'] = $parser->access_time;
 
 //deal with logging here
 
-echo "Parse completed in ".bcsub($scrape_end, $scrape_start, 4)." seconds."."\n\n"; 
+//echo "Parse completed in ".bcsub($scrape_end, $scrape_start, 4)." seconds."."\n\n"; 

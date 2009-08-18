@@ -68,7 +68,7 @@ class PresidentialActions extends EventScraper_Abstract
 $engine_options = array('couchdb','csv', 'ical');
 if(isset($argv[1]) && in_array($argv[1], $engine_options)) {
         $engine= $argv[1];
-            echo "Using ".$engine." as Storage Engine...\n\n";
+           // echo "Using ".$engine." as Storage Engine...\n\n";
 }
 else {
         $engine=null;
@@ -77,9 +77,7 @@ else {
 
 $parser = new PresidentialActions;
 
-echo "\n\n".'Running Parser: ' . $parser->parser_name . '...'."\n";
-
-//setup loggin array
+//setup logging array
 $scrape_log['parser_name'] = $parser->parser_name;
 $scrape_log['parser_version'] = $parser->parser_version;
 
@@ -99,4 +97,4 @@ $scrape_log['access_datetime'] = $parser->access_time;
 
 //deal with logging here
 
-echo "Parse completed in ".bcsub($scrape_end, $scrape_start, 4)." seconds."."\n\n";
+//echo "Parse completed in ".bcsub($scrape_end, $scrape_start, 4)." seconds."."\n\n";
