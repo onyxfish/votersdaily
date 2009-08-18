@@ -1,0 +1,6 @@
+[Scraper]
+name: House Schedule Scraper
+language: python
+version: 1.0
+frequency: 6.0
+enabled: true

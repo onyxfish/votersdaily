@@ -1,17 +1,17 @@
-from multiprocessing import Pool, Process
+#!/usr/bin/env python
+
+import ConfigParser
 import os
 import re
+import subprocess
 import sys
 import threading
-import traceback
 
 class ScraperScheduler(object):
     """
     This class functions like a poor man's cron for all scrapers that exist in
-    the directory tree.  Using crazy-Python-dynamics its introspects all 
-    available modules, imports them, instantiates their EventScraper subclasses 
-    and then schedules them to run at their specified intervals.  It also uses
-    the multiprocessing module for maximum efficiency.
+    the directory tree.  It searches the branch directories for all scraper
+    scripts and runs at their specified intervals, each in its own process.
     """
     
     def run(self):
@@ -19,47 +19,65 @@ class ScraperScheduler(object):
         Mine the directory tree for EventScrapers and schedule their first
         instance.
         """
-        for root, dirs, files in os.walk(os.path.dirname(os.path.abspath(__file__))):
-            # Skip utility folders
-            if os.path.split(root)[1] in ['example', 'pyutils']:
-                continue
+        # Loop through branch-level folders
+        for branch in ['executive', 'judicial', 'legislative', 'other']:
+            runner_path = os.path.dirname(os.path.abspath(__file__))
+            branch_path = os.path.join(runner_path, branch)
             
-            # Add new path to sys.path so that modules may be imported
-            sys.path.append(root)
-            
-            for file in files:
-                filename, ext = os.path.splitext(file)
+            # Loop through scraper-level folders
+            for folder in os.listdir(branch_path):
+                folder_path = os.path.join(branch_path, folder)
                 
-                if ext != '.py':
+                config_file = None
+                scraper_file = None
+                
+                # Get paths to the config and scraper (script) files
+                for file in os.listdir(folder_path):
+                    if file == 'config':
+                        config_file = os.path.join(folder_path, 'config')
+                    elif re.match('scraper', file):
+                        scraper_file = os.path.join(folder_path, file)
+                        
+                if not config_file:
+                    print 'The %s/%s folder does not contain a config file.' % (branch, folder)
                     continue
                 
-                module = __import__(filename)
+                if not scraper_file:
+                    print 'The %s/%s folder does not contain a scraper script.' % (branch, folder)
+                    continue
                 
-                for i in dir(module):
-                    if re.match('.*Scraper$', i) and i != 'EventScraper':
-                        # Instantiate scraper by name
-                        scraper = module.__dict__[i]()
-                        
-                        self.start_scraper(scraper)
+                # Read out the configuration information for this scraper
+                config_parser = ConfigParser.ConfigParser()
+                config_parser.read(config_file)
 
-    def start_scraper(self, scraper):
+                name = config_parser.get('Scraper', 'name')
+                frequency = config_parser.getfloat('Scraper', 'frequency')
+                enabled = config_parser.getboolean('Scraper', 'enabled')
+                
+                # Schedule the first run
+                if enabled:
+                    self.start_scraper(scraper_file, name, frequency)
+                else:
+                    print '%s is disabled.' % name
+
+    def start_scraper(self, scraper, name, frequency):
         """
         Run the specified scraper and then reschedule it to run at its next 
-        interval.  Eat any exceptions so that the scheduler will never crash.
+        interval.
         """
         
-        print 'Running %s.' % scraper.name
+        print 'Running %s.' % name
         
         # Spin off a new process
-        p = Process(target=scraper.run)
-        p.start()
+        subprocess.Popen(scraper, shell=False)
                         
-        print 'Scheduling %s to run again in %i hours.' % (
-            scraper.name, scraper.frequency)
+        print 'Scheduling %s to run again in %i hours.' % (name, frequency)
         
         # Schedule next run
         t = threading.Timer(
-            scraper.frequency * 60.0 * 60.0, self.start_scraper, (scraper))
+            frequency * 60.0 * 60.0, 
+            self.start_scraper, 
+            (scraper, name, frequency))
         t.start()
 
 if __name__ == '__main__':

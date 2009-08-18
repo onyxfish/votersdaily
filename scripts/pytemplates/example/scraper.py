@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 This module provides a outline of an EventScraper subclass, along with detailed
 notes on how to implement a new scraper.
@@ -5,6 +7,8 @@ notes on how to implement a new scraper.
 Please note that this example will NOT run without modification.  For a good
 minimally complicated scraper that will run unmodified see 
 scripts/legislative/house_schedule/scraper.py
+
+All scrapers must include the #! (shebang) line and be executable.
 """
 
 from datetime import datetime
@@ -39,12 +43,8 @@ class ExampleScraper(EventScraper):
     # Canonical name for this scraper
     name = 'Example Scraper'
     # Should be incremented each time the format of the scrapped data changes
-    version = '0.0.1' 
-    # Frequency at which scraping attempts should be made, in hours.
-    # (please be kind to government servers and don't get our robot blocked)
-    # You may enter a fractional value if there is a good reason to parse
-    # this page frequently (such as near real-time data)
-    frequency = 6.0
+    # Should be set to 1.0 for the first fully functional commit
+    version = '0.1' 
 
     parser = html5lib.HTMLParser(
         tree=html5lib.treebuilders.getTreeBuilder('beautifulsoup'))

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from datetime import datetime
 import os
 import re
@@ -15,8 +17,7 @@ class HouseScheduleScraper(EventScraper):
     """
         
     name = 'House Schedule Scraper'
-    version = '0.0.1'
-    frequency = 6.0
+    version = '1.0'
 
     parser = html5lib.HTMLParser(
         tree=html5lib.treebuilders.getTreeBuilder('beautifulsoup'))
