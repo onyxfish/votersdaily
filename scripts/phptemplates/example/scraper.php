@@ -13,8 +13,8 @@ function microtime_float()
 
 ini_set("display_errors", true);
 error_reporting(E_ALL & ~E_NOTICE);
-
-class ScraperName extends EventScraper_Abstract
+/* change class name from ScraperName */
+class ScraperName extends EventScraper_Abstract 
 {
     
     protected $url = 'http://sitename.com/file.ext';
@@ -72,7 +72,7 @@ else {
 }
 
 
-$parser = new ScraperName;
+$parser = new ScraperName; //<-- change this to match class name
 
 echo 'Running Parser: ' . $parser->parser_name . '...'."\n";
 
@@ -91,7 +91,7 @@ $scrape_end = microtime_float();
 
 //value available only after scrape
 $scrape_log['url'] = $parser->source_url;
-$scrape_log['source_text'] = null;
+$scrape_log['source_text'] = $parser->source_text;
 $scrape_log['access_datetime'] = $parser->access_time;
 
 //deal with logging here

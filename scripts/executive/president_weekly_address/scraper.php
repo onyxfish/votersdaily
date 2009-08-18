@@ -101,7 +101,7 @@ $scrape_end = microtime_float();
 
 //value available only after scrape
 $scrape_log['url'] = $parser->source_url;
-$scrape_log['source_text'] = null;
+$scrape_log['source_text'] = $parser->source_text;
 $scrape_log['access_datetime'] = $parser->access_time;
 
 //deal with logging here

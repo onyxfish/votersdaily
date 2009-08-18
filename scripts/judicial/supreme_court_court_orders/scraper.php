@@ -15,14 +15,14 @@ ini_set("display_errors", true);
 error_reporting(E_ALL & ~E_NOTICE);
 
 
-class SupremeCountCourtOrders extends EventScraper_Abstract
+class SupremeCourtOrders extends EventScraper_Abstract
 {
     protected $url = 'http://www.supremecourtus.gov/orders/08ordersofthecourt.html';
     public $parser_name = 'Supreme Court 2008 Court Orders Scraper';
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
-    protected $csv_filename = 'data/supremecourtcourtorders.csv';
-    protected $ical_filename = 'data/supremecourtcourtorders.ics';
+    protected $csv_filename = 'data/supremecourtorders.csv';
+    protected $ical_filename = 'data/supremecourtorders.ics';
 
     public function __construct()
     {
@@ -97,7 +97,7 @@ else {
 }
 
 
-$parser = new SupremeCountCourtOrders;
+$parser = new SupremeCourtOrders;
 
 echo 'Running Parser: ' . $parser->parser_name . '...'."\n";
 
@@ -116,7 +116,7 @@ $scrape_end = microtime_float();
 
 //value available only after scrape
 $scrape_log['url'] = $parser->source_url;
-$scrape_log['source_text'] = null;
+$scrape_log['source_text'] = $parser->source_text;
 $scrape_log['access_datetime'] = $parser->access_time;
 
 //deal with logging here
