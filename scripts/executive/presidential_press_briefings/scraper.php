@@ -51,15 +51,15 @@ class PresidentialPressBriefings extends EventScraper_Abstract
         $total_timestamps = sizeof($data_arr[0]['timestamp']);
         for($i=0; $i < $total_timestamps; $i++) {
             preg_match('#<a[^>]*>(.*?)</a>#is', $data_arr[0]['description'][$i], $title);
-            $events[$i]['start_date'] = date('Y-m-d', strtotime($data_arr[0]['timestamp'][$i]));
+            $events[$i]['datetime'] = date('Y-m-d', strtotime($data_arr[0]['timestamp'][$i]));
             $events[$i]['end_date'] = '';
-            $events[$i]['title'] = (string) $title[1];
+            $events[$i]['title'] = (string) trim($title[1]);
             $events[$i]['description'] = $data_arr[0]['description'][$i];
             $events[$i]['branch'] = 'Executive';
             $events[$i]['entity'] = 'President';
             $events[$i]['source_url'] = $this->url;
             $events[$i]['source_text'] = '';
-            $events[$i]['access_datetime'] = $access_time;
+            $events[$i]['access_datetime'] = $this->access_time;
             $events[$i]['parser_name'] = $this->parser_name;
             $events[$i]['parser_version'] = $this->parser_version;
         }

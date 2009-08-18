@@ -54,7 +54,7 @@ class PresidentWeeklyAddress extends EventScraper_Abstract
         $i=0;
         foreach($xml->entry as $weeklyaddress) {
             $description_str = 'Author: '.$weeklyaddress->author->name.' <a href="'.$weeklyaddress->link->attributes()->href.'">'.$weeklyaddress->title.'</a>';
-            $events[$i]['start_time'] = (string) date("Y-m-d m:i:s", strtotime($weeklyaddress->updated));
+            $events[$i]['datetime'] = (string) date("Y-m-d m:i:s", strtotime($weeklyaddress->updated));
             $events[$i]['end_data'] = '';
             $events[$i]['title'] = (string) $weeklyaddress->title;
             $events[$i]['description'] = $description_str;

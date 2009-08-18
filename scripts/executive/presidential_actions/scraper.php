@@ -49,7 +49,7 @@ class PresidentialActions extends EventScraper_Abstract
         $total_timestamps = sizeof($data_arr[0]['timestamp']);
         for($i=0; $i < $total_timestamps; $i++) {
             preg_match('#<a[^>]*>(.*?)</a>#is', $data_arr[0]['description'][$i], $title);
-            $events[$i]['start_date'] = date('Y-m-d', strtotime($data_arr[0]['timestamp'][$i]));
+            $events[$i]['datetime'] = date('Y-m-d', strtotime($data_arr[0]['timestamp'][$i]));
             $events[$i]['end_date'] = '';
             $events[$i]['title'] = (string) $title[1];
             $events[$i]['description'] = $data_arr[0]['description'][$i];
