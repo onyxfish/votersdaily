@@ -77,8 +77,10 @@ class StorageEngine {
         foreach($arr as $data) {
             $_data = json_encode($data);
             //$id = md5(uniqid(mt_rand(), true));
-            $id = md5($data['start_datetime'].'-'.$data['branch'].'-'.$data['entity'].'-'.$data['title']);
-            $resp = $couchDB->send("PUT", "/".$dbname."/".$id, $_data);
+            list($_title, $_date_comma) = explode(',', $data['title']);
+            $id = (string)  $data['start_time'].'-'.$data['branch'].'-'.$data['entity'].'-'. urlencode($data['title']);
+            echo $id ."\n";
+            $resp = $couchDB->send("PUT", "/".$dbname."/".addslashes($id), $_data);
             //var_dump($resp);
 
         }        
