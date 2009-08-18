@@ -69,7 +69,7 @@ class SupremeCourtOrders extends EventScraper_Abstract
                     $description = str_replace(array('<a name='.$calendar_day[1].'></a>','\r'),'',$description);
 
                     $events[$i]['datetime'] = $date_str;
-                    $events[$i]['end_date'] = null;
+                    $events[$i]['end_datetime'] = null;
                     $events[$i]['title'] = $title;
                     $events[$i]['description'] = $title_url;
                     $events[$i]['branch'] = 'Judicial';

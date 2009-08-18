@@ -70,7 +70,7 @@ class HouseRollCallVotes extends EventScraper_Abstract
                 //format date
                 $date_str = $month . ' '. $day.' '.$this->year ;
                 $events[$i]['datetime'] = date('Y-m-d', strtotime($date_str));
-                $events[$i]['end_date'] = '';
+                $events[$i]['end_datetime'] = null;
                 $events[$i]['title'] = $title[1];
             
                 if($event_arr[6] == 'F') {

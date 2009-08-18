@@ -59,7 +59,7 @@ class WhiteHouseNominations extends EventScraper_Abstract
             $_date_str = (string) $nominations->row[$i]->formal_nomination_date;
             list($_month,$_day,$_year) = explode('/', $_date_str);
             $events[$i]['datetime'] = $_year .'-'.$_month.'-'.$_day;
-            $events[$i]['end_data'] = (string) $nominations->row[$i]->confirmation_vote;
+            $events[$i]['end_datetime'] = (string) $nominations->row[$i]->confirmation_vote;
             $events[$i]['title'] = 'Nomination: ' . $nominations->row[$i]->position;
             $events[$i]['description'] = $description_str;
             $events[$i]['branch'] = 'Executive';

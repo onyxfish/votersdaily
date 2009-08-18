@@ -58,8 +58,7 @@ class SenateRollCallVotes extends EventScraper_Abstract
             list($day, $month) = explode('-', $start_date);
             $date_str = $month . ' '. $day.' 2009';
             $events[$i]['datetime'] = date('Y-m-d', strtotime($date_str));
-            
-            $events[$i]['end_date'] = '';
+            $events[$i]['end_datetime'] = null;
             $events[$i]['title'] = (string) $votes[$i]->title;
             $events[$i]['description'] = $description_str;
             $events[$i]['branch'] = 'Legislative';

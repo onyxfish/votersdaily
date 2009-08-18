@@ -65,7 +65,7 @@ class SenateCalendar extends EventScraper_Abstract
                         $description = str_replace(array('<a name='.$calendar_day[1].'></a>','\r','\n'),' ',$description);
 
                         $events[$i]['datetime'] = $date_str.'-'.$calendar_day[1];
-                        $events[$i]['end_date'] = null;
+                        $events[$i]['end_datetime'] = null;
                         $events[$i]['title'] = 'Senate Calendar';
                         $events[$i]['description'] = str_replace(array("\r\n",':'), ' ', substr($description,1));
                         $events[$i]['branch'] = 'Legislative';
