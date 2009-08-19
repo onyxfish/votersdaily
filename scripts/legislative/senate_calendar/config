@@ -8,4 +8,4 @@ version: 0.1
 # this page frequently (such as near real-time data)
 frequency: 6.0
 # Set false to stop this scraper from being run by the scheduler
-enabled: true
+enabled: false
