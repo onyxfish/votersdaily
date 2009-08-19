@@ -21,8 +21,6 @@ class SupremeCourtOrders extends EventScraper_Abstract
     public $parser_name = 'Supreme Court 2008 Court Orders Scraper';
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
-    protected $csv_filename = 'data/supremecourtorders.csv';
-    protected $ical_filename = 'data/supremecourtorders.ics';
 
     public function __construct()
     {

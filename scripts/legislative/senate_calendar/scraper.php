@@ -21,8 +21,6 @@ class SenateCalendar extends EventScraper_Abstract
     public $parser_name = 'Senate Calendar Scraper';
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
-    protected $csv_filename = 'data/senatecalendar.csv';
-    protected $ical_filename = 'data/senatecalendar.ics';
 
     public function __construct()
     {

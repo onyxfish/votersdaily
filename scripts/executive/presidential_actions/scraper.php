@@ -20,8 +20,6 @@ class PresidentialActions extends EventScraper_Abstract
     public $parser_name = 'Presidential Action Scraper';
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
-    protected $csv_filename = 'data/presidentialactions.csv';
-    protected $ical_filename = 'data/presidentialactions.ics';
 
     public function __construct()
     {

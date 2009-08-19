@@ -10,6 +10,9 @@ abstract class EventScraper_Abstract
     public $storageEngine = 'couchdb';
     public $couchdbName = 'vd_events';
 
+   
+    //each scraper must have parser_name and parser_version
+    //FIXME: parser_frequency is required in config remove it from scrapers
     public function __construct()
     {
         if(!property_exists($this, 'parser_name')) {
@@ -25,6 +28,10 @@ abstract class EventScraper_Abstract
         }
     }
     
+    //default way to get page data
+
+    //FIXME: doesn't function as expected in foreach(){}
+    //had to fall back to file_get_contents()
     protected function urlopen($url)
     {
         $userAgent = "robot: http://wiki.github.com/bouvard/votersdaily";
@@ -34,34 +41,26 @@ abstract class EventScraper_Abstract
         return $response;
     }
 
-    protected function add_events($arr)
+    //this method is executed after the scrape() i.e.
+    //$events = $this->scrape(); - execute the scrape
+    //$this->add_events($events); - pass the resultset to the storageEngine
+    final protected function add_events($arr)
     {
-        switch($this->storageEngine) {
-            case 'couchdb' :
-                $fn = $this->couchdbName;
-                StorageEngine::couchDbStore($arr, $fn);
-                break;
-
-            case 'ical' :
-                $fn = $this->ical_filename;
-                StorageEngine::icalStore($arr, $fn);
-                break;
-
-            default :
-                $fn = $this->csv_filename;
-                StorageEngine::csvStore($arr, $fn);
-                break;
-        }
-        
+       $fn = $this->couchdbName;
+       StorageEngine::couchDbStore($arr, $fn);
     }
 
+    //standard date format
     protected function _vd_date_format($date_str)
     {
         return strftime('%Y-%m-%dT%H:%M:%SZ',strtotime($date_str));
     }
 
-    
+    //method used to execute scrape() - you can do whatever in scrape() as long as you return the expected data fields.
+    //http://wiki.github.com/bouvard/votersdaily/database-planning
     abstract public function run();
+
+    //do whatever it take to get expected data.
     abstract protected function scrape();
     
 }
@@ -98,64 +97,5 @@ class StorageEngine {
             //var_dump($resp);
         //$i++;
         }        
-    }
-    
-    public static function csvStore($arr, $fn)
-    {
-        $lines = array();
-
-        foreach($arr as $v) {
-            $lines[] = "\"" . implode ('","', $v). "\"\n";
-        }
-        $fp = fopen($fn, 'w');
-        if(!$fp) {
-            echo 'Unable to open $fn for output';
-            exit();
-        }
-        fwrite($fp, implode(',', self::$fields)."\n");
-
-        foreach($lines as $line) {
-            fwrite($fp, $line);
-        }        
-    }
-
-    public static function icalStore($arr, $fn)
-    {
-        $ical_events = '';
-        $space = '    ';
-        foreach($arr as $event) {
-            $start_time = date('Ymd\THis', strtotime($event['start_time']));
-            if(trim($arr['end_time']) != ' ') {
-                $end_time = date('Ymd\THis', $event['end_time']);
-            }
-            $summary = $event['title'];
-            $content = str_replace(',', '\,', str_replace('\\', '\\\\', str_replace(array("\n","\r"), "\n" . $space, strip_tags($event['description']))));
-            $ical_events .=<<<ICAL_EVENT
-BEGIN:VEVENT
-DTSTART:$start_time
-DTEND:$end_time
-SUMMARY:$summary
-DESCRIPTION:$content
-END:VEVENT
-
-ICAL_EVENT;
-                
-        }
-        $ical_content = <<<CONTENT
-BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//EventScraper//NONSGML v1.0//EN
-X-WR-CALNAME:EventScraper'&#8217;s Results
-X-WR-TIMEZONE:US/Eastern
-X-ORIGINAL-URL:{$source_url}
-X-WR-CALDESC:Events from {$parser_name}
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-{$ical_events}END:VCALENDAR
-CONTENT;
-       
-        $open_ical_file = fopen($fn, "w");
-        fwrite($open_ical_file, $ical_content);
-        fclose($open_ical_file);
     }
 }

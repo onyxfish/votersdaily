@@ -21,9 +21,6 @@ class SenateLegislativeSchedule extends EventScraper_Abstract
     public $parser_name = 'Senate Legislative Schedule Scraper';
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
-    protected $csv_filename = 'data/senatelegislativeschedule.csv';
-    protected $ical_filename = 'data/senatelegislativeschedule.ics';
-
 
     public function __construct()
     {

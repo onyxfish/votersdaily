@@ -22,8 +22,6 @@ class WhiteHouseNominations extends EventScraper_Abstract
     public $parser_name = 'White House Nominations Scraper';
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
-    protected $csv_filename = 'data/whitehousenominations.csv';
-    protected $ical_filename = 'data/whitehousenominations.ics';
 
 
     public function __construct()
