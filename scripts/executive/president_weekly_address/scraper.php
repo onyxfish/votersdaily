@@ -51,17 +51,18 @@ class PresidentWeeklyAddress extends EventScraper_Abstract
         $i=0;
         foreach($xml->entry as $weeklyaddress) {
             $description_str = 'Author: '.$weeklyaddress->author->name.' <a href="'.$weeklyaddress->link->attributes()->href.'">'.$weeklyaddress->title.'</a>';
+            $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($weeklyaddress->updated) . ' - '.BranchName::$executive.' - '.EntityName::$whitehouse.' - ' . trim($weeklyaddress->title);
             $events[$i]['datetime'] = (string) $this->_vd_date_format($weeklyaddress->updated);
             $events[$i]['end_datetime'] = null;
             $events[$i]['title'] = (string) trim($weeklyaddress->title);
             $events[$i]['description'] = (string) trim($description_str);
-            $events[$i]['branch'] = 'Executive';
-            $events[$i]['entity'] = 'President WhiteHouse';
+            $events[$i]['branch'] = BranchName::$executive;
+            $events[$i]['entity'] = EntityName::$whitehouse;
             $events[$i]['source_url'] = $this->url;
             $events[$i]['source_text'] = (string) trim($weeklyaddress);
-            $events[$i]['access_datetime'] = $this->access_time;
-            $events[$i]['parser_name'] = $this->parser_name;
-            $events[$i]['parser_version'] = $this->parser_version;             
+            $events[$i]['access_datetime'] = (string) $this->access_time;
+            $events[$i]['parser_name'] = (string) $this->parser_name;
+            $events[$i]['parser_version'] = (string) $this->parser_version;             
             $i++;
         }
 
