@@ -72,7 +72,7 @@ class SupremeCourtOrders extends EventScraper_Abstract
                         $description = strip_tags($matches[1], '<a>');
                         $description = strip_tags($description, '<a>');
                         $description = str_replace(array('<a name='.$calendar_day[1].'></a>','\r'),'',$description);
-
+                        $events[$i]['couchdb_id'] = (string) $date_str . ' - Judicial - Supreme Court - '. trim($title);
                         $events[$i]['datetime'] = (string) $date_str;
                         $events[$i]['end_datetime'] = null;
                         $events[$i]['title'] = (string) trim($title);
