@@ -66,10 +66,10 @@ class SenateRollCallVotes extends EventScraper_Abstract
             $events[$i]['vote_question'] = (string) $votes[$i]->question;
             $events[$i]['vote_result'] = (string) $votes[$i]->result;
             
-            $_yeas = (string) trim($votes[$i]->vote_tally->yeas);
+            $_yeas = (int) trim($votes[$i]->vote_tally->yeas);
             $events[$i]['yes_votes'] = $_yeas;
 
-            $_nays = (string) trim($votes[$i]->vote_tally->nays);
+            $_nays = (int) trim($votes[$i]->vote_tally->nays);
             $events[$i]['no_votes'] =  $_nays;
 
             $events[$i]['source_url'] = $this->url;
