@@ -53,17 +53,17 @@ class PresidentialRemarks extends EventScraper_Abstract
             list($month, $day, $year) = explode('/',$data_arr[0]['timestamp'][$i]);
             
             $_date_str = strftime('%Y-%m-%dT%H:%M:%SZ', mktime(0, 0, 0, $month, $day, $year));
-            $events[$i]['couchdb_id'] = (string) $_date_str . ' - Executive - President - '. trim($title[1]);
+            $events[$i]['couchdb_id'] = (string) $_date_str . ' - '.BranchName::$executive.' - '.EntityName::$whitehouse.' - '. trim($title[1]);
             $events[$i]['datetime'] = $_date_str; //issue
-            $events[$i]['end_datetime'] = '';
+            $events[$i]['end_datetime'] = null;
             $events[$i]['title'] = (string) trim($title[1]);
             $events[$i]['description'] = (string) trim($data_arr[0]['description'][$i]);
-            $events[$i]['branch'] = 'Executive';
-            $events[$i]['entity'] = 'President';
+            $events[$i]['branch'] = BranchName::$executive;
+            $events[$i]['entity'] = EntityName::$whitehouse;
             $events[$i]['source_url'] = $this->url;
             $events[$i]['source_text'] = (string) trim($title[0]);
-            $events[$i]['access_datetime'] = $this->access_time;
-            $events[$i]['parser_name'] = $this->parser_name;
+            $events[$i]['access_datetime'] = (string) $this->access_time;
+            $events[$i]['parser_name'] = (string) $this->parser_name;
             $events[$i]['parser_version'] = $this->parser_version;
         }
         return $events;
