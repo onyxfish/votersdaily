@@ -55,21 +55,26 @@ class SenateRollCallVotes extends EventScraper_Abstract
             $start_date = (string) $votes[$i]->vote_date;
             list($day, $month) = explode('-', $start_date);
             $date_str = $month . ' '. $day.' 2009';
-            $events[$i]['couchdb_id'] = (string)  $this->_vd_date_format($date_str) . ' - Legislative - Senate - ' . trim($votes[$i]->title);
+            $events[$i]['couchdb_id'] = (string)  $this->_vd_date_format($date_str) . ' - '.BranchName::$legislative.' - '.EntityName::$senate.' - ' . trim($votes[$i]->title);
             $events[$i]['datetime'] = $this->_vd_date_format($date_str);
             $events[$i]['end_datetime'] = null;
             $events[$i]['title'] = (string) trim($votes[$i]->title);
             $events[$i]['description'] = trim($description_str);
-            $events[$i]['branch'] = 'Legislative';
-            $events[$i]['entity'] = 'Senate';
-            $events[$i]['vote_number'] = $votes[$i]->vote_number;
-            $events[$i]['vote_issue'] = $votes[$i]->issue->A;
-            $events[$i]['vote_question'] = $votes[$i]->question;
-            $events[$i]['vote_result'] = $votes[$i]->result;
-            $events[$i]['yes_votes'] = (string) $votes[$i]->vote_tally->yeas;
-            $events[$i]['no_votes'] = (string) $votes[$i]->vote_tally->nays;
+            $events[$i]['branch'] = BranchName::$legislative;
+            $events[$i]['entity'] = EntityName::$senate;
+            $events[$i]['vote_number'] = (string) $votes[$i]->vote_number;
+            $events[$i]['vote_issue'] = (string) $votes[$i]->issue->A;
+            $events[$i]['vote_question'] = (string) $votes[$i]->question;
+            $events[$i]['vote_result'] = (string) $votes[$i]->result;
+            
+            $_yeas = (string) trim($votes[$i]->vote_tally->yeas);
+            $events[$i]['yes_votes'] = $_yeas;
+
+            $_nays = (string) trim($votes[$i]->vote_tally->nays);
+            $events[$i]['no_votes'] =  $_nays;
+
             $events[$i]['source_url'] = $this->url;
-            $events[$i]['source_text'] = (string) $votes[$i];
+            $events[$i]['source_text'] = null;
             $events[$i]['access_datetime'] = $this->access_time;
             $events[$i]['parser_name'] = $this->parser_name;
             $events[$i]['parser_version'] = $this->parser_version; 
