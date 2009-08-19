@@ -35,6 +35,8 @@ class SenateRollCallVotes extends EventScraper_Abstract
     {
         $events = array();
 
+        $scrape_start = microtime_float();
+
         $this->source_url = $this->url;        
         $xml = $this->urlopen($this->url);
         $this->access_time = time();
@@ -73,26 +75,15 @@ class SenateRollCallVotes extends EventScraper_Abstract
             $events[$i]['parser_name'] = $this->parser_name;
             $events[$i]['parser_version'] = $this->parser_version; 
         }
+        
+        $scrape_end = microtime_float();
+        
+        $this->parser_runtime = bcsub($scrape_end, $scrape_start, 4);
+
         return $events;
     }
 }
 
 $parser = new SenateRollCallVotes;
-
-//setup loggin array
-$scrape_log['parser_name'] = $parser->parser_name;
-$scrape_log['parser_version'] = $parser->parser_version;
-
-
-$scrape_start = microtime_float();
 $parser->run();
-$scrape_end = microtime_float();
 
-//value available only after scrape
-$scrape_log['url'] = $parser->source_url;
-$scrape_log['source_text'] = $parser->source_text;
-$scrape_log['access_datetime'] = $parser->access_time;
-
-//deal with logging here
-
-//echo "Parse completed in ".bcsub($scrape_end, $scrape_start, 4)." seconds."."\n\n"; 

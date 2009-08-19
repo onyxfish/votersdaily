@@ -101,21 +101,4 @@ class WhiteHouseNominations extends EventScraper_Abstract
 }//end of class
 
 $parser = new WhiteHouseNominations;
-
-//setup loggin array
-$scrape_log['parser_name'] = $parser->parser_name;
-$scrape_log['parser_version'] = $parser->parser_version;
-
-
-$scrape_start = microtime_float();
 $parser->run();
-$scrape_end = microtime_float();
-
-//value available only after scrape
-$scrape_log['url'] = $parser->source_url;
-$scrape_log['source_text'] = $parser->source_text;
-$scrape_log['access_datetime'] = $parser->access_time;
-
-//deal with logging here
-
-//echo "Parse completed in ".bcsub($scrape_end, $scrape_start, 4)." seconds."."\n\n";
