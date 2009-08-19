@@ -40,7 +40,7 @@ class WhiteHouseNominations extends EventScraper_Abstract
     
     protected function scrape()
     {
-        $events = array();
+        $events['couchdb'] = array();
 
         $this->source_url = $this->url;
         $response = $this->urlopen($this->url);
@@ -59,20 +59,29 @@ class WhiteHouseNominations extends EventScraper_Abstract
            
             $_date_str = (string) $nominations->row[$i]->formal_nomination_date;
             list($_month,$_day,$_year) = explode('/', $_date_str);
-            $events[$i]['datetime'] = (string) $this->_vd_date_format($_year .'-'.$_month.'-'.$_day);
-            $events[$i]['end_datetime'] = (string) $this->_vd_date_format($nominations->row[$i]->confirmation_vote);
-            $events[$i]['title'] = (string) 'Nomination: ' . trim($nominations->row[$i]->position);
-            $events[$i]['description'] = (string) trim($description_str);
-            $events[$i]['branch'] = 'Executive';
-            $events[$i]['entity'] = 'President WhiteHouse';
-            $events[$i]['nominee'] = (string) $nominations->row[$i]->name;
-            $events[$i]['is_confirmed'] = (string) $nominations->row[$i]->confirmed;
-            $events[$i]['is_holdover'] = (string) $nominations->row[$i]->holdover;
-            $events[$i]['source_url'] = $this->url;
-            $events[$i]['source_text'] = (string) trim($nominations->row[$i]);
-            $events[$i]['access_datetime'] = $this->access_time;
-            $events[$i]['parser_name'] = $this->parser_name;
-            $events[$i]['parser_version'] = $this->parser_version;            
+            //if we don't have a date disregard
+            if(!empty($_month) && !empty($_day) && !empty($_year)) {
+
+                $_year = (int) $_year;
+                $final_date_str = strftime('%Y-%m-%dT%H:%M:%SZ', mktime(0, 0, 0, $_month, $_day, $_year));
+
+                $events[$i]['couchdb_id'] = (string) $final_date_str . ' Executive  - President WhiteHouse - Nomination of '.$nominations->row[$i]->name.' for ' . trim($nominations->row[$i]->position);
+                $events[$i]['datetime'] = (string) $final_date_str;
+                $events[$i]['end_datetime'] = (string) $this->_vd_date_format($nominations->row[$i]->confirmation_vote);
+                $events[$i]['title'] = (string) 'Nomination: ' . trim($nominations->row[$i]->position);
+                $events[$i]['description'] = (string) trim($description_str);
+                $events[$i]['branch'] = 'Executive';
+                $events[$i]['entity'] = 'President WhiteHouse';
+                $events[$i]['nominee'] = (string) $nominations->row[$i]->name;
+                $events[$i]['position'] = (string) $nominations->row[$i]->position;
+                $events[$i]['is_confirmed'] = (string) $nominations->row[$i]->confirmed;
+                $events[$i]['is_holdover'] = (string) $nominations->row[$i]->holdover;
+                $events[$i]['source_url'] = $this->url;
+                $events[$i]['source_text'] = (string) trim($nominations->row[$i]);
+                $events[$i]['access_datetime'] = $this->access_time;
+                $events[$i]['parser_name'] = $this->parser_name;
+                $events[$i]['parser_version'] = $this->parser_version;            
+            } //if 
         }
 
         return $events;

@@ -51,6 +51,7 @@ class PresidentialPressBriefings extends EventScraper_Abstract
         $total_timestamps = sizeof($data_arr[0]['timestamp']);
         for($i=0; $i < $total_timestamps; $i++) {
             preg_match('#<a[^>]*>(.*?)</a>#is', $data_arr[0]['description'][$i], $title);
+            $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($data_arr[0]['timestamp'][$i]) . ' - Executive - President - '. trim($title[1]);
             $events[$i]['datetime'] = $this->_vd_date_format($data_arr[0]['timestamp'][$i]);
             $events[$i]['end_datetime'] = null;
             $events[$i]['title'] = (string) trim($title[1]);
