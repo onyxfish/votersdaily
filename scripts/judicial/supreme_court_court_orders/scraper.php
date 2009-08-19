@@ -54,6 +54,12 @@ class SupremeCourtOrders extends EventScraper_Abstract
                  
                  foreach($trRows[1] as $row) {
                     preg_match_all('#<TD[^>]*>(.*?)</TD>#is',$row, $data);
+                    
+                    $source_text = '';
+                    foreach($data[0] as $origin) {
+                        $source_text .= $origin ."\n";
+                    }
+
                     $_date_tmp = str_replace('/','-',trim($data[1][0]));
                     list($month,$day,$year) = explode('-',$_date_tmp);
 
@@ -70,17 +76,17 @@ class SupremeCourtOrders extends EventScraper_Abstract
                         $description = strip_tags($matches[1], '<a>');
                         $description = strip_tags($description, '<a>');
                         $description = str_replace(array('<a name='.$calendar_day[1].'></a>','\r'),'',$description);
-                        $events[$i]['couchdb_id'] = (string) $date_str . ' - Judicial - Supreme Court - '. trim($title);
+                        $events[$i]['couchdb_id'] = (string) $date_str . ' - '.BranchName::$judicial.' - '.EntityName::$sup.' - '. trim($title);
                         $events[$i]['datetime'] = (string) $date_str;
                         $events[$i]['end_datetime'] = null;
                         $events[$i]['title'] = (string) trim($title);
                         $events[$i]['description'] = (string) trim($title_url);
-                        $events[$i]['branch'] = 'Judicial';
-                        $events[$i]['entity'] = 'Supreme Court';
+                        $events[$i]['branch'] = BranchName::$judicial;
+                        $events[$i]['entity'] = EntityName::$sup;
                         $events[$i]['source_url'] = $this->url;
-                        $events[$i]['source_text'] = null;
-                        $events[$i]['access_datetime'] = $this->access_time;
-                        $events[$i]['parser_name'] = $this->parser_name;
+                        $events[$i]['source_text'] = (string) $source_text;
+                        $events[$i]['access_datetime'] = (string) $this->access_time;
+                        $events[$i]['parser_name'] = (string) $this->parser_name;
                         $events[$i]['parser_version'] = $this->parser_version;
                     
                         $i++;
