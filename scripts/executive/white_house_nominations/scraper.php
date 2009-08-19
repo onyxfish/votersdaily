@@ -62,22 +62,24 @@ class WhiteHouseNominations extends EventScraper_Abstract
 
                 $_year = (int) $_year;
                 $final_date_str = strftime('%Y-%m-%dT%H:%M:%SZ', mktime(0, 0, 0, $_month, $_day, $_year));
-
-                $events[$i]['couchdb_id'] = (string) $final_date_str . ' Executive  - President WhiteHouse - Nomination of '.$nominations->row[$i]->name.' for ' . trim($nominations->row[$i]->position);
+                list($e_year, $e_month, $e_day) =  explode('-', date('Y-m-d', (int) $nominations->row[$i]->confirmation_vote));
+                
+                $end_date_value = strftime('%Y-%m-%dT%H:%M:%SZ', mktime(0,0,0,$e_month, $e_day,$e_year));
+                $events[$i]['couchdb_id'] = (string) $final_date_str . ' -  ' .BranchName::$executive.'  - '.EntityName::$whitehouse.' - Nomination of '.$nominations->row[$i]->name.' for ' . trim($nominations->row[$i]->position);
                 $events[$i]['datetime'] = (string) $final_date_str;
-                $events[$i]['end_datetime'] = (string) $this->_vd_date_format($nominations->row[$i]->confirmation_vote);
+                $events[$i]['end_datetime'] = (string) $end_date_value;
                 $events[$i]['title'] = (string) 'Nomination: ' . trim($nominations->row[$i]->position);
                 $events[$i]['description'] = (string) trim($description_str);
-                $events[$i]['branch'] = 'Executive';
-                $events[$i]['entity'] = 'President WhiteHouse';
+                $events[$i]['branch'] = BranchName::$executive;
+                $events[$i]['entity'] = EntityName::$whitehouse;
                 $events[$i]['nominee'] = (string) $nominations->row[$i]->name;
                 $events[$i]['position'] = (string) $nominations->row[$i]->position;
-                $events[$i]['is_confirmed'] = (string) $nominations->row[$i]->confirmed;
-                $events[$i]['is_holdover'] = (string) $nominations->row[$i]->holdover;
+                $events[$i]['is_confirmed'] = (bool) $nominations->row[$i]->confirmed;
+                $events[$i]['is_holdover'] = (bool) $nominations->row[$i]->holdover;
                 $events[$i]['source_url'] = $this->url;
                 $events[$i]['source_text'] = (string) trim($nominations->row[$i]);
-                $events[$i]['access_datetime'] = $this->access_time;
-                $events[$i]['parser_name'] = $this->parser_name;
+                $events[$i]['access_datetime'] = (string) $this->access_time;
+                $events[$i]['parser_name'] = (string) $this->parser_name;
                 $events[$i]['parser_version'] = $this->parser_version;            
             } //if 
         }
