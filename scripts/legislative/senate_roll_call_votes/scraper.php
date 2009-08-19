@@ -57,6 +57,7 @@ class SenateRollCallVotes extends EventScraper_Abstract
             $start_date = (string) $votes[$i]->vote_date;
             list($day, $month) = explode('-', $start_date);
             $date_str = $month . ' '. $day.' 2009';
+            $events[$i]['couchdb_id'] = (string)  $this->_vd_date_format($date_str) . ' - Legislative - Senate - ' . trim($votes[$i]->title);
             $events[$i]['datetime'] = $this->_vd_date_format($date_str);
             $events[$i]['end_datetime'] = null;
             $events[$i]['title'] = (string) trim($votes[$i]->title);

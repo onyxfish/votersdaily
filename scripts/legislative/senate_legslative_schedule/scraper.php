@@ -75,6 +75,7 @@ class SenateLegislativeSchedule extends EventScraper_Abstract
                     $end_date = null;
                 }
             }
+            $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($start_date) . ' - Legislative - Senate - '.trim($tdTmp[1][1] . ' ' . $tdTmp[2]);
             $events[$i]['datetime'] = $this->_vd_date_format($start_date);
             $events[$i]['end_datetime'] = $end_date;
             $events[$i]['title'] = (string) trim($tdTmp[1][1] . ' ' . $tdTmp[2]);
@@ -85,7 +86,8 @@ class SenateLegislativeSchedule extends EventScraper_Abstract
             $events[$i]['source_text'] = (string) trim($tdTmp[0]);
             $events[$i]['access_datetime'] = $this->access_time;
             $events[$i]['parser_name'] = $this->parser_name;
-            $events[$i]['parser_version'] = $this->parser_version;            
+            $events[$i]['parser_version'] = $this->parser_version;
+
             $i++;
         }
 
