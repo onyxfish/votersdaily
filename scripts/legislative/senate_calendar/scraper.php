@@ -54,6 +54,9 @@ class SenateCalendar extends EventScraper_Abstract
 
                     preg_match('#<table[^>]*>(.+?)<\/table>#is',$row,$matches);
                     preg_match('#<a name=(.*?)>#is', $matches[1], $calendar_day);
+
+                    $source_text = $matches[0];
+
                     $_date_str = explode('/',$this->url);
                     list($date_str, $ext) = explode('.', $_date_str[4]);
 
@@ -61,18 +64,18 @@ class SenateCalendar extends EventScraper_Abstract
                         $description = strip_tags($matches[1], '<a>');
                         $description = strip_tags($description, '<a>');
                         $description = str_replace(array('<a name='.$calendar_day[1].'></a>','\r','\n'),' ',$description);
-                        $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($date_str.'-'.$calendar_day[1]) . ' - Legislative - Senate Calendar'; 
+                        $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($date_str.'-'.$calendar_day[1]) . ' -  '.BranchName::$legislative.' -  - Senate Calendar'; 
 
                         $events[$i]['datetime'] = $this->_vd_date_format($date_str.'-'.$calendar_day[1]);
                         $events[$i]['end_datetime'] = null;
                         $events[$i]['title'] = 'Senate Calendar';
                         $events[$i]['description'] = trim(str_replace(array("\r\n",':'), ' ', substr($description,1)));
-                        $events[$i]['branch'] = 'Legislative';
-                        $events[$i]['entity'] = 'Senate';
+                        $events[$i]['branch'] = BranchName::$legislative;
+                        $events[$i]['entity'] = EntityName::$senate;
                         $events[$i]['source_url'] = $this->url;
-                        $events[$i]['source_text'] = (string) trim($matches[0]);
-                        $events[$i]['access_datetime'] = $this->access_time;
-                        $events[$i]['parser_name'] = $this->parser_name;
+                        $events[$i]['source_text'] = (string) $source_text;
+                        $events[$i]['access_datetime'] = (string) $this->access_time;
+                        $events[$i]['parser_name'] = (string) $this->parser_name;
                         $events[$i]['parser_version'] = $this->parser_version;
 
                     }
