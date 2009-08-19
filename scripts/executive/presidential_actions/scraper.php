@@ -48,18 +48,18 @@ class PresidentialActions extends EventScraper_Abstract
         for($i=0; $i < $total_timestamps; $i++) {
             preg_match('#<a[^>]*>(.*?)</a>#is', $data_arr[0]['description'][$i], $title);
 
-            $events[$i]['couchdb_id'] = $this->_vd_date_format($data_arr[0]['timestamp'][$i]) . '- Executive - President - '.trim($title[1]);
+            $events[$i]['couchdb_id'] = $this->_vd_date_format($data_arr[0]['timestamp'][$i]) . '- '.BranchName::$executive.' - '.EntityName::$whitehouse.' - '.trim($title[1]);
             $events[$i]['datetime'] = $this->_vd_date_format($data_arr[0]['timestamp'][$i]);
             $events[$i]['end_datetime'] = null;
             $events[$i]['title'] = (string) trim($title[1]);
             $events[$i]['description'] = (string) trim($data_arr[0]['description'][$i]);
-            $events[$i]['branch'] = 'Executive';
-            $events[$i]['entity'] = 'President';
-            $events[$i]['source_url'] = $this->url;
+            $events[$i]['branch'] = BranchName::$executive;
+            $events[$i]['entity'] = EntityName::$whitehouse;
+            $events[$i]['source_url'] = (string) $this->url;
             $events[$i]['source_text'] = (string) $_events[0];
-            $events[$i]['access_datetime'] = $this->access_time;
-            $events[$i]['parser_name'] = $this->parser_name;
-            $events[$i]['parser_version'] = $this->parser_version;
+            $events[$i]['access_datetime'] = (string) $this->access_time;
+            $events[$i]['parser_name'] = (string) $this->parser_name;
+            $events[$i]['parser_version'] = (string) $this->parser_version;
         }
         return $events;
     }
