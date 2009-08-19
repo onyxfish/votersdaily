@@ -4,16 +4,15 @@ $PATH_TO_INCLUDES = dirname(dirname(dirname(__FILE__)));
 echo $PATH_TO_INCLUDES;
 require $PATH_TO_INCLUDES.'/phputils/EventScraper.php';
 require $PATH_TO_INCLUDES.'/phputils/couchdb.php';
-function microtime_float()
-{
-        list($utime, $time) = explode(" ", microtime());
-            return ((float)$utime + (float)$time);
-}
- 
-//$script_start = microtime_float();
 
-ini_set("display_errors", true);
-error_reporting(E_ALL & ~E_NOTICE);
+/*
+ * Voters Daily: PHP - President Weekly Address Scraper
+ * http://wiki.github.com/bouvard/votersdaily
+ *
+ * @author      Chauncey Thorn <chaunceyt@gmail.com>
+ * Link: http://www.cthorn.com/
+ *
+ */
 
 
 class PresidentWeeklyAddress extends EventScraper_Abstract
@@ -56,9 +55,9 @@ class PresidentWeeklyAddress extends EventScraper_Abstract
             $events[$i]['end_datetime'] = null;
             $events[$i]['title'] = (string) trim($weeklyaddress->title);
             $events[$i]['description'] = (string) trim($description_str);
-            $events[$i]['branch'] = BranchName::$executive;
-            $events[$i]['entity'] = EntityName::$whitehouse;
-            $events[$i]['source_url'] = $this->url;
+            $events[$i]['branch'] = (string) BranchName::$executive;
+            $events[$i]['entity'] = (string) EntityName::$whitehouse;
+            $events[$i]['source_url'] = (string) $this->url;
             $events[$i]['source_text'] = (string) trim($weeklyaddress);
             $events[$i]['access_datetime'] = (string) $this->access_time;
             $events[$i]['parser_name'] = (string) $this->parser_name;
@@ -70,26 +69,12 @@ class PresidentWeeklyAddress extends EventScraper_Abstract
     }
 }//end of class
 
-$engine_options = array('couchdb','csv', 'ical');
-if(isset($argv[1]) && in_array($argv[1], $engine_options)) {
-        $engine= $argv[1];
-            echo "Using ".$engine." as Storage Engine...\n\n";
-}
-else {
-        $engine=null;
-}
-
-
 $parser = new PresidentWeeklyAddress;
 
 //setup loggin array
 $scrape_log['parser_name'] = $parser->parser_name;
 $scrape_log['parser_version'] = $parser->parser_version;
 
-
-if($engine) {
-        $parser->storageEngine = $engine;
-}
 
 $scrape_start = microtime_float();
 $parser->run();

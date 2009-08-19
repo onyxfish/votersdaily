@@ -3,16 +3,7 @@
 $PATH_TO_INCLUDES = dirname(dirname(dirname(__FILE__)));
 require $PATH_TO_INCLUDES.'/phputils/EventScraper.php';
 require $PATH_TO_INCLUDES.'/phputils/couchdb.php';
-function microtime_float()
-{
-        list($utime, $time) = explode(" ", microtime());
-            return ((float)$utime + (float)$time);
-}
- 
-//$script_start = microtime_float();
 
-ini_set("display_errors", true);
-error_reporting(E_ALL & ~E_NOTICE);
 
 
 class PresidentialRemarks extends EventScraper_Abstract
@@ -54,42 +45,27 @@ class PresidentialRemarks extends EventScraper_Abstract
             
             $_date_str = strftime('%Y-%m-%dT%H:%M:%SZ', mktime(0, 0, 0, $month, $day, $year));
             $events[$i]['couchdb_id'] = (string) $_date_str . ' - '.BranchName::$executive.' - '.EntityName::$whitehouse.' - '. trim($title[1]);
-            $events[$i]['datetime'] = $_date_str; //issue
+            $events[$i]['datetime'] = (string) $_date_str; //issue
             $events[$i]['end_datetime'] = null;
             $events[$i]['title'] = (string) trim($title[1]);
             $events[$i]['description'] = (string) trim($data_arr[0]['description'][$i]);
-            $events[$i]['branch'] = BranchName::$executive;
-            $events[$i]['entity'] = EntityName::$whitehouse;
-            $events[$i]['source_url'] = $this->url;
+            $events[$i]['branch'] = (string) BranchName::$executive;
+            $events[$i]['entity'] = (string) EntityName::$whitehouse;
+            $events[$i]['source_url'] = (string) $this->url;
             $events[$i]['source_text'] = (string) trim($title[0]);
             $events[$i]['access_datetime'] = (string) $this->access_time;
             $events[$i]['parser_name'] = (string) $this->parser_name;
-            $events[$i]['parser_version'] = $this->parser_version;
+            $events[$i]['parser_version'] = (string) $this->parser_version;
         }
         return $events;
     }
 }//end of class
-
-$engine_options = array('couchdb','csv', 'ical');
-if(isset($argv[1]) && in_array($argv[1], $engine_options)) {
-        $engine= $argv[1];
-            echo "Using ".$engine." as Storage Engine...\n\n";
-}
-else {
-        $engine=null;
-}
-
 
 $parser = new PresidentialRemarks;
 
 //setup loggin array
 $scrape_log['parser_name'] = $parser->parser_name;
 $scrape_log['parser_version'] = $parser->parser_version;
-
-
-if($engine) {
-        $parser->storageEngine = $engine;
-}
 
 $scrape_start = microtime_float();
 $parser->run();

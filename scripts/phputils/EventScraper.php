@@ -1,4 +1,15 @@
 <?php
+ini_set("display_errors", true);
+error_reporting(E_ALL & ~E_NOTICE);
+/*
+ * Voters Daily: PHP EventScraper_Abstract Class
+ * http://wiki.github.com/bouvard/votersdaily
+ *
+ * @author      Chauncey Thorn <chaunceyt@gmail.com>
+ * Link: http://www.cthorn.com/
+ *
+ */
+
 abstract class EventScraper_Abstract
 {
     public $parser_version;
@@ -53,16 +64,23 @@ abstract class EventScraper_Abstract
     //$this->add_events($events); - pass the resultset to the storageEngine
     final protected function add_events($arr)
     {
-       $params = $_SERVER[ "argv" ]; 
-       $this->getRunTimeParams($params);
-       $eventdb = $this->couchdbName;
-       $server = $this->couchdbServer;
-       $port = $this->couchdbPort;
+        if(!is_array($arr)) {
+            $_err_message_ = 'The method add_events expects an array. Review your scrape method.';
+            throw new Exception($_err_message_);
+        }
+        
+        $params = $_SERVER[ "argv" ];//TODO: make safer
+        $this->getRunTimeParams($params);
+        $eventdb = $this->couchdbName;
+        $server = $this->couchdbServer;
+        $port = $this->couchdbPort;
 
-       StorageEngine::couchDbStore($arr, $eventdb, $server, $port);
+        StorageEngine::couchDbStore($arr, $eventdb, $server, $port);
     }
 
     //standard date format
+    //note: be careful relying on this - it doesn't work in all cases.
+    //we may have to just enforce the format and let the author of scraper take ownership of datetime and end_datetime format.
     protected function _vd_date_format($date_str)
     {
         return strftime('%Y-%m-%dT%H:%M:%SZ',strtotime($date_str));
@@ -127,27 +145,30 @@ class StorageEngine {
         $options['port'] = $port;
 
         $couchDB = new CouchDbSimple($options);
-        //$resp = $couchDB->send("DELETE", "/".$dbname."/");
+        $resp = $couchDB->send("GET", "/".$dbname."/");
+        //var_dump($resp);
 
         //need to check to see if couchDB database is available before excuting
         //Chris and I talked about run.py being able to handle db 
         $resp = $couchDB->send("PUT", "/".$dbname);
         //var_dump($resp);
         
-        //$i=1; //FYI:$i is being used to ensure we have a unique id. 
         foreach($arr as $data) {
+
+            //get the couchdb_id from $data and then unset it.
             $couchdb_id = $data['couchdb_id'];
 
             //we no longer need couchdb_id and we don't want to save it.
             unset($data['couchdb_id']);
 
+            //encode the date for couchdb
             $_data = json_encode($data);
-            $id = (string) $data['datetime'].'-'.$data['branch'].'-'.$data['entity'].'-'. $data['title'];
+
+            //store the data
             $resp = $couchDB->send("PUT", "/".$dbname."/".rawurlencode($couchdb_id), $_data);
            
             //for debug will remove once we have all data inserting as expected.
             //var_dump($resp);
-        //$i++;
         }        
     }
 }
@@ -168,3 +189,11 @@ class BranchName
     static public $judicial = 'Judicial';
     static public $other = 'Other';
 }
+
+function microtime_float()
+{
+        list($utime, $time) = explode(" ", microtime());
+            return ((float)$utime + (float)$time);
+}
+
+

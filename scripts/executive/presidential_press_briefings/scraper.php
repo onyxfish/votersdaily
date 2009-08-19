@@ -3,16 +3,15 @@
 $PATH_TO_INCLUDES = dirname(dirname(dirname(__FILE__)));
 require $PATH_TO_INCLUDES.'/phputils/EventScraper.php';
 require $PATH_TO_INCLUDES.'/phputils/couchdb.php';
-function microtime_float()
-{
-        list($utime, $time) = explode(" ", microtime());
-            return ((float)$utime + (float)$time);
-}
- 
-//$script_start = microtime_float();
 
-ini_set("display_errors", true);
-error_reporting(E_ALL & ~E_NOTICE);
+/*
+ * Voters Daily: PHP - Presidential Press Briefings Scraper
+ * http://wiki.github.com/bouvard/votersdaily
+ *
+ * @author      Chauncey Thorn <chaunceyt@gmail.com>
+ * Link: http://www.cthorn.com/
+ *
+ */
 
 
 class PresidentialPressBriefings extends EventScraper_Abstract
@@ -55,12 +54,12 @@ class PresidentialPressBriefings extends EventScraper_Abstract
 
             preg_match('#<a[^>]*>(.*?)</a>#is', $data_arr[0]['description'][$i], $title);
             $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($data_arr[0]['timestamp'][$i]) . ' - '.BranchName::$executive.' - '.EntityName::$whitehouse.' - '. trim($title[1]);
-            $events[$i]['datetime'] = $this->_vd_date_format($data_arr[0]['timestamp'][$i]);
+            $events[$i]['datetime'] = (string) $this->_vd_date_format($data_arr[0]['timestamp'][$i]);
             $events[$i]['end_datetime'] = null;
             $events[$i]['title'] = (string) trim($title[1]);
             $events[$i]['description'] = (string) trim($data_arr[0]['description'][$i]);
-            $events[$i]['branch'] = BranchName::$executive;
-            $events[$i]['entity'] = EntityName::$whitehouse;
+            $events[$i]['branch'] = (string) BranchName::$executive;
+            $events[$i]['entity'] = (string) EntityName::$whitehouse;
             $events[$i]['source_url'] = (string) $this->url;
             $events[$i]['source_text'] = (string) $source_text;
             $events[$i]['access_datetime'] = (string) $this->access_time;
@@ -71,26 +70,12 @@ class PresidentialPressBriefings extends EventScraper_Abstract
     }
 }
 
-$engine_options = array('couchdb');
-if(isset($argv[1]) && in_array($argv[1], $engine_options)) {
-        $engine= $argv[1];
-            echo "Using ".$engine." as Storage Engine...\n\n";
-}
-else {
-        $engine=null;
-}
-
-
 $parser = new PresidentialPressBriefings;
 
 //setup loggin array
 $scrape_log['parser_name'] = $parser->parser_name;
 $scrape_log['parser_version'] = $parser->parser_version;
 
-
-if($engine) {
-        $parser->storageEngine = $engine;
-}
 
 $scrape_start = microtime_float();
 $parser->run();

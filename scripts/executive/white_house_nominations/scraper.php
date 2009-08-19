@@ -3,16 +3,15 @@
 $PATH_TO_INCLUDES = dirname(dirname(dirname(__FILE__)));
 require $PATH_TO_INCLUDES.'/phputils/EventScraper.php';
 require $PATH_TO_INCLUDES.'/phputils/couchdb.php';
-function microtime_float()
-{
-        list($utime, $time) = explode(" ", microtime());
-            return ((float)$utime + (float)$time);
-}
- 
-//$script_start = microtime_float();
 
-ini_set("display_errors", true);
-error_reporting(E_ALL & ~E_NOTICE);
+/*
+ * Voters Daily: PHP - White House Nominations Scraper
+ * http://wiki.github.com/bouvard/votersdaily
+ *
+ * @author      Chauncey Thorn <chaunceyt@gmail.com>
+ * Link: http://www.cthorn.com/
+ *
+ */
 
 
 class WhiteHouseNominations extends EventScraper_Abstract
@@ -70,17 +69,17 @@ class WhiteHouseNominations extends EventScraper_Abstract
                 $events[$i]['end_datetime'] = (string) $end_date_value;
                 $events[$i]['title'] = (string) 'Nomination: ' . trim($nominations->row[$i]->position);
                 $events[$i]['description'] = (string) trim($description_str);
-                $events[$i]['branch'] = BranchName::$executive;
-                $events[$i]['entity'] = EntityName::$whitehouse;
+                $events[$i]['branch'] = (string) BranchName::$executive;
+                $events[$i]['entity'] = (string) EntityName::$whitehouse;
                 $events[$i]['nominee'] = (string) $nominations->row[$i]->name;
                 $events[$i]['position'] = (string) $nominations->row[$i]->position;
-                $events[$i]['is_confirmed'] = (bool) $nominations->row[$i]->confirmed;
-                $events[$i]['is_holdover'] = (bool) $nominations->row[$i]->holdover;
-                $events[$i]['source_url'] = $this->url;
+                $events[$i]['is_confirmed'] = (bool) $nominations->row[$i]->confirmed; //FIXME: always true in couchdb
+                $events[$i]['is_holdover'] = (bool) $nominations->row[$i]->holdover; //FIXME: always true in couchdb value is true/false
+                $events[$i]['source_url'] = (string) $this->url;
                 $events[$i]['source_text'] = (string) trim($nominations->row[$i]);
                 $events[$i]['access_datetime'] = (string) $this->access_time;
                 $events[$i]['parser_name'] = (string) $this->parser_name;
-                $events[$i]['parser_version'] = $this->parser_version;            
+                $events[$i]['parser_version'] = (string) $this->parser_version;            
             } //if 
         }
 
@@ -88,26 +87,12 @@ class WhiteHouseNominations extends EventScraper_Abstract
     }
 }//end of class
 
-$engine_options = array('couchdb','csv', 'ical');
-if(isset($argv[1]) && in_array($argv[1], $engine_options)) {
-        $engine= $argv[1];
-            echo "Using ".$engine." as Storage Engine...\n\n";
-}
-else {
-        $engine=null;
-}
-
-
 $parser = new WhiteHouseNominations;
 
 //setup loggin array
 $scrape_log['parser_name'] = $parser->parser_name;
 $scrape_log['parser_version'] = $parser->parser_version;
 
-
-if($engine) {
-        $parser->storageEngine = $engine;
-}
 
 $scrape_start = microtime_float();
 $parser->run();

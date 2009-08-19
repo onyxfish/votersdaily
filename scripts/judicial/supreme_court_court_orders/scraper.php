@@ -3,17 +3,15 @@
 $PATH_TO_INCLUDES = dirname(dirname(dirname(__FILE__)));
 require $PATH_TO_INCLUDES.'/phputils/EventScraper.php';
 require $PATH_TO_INCLUDES.'/phputils/couchdb.php';
-function microtime_float()
-{
-        list($utime, $time) = explode(" ", microtime());
-            return ((float)$utime + (float)$time);
-}
- 
-//$script_start = microtime_float();
 
-ini_set("display_errors", true);
-error_reporting(E_ALL & ~E_NOTICE);
-
+/*
+ * Voters Daily: PHP - Supreme Court 2008 Court Orders Scraper
+ * http://wiki.github.com/bouvard/votersdaily
+ *
+ * @author      Chauncey Thorn <chaunceyt@gmail.com>
+ * Link: http://www.cthorn.com/
+ *
+ */
 
 class SupremeCourtOrders extends EventScraper_Abstract
 {
@@ -63,8 +61,8 @@ class SupremeCourtOrders extends EventScraper_Abstract
                     $_date_tmp = str_replace('/','-',trim($data[1][0]));
                     list($month,$day,$year) = explode('-',$_date_tmp);
 
-                    //$date_str = '20'.$year.'-'.$month.'-'.$day;
                     //FIX: for some reason $year may contain 20www.supremecourtus.gov
+                    //only losing a few of the entries
                     if(ctype_digit($year)) {
 
                         $_year_tmp = (int) '20'.$year;
@@ -81,13 +79,13 @@ class SupremeCourtOrders extends EventScraper_Abstract
                         $events[$i]['end_datetime'] = null;
                         $events[$i]['title'] = (string) trim($title);
                         $events[$i]['description'] = (string) trim($title_url);
-                        $events[$i]['branch'] = BranchName::$judicial;
-                        $events[$i]['entity'] = EntityName::$sup;
-                        $events[$i]['source_url'] = $this->url;
+                        $events[$i]['branch'] = (string) BranchName::$judicial;
+                        $events[$i]['entity'] = (string) EntityName::$sup;
+                        $events[$i]['source_url'] = (string) $this->url;
                         $events[$i]['source_text'] = (string) $source_text;
                         $events[$i]['access_datetime'] = (string) $this->access_time;
                         $events[$i]['parser_name'] = (string) $this->parser_name;
-                        $events[$i]['parser_version'] = $this->parser_version;
+                        $events[$i]['parser_version'] = (string) $this->parser_version;
                     
                         $i++;
                     }//end if ctype_digit check
@@ -99,26 +97,13 @@ class SupremeCourtOrders extends EventScraper_Abstract
     }
 }
 
-$engine_options = array('couchdb','csv', 'ical');
-if(isset($argv[1]) && in_array($argv[1], $engine_options)) {
-        $engine= $argv[1];
-            echo "Using ".$engine." as Storage Engine...\n\n";
-}
-else {
-        $engine=null;
-}
-
-
+//main
 $parser = new SupremeCourtOrders;
 
 //setup loggin array
 $scrape_log['parser_name'] = $parser->parser_name;
 $scrape_log['parser_version'] = $parser->parser_version;
 
-
-if($engine) {
-        $parser->storageEngine = $engine;
-}
 
 $scrape_start = microtime_float();
 $parser->run();
