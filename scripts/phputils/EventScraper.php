@@ -26,7 +26,7 @@ abstract class EventScraper_Abstract
     public $couchdbName = 'vd_events';
     public $couchdbServer = 'localhost';
     public $couchdbPort = 5984;
-    public $couchdbLogdb = 'vd_logs';
+    public $couchdbLogDb = 'vd_logs';
 
    
     //each scraper must have parser_name and parser_version
@@ -76,6 +76,18 @@ abstract class EventScraper_Abstract
         $port = $this->couchdbPort;
 
         StorageEngine::couchDbStore($arr, $eventdb, $server, $port);
+
+        //logging.
+        $logdb = $this->couchdbLogDb;
+        $scrape_log['parser_name'] = (string) $this->parser_name;
+        $scrape_log['parser_version'] = (string) $this->parser_version;
+        $scrape_log['url'] = (string) $this->source_url;
+        $scrape_log['source_text'] = (string) $this->source_text;
+        $scrape_log['access_datetime'] = (string) $this->access_time;
+        $scrape_log['parser_runtime'] = $this->parser_runtime;
+
+        StorageEngine::couchDbLog($scrape_log, $logdb, $server, $port); 
+
     }
 
     //standard date format
@@ -137,7 +149,6 @@ abstract class EventScraper_Abstract
 
 
 class StorageEngine {
-    protected static $fields = array('datetime','end_datetime','title','description','branch','entity','source_url','source_text','access_datetime','parser_name','person_version');
 
     public static function couchDbStore($arr, $dbname, $server, $port)
     {
@@ -171,6 +182,24 @@ class StorageEngine {
             //var_dump($resp);
         }        
     }
+
+    public static function couchDbLog($arr, $logdb, $server, $port)
+    {
+        $options['host'] = $server;
+        $options['port'] = $port;
+        $couchDB = new CouchDbSimple($options);
+        $resp = $couchDB->send("GET", "/".$logdb."/");
+        //var_dump($resp);
+
+        $resp = $couchDB->send("PUT", "/".$logdb);
+
+        $_data = json_encode($arr);
+        $right_now = date('D, d M Y H:i:s T');
+        $logdb_id = strftime('%Y-%m-%dT%H:%M:%SZ',strtotime($right_now)) . ' - ' .$arr['parser_name']. ' - ' . $arr['parser_version']. ' - Execution time: '.$arr['parser_runtime'];
+        $resp = $couchDB->send("PUT", "/".$logdb."/".rawurlencode($logdb_id), $_data);
+        //var_dump($resp);
+
+    }
 }
 
 class EntityName
@@ -192,8 +221,8 @@ class BranchName
 
 function microtime_float()
 {
-        list($utime, $time) = explode(" ", microtime());
-            return ((float)$utime + (float)$time);
+    list($utime, $time) = explode(" ", microtime());
+    return ((float)$utime + (float)$time);
 }
 
 
