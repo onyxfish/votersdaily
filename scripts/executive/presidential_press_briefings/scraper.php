@@ -48,6 +48,11 @@ class PresidentialPressBriefings extends EventScraper_Abstract
         
         $total_timestamps = sizeof($data_arr[0]['timestamp']);
         for($i=0; $i < $total_timestamps; $i++) {
+            $source_text = '';
+            foreach($_events[0] as $origin) {
+                $source_text .= $origin;
+            }
+
             preg_match('#<a[^>]*>(.*?)</a>#is', $data_arr[0]['description'][$i], $title);
             $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($data_arr[0]['timestamp'][$i]) . ' - '.BranchName::$executive.' - '.EntityName::$whitehouse.' - '. trim($title[1]);
             $events[$i]['datetime'] = $this->_vd_date_format($data_arr[0]['timestamp'][$i]);
@@ -57,7 +62,7 @@ class PresidentialPressBriefings extends EventScraper_Abstract
             $events[$i]['branch'] = BranchName::$executive;
             $events[$i]['entity'] = EntityName::$whitehouse;
             $events[$i]['source_url'] = (string) $this->url;
-            $events[$i]['source_text'] = (string) trim($_events[0]);
+            $events[$i]['source_text'] = (string) $source_text;
             $events[$i]['access_datetime'] = (string) $this->access_time;
             $events[$i]['parser_name'] = (string) $this->parser_name;
             $events[$i]['parser_version'] = (string) $this->parser_version;
