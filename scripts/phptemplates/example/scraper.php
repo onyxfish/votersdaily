@@ -45,8 +45,8 @@ class ScraperName extends EventScraper_Abstract
         $this->access_time = time();
 
         /*
-        $events[$i]['start_date'] = null;
-        $events[$i]['end_date'] = null;
+        $events[$i]['datetime'] = null;
+        $events[$i]['end_datetime'] = null;
         $events[$i]['title'] = null;
         $events[$i]['description'] = null;
         $events[$i]['branch'] = null;

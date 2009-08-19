@@ -51,14 +51,19 @@ class PresidentialRemarks extends EventScraper_Abstract
         $total_timestamps = sizeof($data_arr[0]['timestamp']);
         for($i=0; $i < $total_timestamps; $i++) {
             preg_match('#<a[^>]*>(.*?)</a>#is', $data_arr[0]['description'][$i], $title);
-            $events[$i]['start_date'] = date('Y-m-d', strtotime($data_arr[0]['timestamp'][$i]));
-            $events[$i]['end_date'] = '';
-            $events[$i]['title'] = (string) $title[1];
-            $events[$i]['description'] = $data_arr[0]['description'][$i];
+            $data_arr[0]['timestamp'][$i];
+            list($month, $day, $year) = explode('/',$data_arr[0]['timestamp'][$i]);
+            
+            $_date_str = strftime('%Y-%m-%dT%H:%M:%SZ', mktime(0, 0, 0, $month, $day, $year));
+            $events[$i]['couchdb_id'] = (string) $_date_str . ' - Executive - President - '. trim($title[1]);
+            $events[$i]['datetime'] = $_date_str; //issue
+            $events[$i]['end_datetime'] = '';
+            $events[$i]['title'] = (string) trim($title[1]);
+            $events[$i]['description'] = (string) trim($data_arr[0]['description'][$i]);
             $events[$i]['branch'] = 'Executive';
             $events[$i]['entity'] = 'President';
             $events[$i]['source_url'] = $this->url;
-            $events[$i]['source_text'] = '';
+            $events[$i]['source_text'] = (string) trim($title[0]);
             $events[$i]['access_datetime'] = $this->access_time;
             $events[$i]['parser_name'] = $this->parser_name;
             $events[$i]['parser_version'] = $this->parser_version;
@@ -78,8 +83,6 @@ else {
 
 
 $parser = new PresidentialRemarks;
-
-echo "\n\n".'Running Parser: ' . $parser->parser_name . '...'."\n";
 
 //setup loggin array
 $scrape_log['parser_name'] = $parser->parser_name;
@@ -101,4 +104,4 @@ $scrape_log['access_datetime'] = $parser->access_time;
 
 //deal with logging here
 
-echo "Parse completed in ".bcsub($scrape_end, $scrape_start, 4)." seconds."."\n\n"; 
+//echo "Parse completed in ".bcsub($scrape_end, $scrape_start, 4)." seconds."."\n\n"; 

@@ -34,6 +34,7 @@ class HouseRollCallVotes extends EventScraper_Abstract
     public function run()
     {
         $events = $this->scrape();
+        //print_r($events);
         $this->add_events($events);
     }
     
@@ -53,9 +54,8 @@ class HouseRollCallVotes extends EventScraper_Abstract
              $voteLinks[] = 'http://clerk.house.gov/evs/2009/ROLL'.$otherLink;
         }
         asort($voteLinks);
-
         foreach($voteLinks as $voteLink) {
-            $page_response = $this->urlopen($voteLink);
+            $page_response = file_get_contents($voteLink);
             //get title
             preg_match('#<TITLE>(.*?)<\/TITLE>#is',$page_response, $title);
 
@@ -66,12 +66,16 @@ class HouseRollCallVotes extends EventScraper_Abstract
             foreach($data[1] as $event) {
                 $event = str_replace(array("\r\n",'  :  ',' :  '),':',strip_tags(trim($event)));
                 $event_arr = explode(':', $event);
+
+                if(ctype_digit($event_arr[0])) {
+
                 list($day, $month) = explode('-', $event_arr[1]);
                 //format date
                 $date_str = $month . ' '. $day.' '.$this->year ;
-                $events[$i]['start_date'] = date('Y-m-d', strtotime($date_str));
-                $events[$i]['end_data'] = '';
-                $events[$i]['title'] = $title[1];
+                $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($date_str) . ' - Legislative - House of Representatives - ' .  trim($title[1]) .' - Roll Call # '.$event_arr[0];
+                $events[$i]['datetime'] = (string) $this->_vd_date_format($date_str);
+                $events[$i]['end_datetime'] = null;
+                $events[$i]['title'] = (string) trim($title[1]);
             
                 if($event_arr[6] == 'F') {
                     $status = 'Failed';
@@ -86,14 +90,16 @@ class HouseRollCallVotes extends EventScraper_Abstract
                 $bill_str = str_replace(' ','.',$event_arr[3]);
                 $description_str .= ' http://thomas.loc.gov/cgi-bin/bdquery/z?d111:'.strtolower($bill_str).':';
 
-                $events[$i]['description'] = $description_str;
+                $events[$i]['description'] = (string) trim($description_str);
                 $events[$i]['branch'] = 'Legislative';
                 $events[$i]['entity'] = 'House of Representatives';
                 $events[$i]['source_url'] = $this->url;
                 $events[$i]['source_text'] = $event;
-                $events[$i]['access_datetime'] = $access_time;
+                $events[$i]['access_datetime'] = $this->access_time;
                 $events[$i]['parser_name'] = $this->parser_name;
                 $events[$i]['parser_version'] = $this->parser_version;
+
+                }
                 $i++;
             }
         }
@@ -113,8 +119,6 @@ else {
 
 
 $parser = new HouseRollCallVotes;
-
-echo "\n\n".'Running Parser: ' . $parser->parser_name . '...'."\n";
 
 //setup loggin array
 $scrape_log['parser_name'] = $parser->parser_name;
@@ -136,4 +140,4 @@ $scrape_log['access_datetime'] = $parser->access_time;
 
 //deal with logging here
 
-echo "Parse completed in ".bcsub($scrape_end, $scrape_start, 4)." seconds."."\n\n"; 
+//echo "Parse completed in ".bcsub($scrape_end, $scrape_start, 4)." seconds."."\n\n"; 

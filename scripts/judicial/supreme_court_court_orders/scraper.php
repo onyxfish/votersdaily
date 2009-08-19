@@ -1,6 +1,6 @@
 #!/usr/bin/php -q
 <?php
-$PATH_TO_INCLUDES = dirname(dirname(dirname(dirname(__FILE__))));
+$PATH_TO_INCLUDES = dirname(dirname(dirname(__FILE__)));
 require $PATH_TO_INCLUDES.'/phputils/EventScraper.php';
 require $PATH_TO_INCLUDES.'/phputils/couchdb.php';
 function microtime_float()
@@ -59,27 +59,35 @@ class SupremeCourtOrders extends EventScraper_Abstract
                     $_date_tmp = str_replace('/','-',trim($data[1][0]));
                     list($month,$day,$year) = explode('-',$_date_tmp);
 
-                    $date_str = '20'.$year.'-'.$month.'-'.$day;
+                    //$date_str = '20'.$year.'-'.$month.'-'.$day;
+                    //FIX: for some reason $year may contain 20www.supremecourtus.gov
+                    if(ctype_digit($year)) {
 
-                    $title_url = $data[1][1];
-                    $title = strip_tags($data[1][1]);
+                        $_year_tmp = (int) '20'.$year;
+                        $date_str = strftime('%Y-%m-%dT%H:%M:%SZ', mktime(0, 0, 0, $month, $day, $_year_tmp));
+
+                        $title_url = $data[1][1];
+                        $title = strip_tags($data[1][1]);
                     
-                    $description = strip_tags($matches[1], '<a>');
-                    $description = strip_tags($description, '<a>');
-                    $description = str_replace(array('<a name='.$calendar_day[1].'></a>','\r'),'',$description);
+                        $description = strip_tags($matches[1], '<a>');
+                        $description = strip_tags($description, '<a>');
+                        $description = str_replace(array('<a name='.$calendar_day[1].'></a>','\r'),'',$description);
+                        $events[$i]['couchdb_id'] = (string) $date_str . ' - Judicial - Supreme Court - '. trim($title);
+                        $events[$i]['datetime'] = (string) $date_str;
+                        $events[$i]['end_datetime'] = null;
+                        $events[$i]['title'] = (string) trim($title);
+                        $events[$i]['description'] = (string) trim($title_url);
+                        $events[$i]['branch'] = 'Judicial';
+                        $events[$i]['entity'] = 'Supreme Court';
+                        $events[$i]['source_url'] = $this->url;
+                        $events[$i]['source_text'] = null;
+                        $events[$i]['access_datetime'] = $this->access_time;
+                        $events[$i]['parser_name'] = $this->parser_name;
+                        $events[$i]['parser_version'] = $this->parser_version;
+                    
+                        $i++;
+                    }//end if ctype_digit check
 
-                    $events[$i]['start_date'] = $date_str;
-                    $events[$i]['end_date'] = null;
-                    $events[$i]['title'] = $title;
-                    $events[$i]['description'] = $title_url;
-                    $events[$i]['branch'] = 'Judicial';
-                    $events[$i]['entity'] = 'Supreme Court';
-                    $events[$i]['source_url'] = $this->url;
-                    $events[$i]['source_text'] = $event;
-                    $events[$i]['access_datetime'] = $this->access_time;
-                    $events[$i]['parser_name'] = $this->parser_name;
-                    $events[$i]['parser_version'] = $this->parser_version;
-                    $i++;
                  }
             }
         }
@@ -98,8 +106,6 @@ else {
 
 
 $parser = new SupremeCourtOrders;
-
-echo 'Running Parser: ' . $parser->parser_name . '...'."\n";
 
 //setup loggin array
 $scrape_log['parser_name'] = $parser->parser_name;
@@ -121,4 +127,4 @@ $scrape_log['access_datetime'] = $parser->access_time;
 
 //deal with logging here
 
-echo "Parse completed in ".bcsub($scrape_end, $scrape_start, 4)." seconds."."\n\n";
+//echo "Parse completed in ".bcsub($scrape_end, $scrape_start, 4)." seconds."."\n\n";

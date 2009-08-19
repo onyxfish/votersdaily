@@ -63,15 +63,16 @@ class SenateCalendar extends EventScraper_Abstract
                         $description = strip_tags($matches[1], '<a>');
                         $description = strip_tags($description, '<a>');
                         $description = str_replace(array('<a name='.$calendar_day[1].'></a>','\r','\n'),' ',$description);
+                        $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($date_str.'-'.$calendar_day[1]) . ' - Legislative - Senate Calendar'; 
 
-                        $events[$i]['start_date'] = $date_str.'-'.$calendar_day[1];
-                        $events[$i]['end_date'] = null;
+                        $events[$i]['datetime'] = $this->_vd_date_format($date_str.'-'.$calendar_day[1]);
+                        $events[$i]['end_datetime'] = null;
                         $events[$i]['title'] = 'Senate Calendar';
-                        $events[$i]['description'] = str_replace(array("\r\n",':'), ' ', substr($description,1));
+                        $events[$i]['description'] = trim(str_replace(array("\r\n",':'), ' ', substr($description,1)));
                         $events[$i]['branch'] = 'Legislative';
                         $events[$i]['entity'] = 'Senate';
                         $events[$i]['source_url'] = $this->url;
-                        $events[$i]['source_text'] = $event;
+                        $events[$i]['source_text'] = (string) trim($matches[0]);
                         $events[$i]['access_datetime'] = $this->access_time;
                         $events[$i]['parser_name'] = $this->parser_name;
                         $events[$i]['parser_version'] = $this->parser_version;
@@ -98,8 +99,6 @@ else {
 
 $parser = new SenateCalendar;
 
-echo "\n\n".'Running Parser: ' . $parser->parser_name . '...'."\n";
-
 //setup loggin array
 $scrape_log['parser_name'] = $parser->parser_name;
 $scrape_log['parser_version'] = $parser->parser_version;
@@ -120,4 +119,4 @@ $scrape_log['access_datetime'] = $parser->access_time;
 
 //deal with logging here
 
-echo "Parse completed in ".bcsub($scrape_end, $scrape_start, 4)." seconds."."\n\n"; 
+//echo "Parse completed in ".bcsub($scrape_end, $scrape_start, 4)." seconds."."\n\n"; 

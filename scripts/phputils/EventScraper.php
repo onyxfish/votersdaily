@@ -8,7 +8,7 @@ abstract class EventScraper_Abstract
     public $source_text;
     public $parser_frequency;
     public $storageEngine = 'couchdb';
-    public $couchdbName = 'phpvotedailydb';
+    public $couchdbName = 'vd_events';
 
     public function __construct()
     {
@@ -54,6 +54,12 @@ abstract class EventScraper_Abstract
         }
         
     }
+
+    protected function _vd_date_format($date_str)
+    {
+        return strftime('%Y-%m-%dT%H:%M:%SZ',strtotime($date_str));
+    }
+
     
     abstract public function run();
     abstract protected function scrape();
@@ -62,7 +68,7 @@ abstract class EventScraper_Abstract
 
 
 class StorageEngine {
-    protected static $fields = array('start_time','end_time','title','description','branch','entity','source_url','source_text','access_datetime','parser_name','person_version');
+    protected static $fields = array('datetime','end_datetime','title','description','branch','entity','source_url','source_text','access_datetime','parser_name','person_version');
 
     public static function couchDbStore($arr, $dbname)
     {
@@ -72,15 +78,25 @@ class StorageEngine {
         $couchDB = new CouchDbSimple($options);
         //$resp = $couchDB->send("DELETE", "/".$dbname."/");
 
+        //need to check to see if couchDB database is available before excuting
+        //Chris and I talked about run.py being able to handle db 
         $resp = $couchDB->send("PUT", "/".$dbname);
         //var_dump($resp);
+        
+        //$i=1; //FYI:$i is being used to ensure we have a unique id. 
         foreach($arr as $data) {
-            $_data = json_encode($data);
-            //$id = md5(uniqid(mt_rand(), true));
-            $id = md5($data['start_datetime'].'-'.$data['branch'].'-'.$data['entity'].'-'.$data['title']);
-            $resp = $couchDB->send("PUT", "/".$dbname."/".$id, $_data);
-            //var_dump($resp);
+            $couchdb_id = $data['couchdb_id'];
 
+            //we no longer need couchdb_id and we don't want to save it.
+            unset($data['couchdb_id']);
+
+            $_data = json_encode($data);
+            $id = (string) $data['datetime'].'-'.$data['branch'].'-'.$data['entity'].'-'. $data['title'];
+            $resp = $couchDB->send("PUT", "/".$dbname."/".rawurlencode($couchdb_id), $_data);
+           
+            //for debug will remove once we have all data inserting as expected.
+            //var_dump($resp);
+        //$i++;
         }        
     }
     
