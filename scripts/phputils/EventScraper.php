@@ -68,7 +68,7 @@ abstract class EventScraper_Abstract
 
 
 class StorageEngine {
-    protected static $fields = array('start_time','end_time','title','description','branch','entity','source_url','source_text','access_datetime','parser_name','person_version');
+    protected static $fields = array('datetime','end_datetime','title','description','branch','entity','source_url','source_text','access_datetime','parser_name','person_version');
 
     public static function couchDbStore($arr, $dbname)
     {
@@ -82,16 +82,21 @@ class StorageEngine {
         //Chris and I talked about run.py being able to handle db 
         $resp = $couchDB->send("PUT", "/".$dbname);
         //var_dump($resp);
-
-        $i=1; //FYI:$i is being used to ensure we have a unique id. 
+        
+        //$i=1; //FYI:$i is being used to ensure we have a unique id. 
         foreach($arr as $data) {
+            $couchdb_id = $data['couchdb_id'];
+
+            //we no longer need couchdb_id and we don't want to save it.
+            unset($data['couchdb_id']);
+
             $_data = json_encode($data);
-            $id = (string) $data['datetime'].' '.$i.'-'.$data['branch'].'-'.$data['entity'].'-'. $data['title'];
-            $resp = $couchDB->send("PUT", "/".$dbname."/".urlencode($id), $_data);
+            $id = (string) $data['datetime'].'-'.$data['branch'].'-'.$data['entity'].'-'. $data['title'];
+            $resp = $couchDB->send("PUT", "/".$dbname."/".rawurlencode($couchdb_id), $_data);
            
             //for debug will remove once we have all data inserting as expected.
             //var_dump($resp);
-        $i++;
+        //$i++;
         }        
     }
     
