@@ -53,6 +53,11 @@ class SenateLegislativeSchedule extends EventScraper_Abstract
             list($start_str, $end_str) = explode('-',$tdTmp[1][0]);
             //list($month, $until) = explode(' ',$tdTmp[1][0]);
 
+            $source_text = '';
+            foreach($tdTmp[0] as $origin) {
+                $source_text .= $origin;
+            }
+
             if(!empty($start_str) && $start_str != 'TBD') {
                 $start_date = $start_str.' 2009';
                 list($start_month, $start_day) = explode(' ', $start_str);
@@ -72,18 +77,22 @@ class SenateLegislativeSchedule extends EventScraper_Abstract
                     $end_date = null;
                 }
             }
-            $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($start_date) . ' - Legislative - Senate - '.trim($tdTmp[1][1] . ' ' . $tdTmp[2]);
+
+            if(!empty($tdTmp[1][1])) {
+
+            $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($start_date) . ' - '.BranchName::$legislative.' - '.EntityName::$house.' - '.trim($tdTmp[1][1] . ' ' . $tdTmp[2]);
             $events[$i]['datetime'] = $this->_vd_date_format($start_date);
             $events[$i]['end_datetime'] = $end_date;
             $events[$i]['title'] = (string) trim($tdTmp[1][1] . ' ' . $tdTmp[2]);
             $events[$i]['description'] = null;
-            $events[$i]['branch'] = 'Legislative';
-            $events[$i]['entity'] = 'Senate';
+            $events[$i]['branch'] = BranchName::$legislative;
+            $events[$i]['entity'] = EntityName::$senate;
             $events[$i]['source_url'] = $this->url;
-            $events[$i]['source_text'] = (string) trim($tdTmp[0]);
-            $events[$i]['access_datetime'] = $this->access_time;
-            $events[$i]['parser_name'] = $this->parser_name;
+            $events[$i]['source_text'] = (string) $source_text;
+            $events[$i]['access_datetime'] = (string) $this->access_time;
+            $events[$i]['parser_name'] = (string) $this->parser_name;
             $events[$i]['parser_version'] = $this->parser_version;
+            }
 
             $i++;
         }
@@ -92,7 +101,7 @@ class SenateLegislativeSchedule extends EventScraper_Abstract
     }
 }
 
-$engine_options = array('couchdb','csv', 'ical');
+$engine_options = array('couchdb');
 if(isset($argv[1]) && in_array($argv[1], $engine_options)) {
     $engine= $argv[1];
     echo "Using ".$engine." as Storage Engine...\n\n";
