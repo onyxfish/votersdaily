@@ -75,7 +75,7 @@ class SenateRollCallVotes extends EventScraper_Abstract
 
             $events[$i]['source_url'] = $this->url;
             $events[$i]['source_text'] = null;
-            $events[$i]['access_datetime'] = $this->access_time;
+            $events[$i]['access_datetime'] = (string) $this->access_time;
             $events[$i]['parser_name'] = $this->parser_name;
             $events[$i]['parser_version'] = $this->parser_version; 
         }
