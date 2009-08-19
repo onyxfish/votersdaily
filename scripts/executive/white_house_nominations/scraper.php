@@ -73,10 +73,23 @@ class WhiteHouseNominations extends EventScraper_Abstract
                 $events[$i]['entity'] = (string) EntityName::$whitehouse;
                 $events[$i]['nominee'] = (string) $nominations->row[$i]->name;
                 $events[$i]['position'] = (string) $nominations->row[$i]->position;
-                $events[$i]['is_confirmed'] = (bool) $nominations->row[$i]->confirmed; //FIXME: always true in couchdb
-                $events[$i]['is_holdover'] = (bool) $nominations->row[$i]->holdover; //FIXME: always true in couchdb value is true/false
+                
+                if($nominations->row[$i]->confirmed == 'true') {
+                    $events[$i]['is_confirmed'] = true;
+                }
+                else {
+                    $events[$i]['is_confirmed'] = false;
+                }
+
+                if($nominations->row[$i]->holdover == 'true') {
+                    $events[$i]['is_holdover'] = true;
+                }
+                else {
+                    $events[$i]['is_holdover'] = false;
+                }
+
                 $events[$i]['source_url'] = (string) $this->url;
-                $events[$i]['source_text'] = (string) trim($nominations->row[$i]);
+                $events[$i]['source_text'] = null;
                 $events[$i]['access_datetime'] = (string) $this->access_time;
                 $events[$i]['parser_name'] = (string) $this->parser_name;
                 $events[$i]['parser_version'] = (string) $this->parser_version;            

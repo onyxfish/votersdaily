@@ -49,11 +49,11 @@ class SenateRollCallVotes extends EventScraper_Abstract
             $description_str = 'Vote Number '.$votes[$i]->vote_number.' Issue ' . $votes[$i]->issue->A;
             $description_str .= ' Answering: ' . $votes[$i]->question . ' Results: ' .$votes[$i]->result;
             $description_str .=  ' Votes - yeas: ' .$votes[$i]->vote_tally->yeas. ' nays: ' .$votes[$i]->vote_tally->nays;
-
             //deal with date
             $start_date = (string) $votes[$i]->vote_date;
             list($day, $month) = explode('-', $start_date);
             $date_str = $month . ' '. $day.' 2009';
+
             $events[$i]['couchdb_id'] = (string)  $this->_vd_date_format($date_str) . ' - '.BranchName::$legislative.' - '.EntityName::$senate.' - ' . trim($votes[$i]->title);
             $events[$i]['datetime'] = $this->_vd_date_format($date_str);
             $events[$i]['end_datetime'] = null;
@@ -65,13 +65,8 @@ class SenateRollCallVotes extends EventScraper_Abstract
             $events[$i]['vote_issue'] = (string) $votes[$i]->issue->A;
             $events[$i]['vote_question'] = (string) $votes[$i]->question;
             $events[$i]['vote_result'] = (string) $votes[$i]->result;
-            
-            $_yeas = (int) trim($votes[$i]->vote_tally->yeas);
-            $events[$i]['yes_votes'] = $_yeas;
-
-            $_nays = (int) trim($votes[$i]->vote_tally->nays);
-            $events[$i]['no_votes'] =  $_nays;
-
+            $events[$i]['yes_votes'] = (int) trim($votes[$i]->vote_tally->yeas);
+            $events[$i]['no_votes'] =  (int) trim($votes[$i]->vote_tally->nays);
             $events[$i]['source_url'] = $this->url;
             $events[$i]['source_text'] = null;
             $events[$i]['access_datetime'] = (string) $this->access_time;
