@@ -99,3 +99,20 @@ class StorageEngine {
         }        
     }
 }
+
+class EntityName
+{
+    static public $whitehouse = 'White House';
+    static public $senate = 'Senate';
+    static public $house = 'House of Representatives';
+    static public $sup = 'Supreme Court';
+    static public $fec = 'Federal Election Commission';
+}
+
+class BranchName
+{
+    static public $executive = 'Executive';
+    static public $legislative = 'Legislative';
+    static public $judicial = 'Judicial';
+    static public $other = 'Other';
+}
