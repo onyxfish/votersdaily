@@ -7,8 +7,15 @@ abstract class EventScraper_Abstract
     public $source_url;
     public $source_text;
     public $parser_frequency;
+
+    //default runtime params
+    //these value may be changed via cli by run.py
+    
     public $storageEngine = 'couchdb';
     public $couchdbName = 'vd_events';
+    public $couchdbServer = 'localhost';
+    public $couchdbPort = 5984;
+    public $couchdbLogdb = 'vd_logs';
 
    
     //each scraper must have parser_name and parser_version
@@ -46,14 +53,58 @@ abstract class EventScraper_Abstract
     //$this->add_events($events); - pass the resultset to the storageEngine
     final protected function add_events($arr)
     {
-       $fn = $this->couchdbName;
-       StorageEngine::couchDbStore($arr, $fn);
+       $params = $_SERVER[ "argv" ]; 
+       $this->getRunTimeParams($params);
+       $eventdb = $this->couchdbName;
+       $server = $this->couchdbServer;
+
+       StorageEngine::couchDbStore($arr, $eventdb, $server);
     }
 
     //standard date format
     protected function _vd_date_format($date_str)
     {
         return strftime('%Y-%m-%dT%H:%M:%SZ',strtotime($date_str));
+    }
+
+    //get CLI params passed by run.py if any
+    //FIXME: restrict to only deal with predefined params.
+    public function getRunTimeParams($arr)
+    {
+        if(!is_array($arr)) {
+            list($param, $value) = explode('=',$arr);
+            $this->_set_getopt_params($param, $value);
+        }
+        else {
+            foreach($arr as $getopt) {
+                list($param, $value) = explode('=',$getopt);
+                $this->_set_getopt_params($param, $value);
+            }
+        }
+    }
+
+    // set commandline options coming from run.py
+    protected function _set_getopt_params($param, $value)
+    {
+        //default 'vd_events
+        if($param === '--engine') {
+            $this->storageEngine = $value;
+        }
+
+        //default http://localhost:5984/
+        if($param === '--server') {
+            $this->couchdbServer = $value;
+        }
+
+        //default vd_events
+        if($param === '--eventdb') {
+           $this->couchdbName = $value;
+        }
+
+        //default vd_logs
+        if($param === '--logdb') {
+           $this->couchdbLogdb = $value;
+        }
     }
 
     //method used to execute scrape() - you can do whatever in scrape() as long as you return the expected data fields.
@@ -69,10 +120,10 @@ abstract class EventScraper_Abstract
 class StorageEngine {
     protected static $fields = array('datetime','end_datetime','title','description','branch','entity','source_url','source_text','access_datetime','parser_name','person_version');
 
-    public static function couchDbStore($arr, $dbname)
+    public static function couchDbStore($arr, $dbname, $server)
     {
-        $options['host'] = "localhost";
-        $options['port'] = 5984;
+        $options['host'] = 'localhost';
+        $options['port'] = '5984';
 
         $couchDB = new CouchDbSimple($options);
         //$resp = $couchDB->send("DELETE", "/".$dbname."/");
