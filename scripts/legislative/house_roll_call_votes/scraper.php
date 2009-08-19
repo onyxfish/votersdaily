@@ -68,17 +68,21 @@ class HouseRollCallVotes extends EventScraper_Abstract
                 list($day, $month) = explode('-', $event_arr[1]);
                 //format date
                 $date_str = $month . ' '. $day.' '.$this->year ;
-                $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($date_str) . ' - Legislative - House of Representatives - ' .  trim($title[1]) .' - Roll Call # '.$event_arr[0];
+                $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($date_str) . ' - '.BranchName::$legislative.' - '.EntityName::$house.' - ' .  trim($title[1]) .' - Roll Call # '.$event_arr[0];
                 $events[$i]['datetime'] = (string) $this->_vd_date_format($date_str);
                 $events[$i]['end_datetime'] = null;
                 $events[$i]['title'] = (string) trim($title[1]);
             
+                //creating new field (bool)
                 if($event_arr[6] == 'F') {
                     $status = 'Failed';
+                    $events[$i]['vote_status'] = false;
                 }
                 else if($event_arr[6] == 'P') {
                     $status = 'Passed';
+                    $events[$i]['vote_status'] = true;
                 }
+                
                 
                 //NOTICE: this block of code is causing notices $event_arr index .. 
                 $description_str = 'Roll Call # '.$event_arr[0] . ' ' . $event_arr[3] . ' - ' . $event_arr[5] . ' ' . $event_arr[7] .' ('.$status.')';
@@ -87,13 +91,13 @@ class HouseRollCallVotes extends EventScraper_Abstract
                 $description_str .= ' http://thomas.loc.gov/cgi-bin/bdquery/z?d111:'.strtolower($bill_str).':';
 
                 $events[$i]['description'] = (string) trim($description_str);
-                $events[$i]['branch'] = 'Legislative';
-                $events[$i]['entity'] = 'House of Representatives';
-                $events[$i]['source_url'] = $this->url;
+                $events[$i]['branch'] = (string) BranchName::$legislative;
+                $events[$i]['entity'] = (string) EntityName::$house;
+                $events[$i]['source_url'] = (string) $this->url;
                 $events[$i]['source_text'] = $event;
-                $events[$i]['access_datetime'] = $this->access_time;
-                $events[$i]['parser_name'] = $this->parser_name;
-                $events[$i]['parser_version'] = $this->parser_version;
+                $events[$i]['access_datetime'] = (string) $this->access_time;
+                $events[$i]['parser_name'] = (string) $this->parser_name;
+                $events[$i]['parser_version'] = (string) $this->parser_version;
 
                 }
                 $i++;
