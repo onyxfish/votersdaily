@@ -57,8 +57,9 @@ abstract class EventScraper_Abstract
        $this->getRunTimeParams($params);
        $eventdb = $this->couchdbName;
        $server = $this->couchdbServer;
+       $port = $this->couchdbPort;
 
-       StorageEngine::couchDbStore($arr, $eventdb, $server);
+       StorageEngine::couchDbStore($arr, $eventdb, $server, $port);
     }
 
     //standard date format
@@ -120,10 +121,10 @@ abstract class EventScraper_Abstract
 class StorageEngine {
     protected static $fields = array('datetime','end_datetime','title','description','branch','entity','source_url','source_text','access_datetime','parser_name','person_version');
 
-    public static function couchDbStore($arr, $dbname, $server)
+    public static function couchDbStore($arr, $dbname, $server, $port)
     {
-        $options['host'] = 'localhost';
-        $options['port'] = '5984';
+        $options['host'] = $server;
+        $options['port'] = $port;
 
         $couchDB = new CouchDbSimple($options);
         //$resp = $couchDB->send("DELETE", "/".$dbname."/");
