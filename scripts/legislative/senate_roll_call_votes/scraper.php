@@ -42,12 +42,12 @@ class SenateRollCallVotes extends EventScraper_Abstract
         $xml = $this->urlopen($this->url);
         $this->access_time = time();
         $this->source_text = $xml;
-
+        
         $response = simplexml_load_string($xml);
         
         $votes = $response->votes->vote;
         $total_events = sizeof($votes);
-    
+
         for($i=0; $i< $total_events; $i++) {
             //getting source_text for this entry
             $source_text = '';
@@ -63,6 +63,35 @@ class SenateRollCallVotes extends EventScraper_Abstract
             $start_date = (string) $votes[$i]->vote_date;
             list($day, $month) = explode('-', $start_date);
             $date_str = $month . ' '. $day.' 2009';
+            
+            //hack to get the url for vote and issue
+            $cong_session = '111';
+            $vote_url = 'http://thomas.loc.gov/cgi-bin/bdquery/z?d'.$cong_session.':';
+
+            list($_issue_part1, $part2) = explode(' ', $votes[$i]->issue->A);
+            $part1 = str_replace('.','',$_issue_part1);
+
+            switch($part1) {
+                case 'S' :
+                    $_part1_str = 'SN';
+                    break;
+                case 'SJRes' :
+                    $_part1_str = 'SJ';
+                    break;
+                case 'SAmdt' :
+                    $_part1_str = 'SP';
+                    default :
+            }
+
+            
+            if(!strlen(trim($part2)) != 0 || strlen(trim($part2)) < 5) {
+                $total_under = (5 - sizeof(trim($part2)));
+                $padding='0';
+                $_vote_issue_url = $vote_url.$_part1_str.str_repeat($padding,$total_under).trim($part2).':';
+            }
+            else {
+                $_vote_issue_url = null; 
+            }
 
             $events[$i]['couchdb_id'] = (string)  $this->_vd_date_format($date_str) . ' - '.BranchName::$legislative.' - '.EntityName::$senate.' - ' . trim($votes[$i]->title);
             $events[$i]['datetime'] = $this->_vd_date_format($date_str);
@@ -73,6 +102,7 @@ class SenateRollCallVotes extends EventScraper_Abstract
             $events[$i]['entity'] = EntityName::$senate;
             $events[$i]['vote_number'] = (string) $votes[$i]->vote_number;
             $events[$i]['vote_issue'] = (string) $votes[$i]->issue->A;
+            $events[$i]['vote_issue_url'] = $_vote_issue_url;
             $events[$i]['vote_question'] = (string) $votes[$i]->question;
             $events[$i]['vote_result'] = (string) $votes[$i]->result;
             $events[$i]['yes_votes'] = (int) trim($votes[$i]->vote_tally->yeas);
