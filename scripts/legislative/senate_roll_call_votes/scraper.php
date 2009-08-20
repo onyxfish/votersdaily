@@ -3,7 +3,6 @@
 $PATH_TO_INCLUDES = dirname(dirname(dirname(__FILE__)));
 require $PATH_TO_INCLUDES.'/phputils/EventScraper.php';
 require $PATH_TO_INCLUDES.'/phputils/couchdb.php';
-require $PATH_TO_INCLUDES.'/phputils/xml2array.php';
 
 /*
  * Voters Daily: PHP - Senate Roll Call Votes Scraper
