@@ -1,6 +1,4 @@
 <?php
-ini_set("display_errors", true);
-error_reporting(E_ALL & ~E_NOTICE);
 /*
  * Voters Daily: PHP EventScraper_Abstract Class
  * http://wiki.github.com/bouvard/votersdaily
@@ -9,6 +7,9 @@ error_reporting(E_ALL & ~E_NOTICE);
  * Link: http://www.cthorn.com/
  *
  */
+ini_set("display_errors", true);
+error_reporting(E_ALL & ~E_NOTICE);
+
 
 abstract class EventScraper_Abstract
 {
