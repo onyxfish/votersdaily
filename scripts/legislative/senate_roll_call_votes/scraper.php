@@ -3,6 +3,7 @@
 $PATH_TO_INCLUDES = dirname(dirname(dirname(__FILE__)));
 require $PATH_TO_INCLUDES.'/phputils/EventScraper.php';
 require $PATH_TO_INCLUDES.'/phputils/couchdb.php';
+require $PATH_TO_INCLUDES.'/phputils/xml2array.php';
 
 /*
  * Voters Daily: PHP - Senate Roll Call Votes Scraper
@@ -48,6 +49,13 @@ class SenateRollCallVotes extends EventScraper_Abstract
         $total_events = sizeof($votes);
     
         for($i=0; $i< $total_events; $i++) {
+            //getting source_text for this entry
+            $source_text = '';
+            $_votes = $votes[$i];
+            foreach($_votes as $origin) {
+                $source_text .= $origin;  
+            }
+
             $description_str = 'Vote Number '.$votes[$i]->vote_number.' Issue ' . $votes[$i]->issue->A;
             $description_str .= ' Answering: ' . $votes[$i]->question . ' Results: ' .$votes[$i]->result;
             $description_str .=  ' Votes - yeas: ' .$votes[$i]->vote_tally->yeas. ' nays: ' .$votes[$i]->vote_tally->nays;
@@ -70,7 +78,7 @@ class SenateRollCallVotes extends EventScraper_Abstract
             $events[$i]['yes_votes'] = (int) trim($votes[$i]->vote_tally->yeas);
             $events[$i]['no_votes'] =  (int) trim($votes[$i]->vote_tally->nays);
             $events[$i]['source_url'] = $this->url;
-            $events[$i]['source_text'] = null;
+            $events[$i]['source_text'] = (string) $source_text;
             $events[$i]['access_datetime'] = (string) $this->access_time;
             $events[$i]['parser_name'] = $this->parser_name;
             $events[$i]['parser_version'] = $this->parser_version; 
