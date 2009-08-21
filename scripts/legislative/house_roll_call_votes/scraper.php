@@ -30,11 +30,13 @@ class HouseRollCallVotes extends EventScraper_Abstract
     public function run()
     {
         $_events = $this->scrape();
+
+        //we have a number of pages so we're going to execute
+        //add_events numemous of times.
         foreach($_events as $events) {
             //print_r($events);
             $this->add_events($events);
         }
-        //print_r($events);
     }
     
     protected function scrape()
@@ -46,6 +48,8 @@ class HouseRollCallVotes extends EventScraper_Abstract
 
         //$access_time = time();
         $this->access_time = time();
+        
+        //top page: http://clerk.house.gov/evs/2009/index.asp
 
         preg_match_all('#<TABLE[^>]*>(.+?)<\/TABLE>#is',$response,$top_page);
 
@@ -101,38 +105,41 @@ class HouseRollCallVotes extends EventScraper_Abstract
                     $toppage_events[$i]['entity'] = (string) EntityName::$house;
                     $toppage_events[$i]['source_url'] = (string) $this->url;
                     
-                    $toppage_events[$i]['source_text'] = $_source_text;
+                    $toppage_events[$i]['source_text'] = (string) $_source_text;
                     $toppage_events[$i]['access_datetime'] = (string) $this->access_time;
                     $toppage_events[$i]['parser_name'] = (string) $this->parser_name;
                     $toppage_events[$i]['parser_version'] = (string) $this->parser_version;
                     $i++;
                 }
 
+                //merge into events array
                 $_tmp_events[] = array_merge($toppage_events,$events);
             }
 
-        preg_match_all('#<A HREF="ROLL(.*?)">#is',$response, $otherLinks);
+            //get all the other pages for current year.
+            $_current_year = date('Y');
+            preg_match_all('#<A HREF="ROLL(.*?)">#is',$response, $otherLinks);
             foreach($otherLinks[1] as $otherLink) {
-                //$voteLinks[] = 'http://clerk.house.gov/evs/2009/ROLL'.$otherLink;
-                $_voteLink = 'http://clerk.house.gov/evs/2009/ROLL'.$otherLink;
+
+                $_voteLink = 'http://clerk.house.gov/evs/'.$_current_year.'/ROLL'.$otherLink;
                 $page_response .= file_get_contents($_voteLink);
                 preg_match_all('#<TITLE>(.*?)<\/TITLE>#is',$page_response, $title);
              
-                //print_r($title[1]);
+                //get all of the <table></table>
                 preg_match_all('#<TABLE[^>]*>(.+?)<\/TABLE>#is',$page_response,$matches);
 
                 $t=0;
                 foreach($matches[1] as $data1) {
+                    //foreach <table></table> get <tr></tr>
                     preg_match_all('#<TR>(.+?)<\/TR>#is',$data1, $pages);
-                    //print_r($pages[1]);
 
                     $i=0;
                     foreach($pages[1] as $data2) {
+                        //this is the source_text for this doc
                         $_source_text = $data2;
 
+                        //start getting the data from <td><td>
                         preg_match_all('#<TD[^>]*>(.+?)<\/TD>#is',$data2, $data2_pages);
-
-                        //print_r($data2_pages[1]);
 
                         //datetime
                         preg_match('#<FONT[^>]*>(.+?)<\/FONT>#is',$data2_pages[1][1],$date_str);
@@ -143,8 +150,10 @@ class HouseRollCallVotes extends EventScraper_Abstract
                         //rollcall number url
                         preg_match('#<A HREF="(.*?)">#is',$data2_pages[1][0], $rollnumber_url_str);
 
-                        //issue
+                        //issue url
                         preg_match('#<A HREF=(.*?)>#is', $data2_pages[1][2], $issue_url_str);
+
+                        //ussue
                         preg_match('#<A[^>]*>(.+?)<\/A>#is',$data2_pages[1][2], $issue_str);
 
                         //question
@@ -165,6 +174,7 @@ class HouseRollCallVotes extends EventScraper_Abstract
                         $other_events[$i]['issue_url'] = (string) trim(str_replace('"','',$issue_url_str[1]));
                         $other_events[$i]['question'] = (string) $question_str[1];
                 
+                         
                         if($result_str[1] == 'F') {
                             $events[$i]['vote_status'] = false;
                         }
@@ -181,21 +191,18 @@ class HouseRollCallVotes extends EventScraper_Abstract
                         $other_events[$i]['branch'] = (string) BranchName::$legislative;
                         $other_events[$i]['entity'] = (string) EntityName::$house;
                         $other_events[$i]['source_url'] = (string) $this->url;
-                        $other_events[$i]['source_text'] = $_source_text;
+                        $other_events[$i]['source_text'] = (string) $_source_text;
                         $other_events[$i]['access_datetime'] = (string) $this->access_time;
                         $other_events[$i]['parser_name'] = (string) $this->parser_name;
                         $other_events[$i]['parser_version'] = (string) $this->parser_version;
                 
                     }
 
+                    //merge into events array
                     $_tmp_events[] = array_merge($other_events, $events);;
                 }
         }
-            
-                //creating new field (bool)
-                /*
-                 */
-                
+        
         return $_tmp_events;
     }
 }
