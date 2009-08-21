@@ -11,6 +11,10 @@ import urllib2
 import couchdb
 from couchdb.schema import *
 
+# Previous versions will yield erroneous 409 responses from CouchDB
+if couchdb.__version__ < "0.7":
+    print 'couchdb-python version 0.7 or greater is required.'
+
 
 class ScrapeError(Exception):
     """
@@ -31,7 +35,7 @@ class EventScraper(object):
     # CouchDB config
     SERVER_URI = 'http://localhost:5984/'
     EVENT_DB_NAME = 'vd_events'
-    LOG_DB_NAME = 'vd_log'
+    LOG_DB_NAME = 'vd_logs'
     
     # These values should be set when urlopen() is called,
     # but might not be if the scraper errors out before it completes
@@ -86,30 +90,70 @@ class EventScraper(object):
             
         return source_text
     
-    def event_exists(self, event):
+    def validate_event(self, event):
         """
-        Return True if a specified event already exists in the events database.
-        
-        Note: helper method for scraper writers.
+        Raises an AttributeError exception if all required fields have not been
+        populated.
         """
-        if event.exists(self.event_db):
+        for attr in ['datetime', 'branch', 'entity', 'title', 'source_url',
+                     'source_text', 'access_datetime']:
+            if not event[attr]:
+                raise AttributeError(
+                    '%s is a required attribute for every Event.')
+                
+    def event_exists(self, id):
+        """
+        Return true if an event with this unique already exists.
+        """
+        if id in self.event_db:
             return True
         
         return False
+                
+    def encode_dict(self, data):
+        """
+        Work around couchdb-python's lack of support for datetime's by pre-
+        encoding them to strings.
+        """
+        copy_event = {}
+        
+        for k, v in data.items():
+            if isinstance(v, datetime.datetime):
+                copy_event[k] = self.encode_datetime(v)
+            else:
+                copy_event[k] = v
+        
+        return copy_event
+    
+    def encode_datetime(self, value):
+        """
+        Encode a datetime in ISO 8601 UTC format with second accuracy.
+        """
+        return value.replace(microsecond=0).isoformat() + 'Z'
 
-    def add_event(self, event):
+    def add_event(self, id, event):
         """
         Add scraped Event object to the database.
         """
+        # Skip duplicates
+        if self.event_exists(id):
+            return
+        
+        # Append common properties
         event['parser_name'] = self.name
         event['parser_version'] = self.version
         
-        event.store(self.event_db)
+        # Validate
+        self.validate_event(event)
+        
+        # Store
+        self.event_db[id] = self.encode_dict(event)
     
     def add_log(self, result, traceback=None):
         """
         Add a log entry to the database.
         """
+        # Create log
         scrape_log = ScrapeLog(
             self.name,
             self.version,
@@ -118,10 +162,18 @@ class EventScraper(object):
             self.access_datetime,
             result)
         
+        # If appropriate, attach traceback
         if traceback:
             scrape_log['traceback'] = traceback
+            
+        # Generate a unique id
+        id = '%s - %s - %s' % (
+            self.encode_datetime(scrape_log['access_datetime']), 
+            scrape_log['parser_name'], 
+            scrape_log['result'])
         
-        scrape_log.store(self.log_db)
+        # Store
+        self.log_db[id] = self.encode_dict(scrape_log)
 
     def scrape(self):
         """
@@ -146,33 +198,8 @@ class EventScraper(object):
             # Make exception visible on command line
             raise
 
-
-class CouchDBDict(dict):
-    """
-    A subclass of dict that provides utility functions to encode datetime
-    objects in such a way that they can safely be used with couchdb-python.
-    """
-    
-    def _encode(self):
-        """
-        Work around couchdb-python's lack of support for datetime's by pre-
-        encoding them to strings.
-        """
-        copy_self = {}
         
-        for k, v in self.items():
-            if isinstance(v, datetime.datetime):
-                copy_self[k] = self._encode_datetime(v)
-            else:
-                copy_self[k] = v
-        
-        return copy_self
-    
-    def _encode_datetime(self, value):
-        return value.replace(microsecond=0).isoformat() + 'Z'
-
-        
-class Event(CouchDBDict):
+class Event(dict):
     """
     A representaion of an Event to be stored in the database backend.  Required
     attributes are defined in __init__, but as as subclass of dict additional
@@ -183,6 +210,8 @@ class Event(CouchDBDict):
         """
         Setup attribute defaults.
         """
+        dict.__init__(self)
+        
         self['datetime'] = datetime
         self['branch'] = branch
         self['entity'] = entity
@@ -194,52 +223,8 @@ class Event(CouchDBDict):
         self['access_datetime'] = None
         self.update(kwargs)
         
-        self.id = self._id()
-        
-    def _id(self):
-        """
-        Return an id for this document which is unique to it by concatenating
-        together its significant attributes.
-        """
-        return '%s - %s - %s - %s' % (
-            self._encode_datetime(self['datetime']), 
-            self['branch'], 
-            self['entity'],
-            self['title'])
-        
-    def exists(self, database):
-        """
-        Return True if this document already exists in the given database.
-        """
-        if self.id in database:
-            return True
-        
-        return False
     
-    def validate(self):
-        """
-        Raises an AttributeError exception if all required fields have not been
-        populated.
-        """
-        for attr in ['datetime', 'branch', 'entity', 'title', 'source_url',
-                     'source_text', 'access_datetime']:
-            if not self[attr]:
-                raise AttributeError(
-                    '%s is a required attribute for every Event.')
-    
-    def store(self, database):
-        """
-        Validate this document and then store it in the database.
-        """
-        if self.exists(database):
-            return
-        
-        self.validate()
-        
-        database[self.id] = self._encode()
-        
-    
-class ScrapeLog(CouchDBDict):
+class ScrapeLog(dict):
     """
     A represenation of a scrape attempt log entry for storage in the database.
     """
@@ -256,22 +241,3 @@ class ScrapeLog(CouchDBDict):
         self['access_datetime'] = access_datetime
         self['result'] = result
         self.update(kwargs)
-        
-        # Compute a unique id
-        self.id = self._id()
-        
-    def _id(self):
-        """
-        Return an id for this document which is unique to it by concatenating
-        together its significant attributes.
-        """        
-        return '%s - %s - %s' % (
-            self._encode_datetime(self['access_datetime']), 
-            self['parser_name'], 
-            self['result'])
-    
-    def store(self, database):
-        """
-        Store this entry in the database.
-        """        
-        database[self.id] = self._encode()
