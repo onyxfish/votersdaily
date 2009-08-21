@@ -2,6 +2,7 @@
 
 import datetime
 import hashlib
+import optparse
 import os
 import sys
 import time
@@ -14,6 +15,7 @@ from couchdb.schema import *
 # Previous versions will yield erroneous 409 responses from CouchDB
 if couchdb.__version__ < "0.7":
     print 'couchdb-python version 0.7 or greater is required.'
+    sys.exit()
 
 
 class ScrapeError(Exception):
@@ -31,11 +33,6 @@ class EventScraper(object):
     Subclasses must set name, version, and url attributes before calling
     EventScraper.__init__().
     """
-    
-    # CouchDB config
-    SERVER_URI = 'http://localhost:5984/'
-    EVENT_DB_NAME = 'vd_events'
-    LOG_DB_NAME = 'vd_logs'
     
     # These values should be set when urlopen() is called,
     # but might not be if the scraper errors out before it completes
@@ -60,17 +57,25 @@ class EventScraper(object):
         """
         Setup CouchDB.  Encapsulated for clarity.
         """
-        self.server = couchdb.Server(self.SERVER_URI)
+        self.server_uri = 'http://%s:%s' % (
+            self.options.server, self.options.port)
+        self.server = couchdb.Server(self.server_uri)
         
-        if self.EVENT_DB_NAME not in self.server:
-            self.server.create(self.EVENT_DB_NAME)
+        if self.options.eventdb not in self.server:
+            self.server.create(self.options.eventdb)
+        elif self.options.debug:
+            del self.server[self.options.eventdb]
+            self.server.create(self.options.eventdb)
             
-        self.event_db = self.server[self.EVENT_DB_NAME]
+        self.event_db = self.server[self.options.eventdb]
         
-        if self.LOG_DB_NAME not in self.server:
-            self.server.create(self.LOG_DB_NAME)
+        if self.options.logdb not in self.server:
+            self.server.create(self.options.logdb)
+        elif self.options.debug:
+            del self.server[self.options.logdb]
+            self.server.create(self.options.logdb)
             
-        self.log_db = self.server[self.LOG_DB_NAME]
+        self.log_db = self.server[self.options.logdb]
 
     def urlopen(self, url, is_root):
         """
@@ -180,11 +185,48 @@ class EventScraper(object):
         This method must be overriden by each derived scraper.
         """
         pass
+    
+    def parse_cli_options(self):
+        """
+        Parse any command line options that were passed to the script.
+        """
+        parser = optparse.OptionParser()
+        
+        parser.add_option('--engine', 
+                          dest='engine',
+                          help='storage engine scrape data into', 
+                          default='couchdb')
+        parser.add_option('--server',
+                          dest='server',
+                          help='address of the server where the storage database resides', 
+                          default='localhost')
+        parser.add_option('--port',
+                          dest='port',
+                          help='port on the server where the storage database connects', 
+                          default='5984')
+        parser.add_option('--eventdb',
+                          dest='eventdb',
+                          help='name of the events database on the storage database', 
+                          default='vd_events')
+        parser.add_option('--logdb',
+                          dest='logdb',
+                          help='name of the logs database on the storage database', 
+                          default='vd_logs')
+        
+        parser.add_option('--debug',
+                          dest='debug',
+                          action='store_true',
+                          help='enable debugging mode', 
+                          default=False)
+        
+        (self.options, self.args) = parser.parse_args()
             
     def run(self):
         """
         Run this scraper and log the results.
         """
+        self.parse_cli_options()
+        
         self._init_couchdb()
         
         try:
