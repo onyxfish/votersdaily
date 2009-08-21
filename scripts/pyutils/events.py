@@ -189,34 +189,34 @@ class EventScraper(object):
     def parse_cli_options(self):
         """
         Parse any command line options that were passed to the script.
-        """
+        """       
         parser = optparse.OptionParser()
         
         parser.add_option('--engine', 
                           dest='engine',
-                          help='storage engine scrape data into', 
+                          help='storage engine to scrape data into', 
                           default='couchdb')
         parser.add_option('--server',
                           dest='server',
-                          help='address of the server where the storage database resides', 
+                          help='ip or hostname of the server where the storage engine resides', 
                           default='localhost')
         parser.add_option('--port',
                           dest='port',
-                          help='port on the server where the storage database connects', 
+                          help='port on the server where the storage engine connects', 
                           default='5984')
         parser.add_option('--eventdb',
                           dest='eventdb',
-                          help='name of the events database on the storage database', 
+                          help='name of the events database on the storage engine', 
                           default='vd_events')
         parser.add_option('--logdb',
                           dest='logdb',
-                          help='name of the logs database on the storage database', 
+                          help='name of the logs database on the storage engine', 
                           default='vd_logs')
         
         parser.add_option('--debug',
                           dest='debug',
                           action='store_true',
-                          help='enable debugging mode', 
+                          help='drop current databases at startup', 
                           default=False)
         
         (self.options, self.args) = parser.parse_args()
