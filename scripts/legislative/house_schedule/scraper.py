@@ -93,7 +93,13 @@ class HouseScheduleScraper(EventScraper):
                 source_text=str(row),
                 access_datetime=self.access_datetime)
             
-            self.add_event(new_event)
+            id = '%s - %s - %s - %s' % (
+                self.encode_datetime(new_event['datetime']),
+                new_event['branch'],
+                new_event['entity'],
+                new_event['title'])
+            
+            self.add_event(id, new_event)
                 
 if __name__ == '__main__':
     HouseScheduleScraper().run()

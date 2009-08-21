@@ -19,6 +19,8 @@ class ScraperScheduler(object):
         Mine the directory tree for EventScrapers and schedule their first
         instance.
         """
+        self.cli_options = ' '.join(sys.argv[1:])
+        
         # Loop through branch-level folders
         for branch in ['executive', 'judicial', 'legislative', 'other']:
             runner_path = os.path.dirname(os.path.abspath(__file__))
@@ -68,8 +70,10 @@ class ScraperScheduler(object):
         
         print 'Running %s.' % name
         
-        # Spin off a new process
-        subprocess.Popen(scraper, shell=False)
+        # Spin off a new process (using any passed CLI options)
+        scraper_args = [scraper]
+        scraper_args.extend(sys.argv[1:])
+        subprocess.Popen(scraper_args, shell=False)
                         
         print 'Scheduling %s to run again in %i hours.' % (name, frequency)
         
