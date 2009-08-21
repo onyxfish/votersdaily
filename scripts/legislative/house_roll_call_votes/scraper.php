@@ -55,6 +55,8 @@ class HouseRollCallVotes extends EventScraper_Abstract
 
                 $i=0;
                 foreach($pages[1] as $data2) {
+                    $_source_text = $data2;
+
                     preg_match_all('#<TD[^>]*>(.+?)<\/TD>#is',$data2, $data2_pages);
 
                     //print_r($data2_pages[1]);
@@ -92,17 +94,14 @@ class HouseRollCallVotes extends EventScraper_Abstract
                     $toppage_events[$i]['question'] = (string) trim($question_str[1]);
                     $toppage_events[$i]['result'] = (string) trim($result_str[1]);
                     $toppage_events[$i]['title'] = (string) trim($title_str[1]);
-                    //NOTICE: this block of code is causing notices $event_arr index .. 
-                    $description_str = 'Roll Call # '.$event_arr[0] . ' ' . $event_arr[3] . ' - ' . $event_arr[5] . ' ' . $event_arr[7] .' ('.$status.')';
-                    $description_str .= ' Links:  http://clerk.house.gov/cgi-bin/vote.asp?year=2009&rollnumber='.$event_arr[0];
-                    $bill_str = str_replace(' ','.',$event_arr[3]);
-                    $description_str .= ' http://thomas.loc.gov/cgi-bin/bdquery/z?d111:'.strtolower($bill_str).':';
-
+                    
+                    $description_str = 'Roll Call # '.$rollnumber_str[1] . ' ' . $issue_str[1] . ' - ' . $question_str[1] . '  ('.$result_str[1].')';
                     $toppage_events[$i]['description'] = (string) trim($description_str);
                     $toppage_events[$i]['branch'] = (string) BranchName::$legislative;
                     $toppage_events[$i]['entity'] = (string) EntityName::$house;
                     $toppage_events[$i]['source_url'] = (string) $this->url;
-                    $toppage_events[$i]['source_text'] = $event;
+                    
+                    $toppage_events[$i]['source_text'] = $_source_text;
                     $toppage_events[$i]['access_datetime'] = (string) $this->access_time;
                     $toppage_events[$i]['parser_name'] = (string) $this->parser_name;
                     $toppage_events[$i]['parser_version'] = (string) $this->parser_version;
@@ -129,6 +128,8 @@ class HouseRollCallVotes extends EventScraper_Abstract
 
                     $i=0;
                     foreach($pages[1] as $data2) {
+                        $_source_text = $data2;
+
                         preg_match_all('#<TD[^>]*>(.+?)<\/TD>#is',$data2, $data2_pages);
 
                         //print_r($data2_pages[1]);
@@ -163,21 +164,24 @@ class HouseRollCallVotes extends EventScraper_Abstract
                         $other_events[$i]['issue'] = (string) $issue_str[1];
                         $other_events[$i]['issue_url'] = (string) trim(str_replace('"','',$issue_url_str[1]));
                         $other_events[$i]['question'] = (string) $question_str[1];
-                        $other_events[$i]['result'] = (string) $result_str[1];
+                
+                        if($result_str[1] == 'F') {
+                            $events[$i]['vote_status'] = false;
+                        }
+                        else if($result_str[1] == 'P') {
+                            $events[$i]['vote_status'] = true;
+                        }
+
                         $other_events[$i]['title'] = (string) $title_str[1];
                         $i++;
                 
-                        //NOTICE: this block of code is causing notices $event_arr index .. 
-                        $description_str = 'Roll Call # '.$event_arr[0] . ' ' . $event_arr[3] . ' - ' . $event_arr[5] . ' ' . $event_arr[7] .' ('.$status.')';
-                        $description_str .= ' Links:  http://clerk.house.gov/cgi-bin/vote.asp?year=2009&rollnumber='.$event_arr[0];
-                        $bill_str = str_replace(' ','.',$event_arr[3]);
-                        $description_str .= ' http://thomas.loc.gov/cgi-bin/bdquery/z?d111:'.strtolower($bill_str).':';
+                        $description_str = 'Roll Call # '.$rollnumber_str[1] . ' ' . $issue_str[1] . ' - ' . $question_str[1] . '  ('.$result_str[1].')';
 
                         $other_events[$i]['description'] = (string) trim($description_str);
                         $other_events[$i]['branch'] = (string) BranchName::$legislative;
                         $other_events[$i]['entity'] = (string) EntityName::$house;
                         $other_events[$i]['source_url'] = (string) $this->url;
-                        $other_events[$i]['source_text'] = $event;
+                        $other_events[$i]['source_text'] = $_source_text;
                         $other_events[$i]['access_datetime'] = (string) $this->access_time;
                         $other_events[$i]['parser_name'] = (string) $this->parser_name;
                         $other_events[$i]['parser_version'] = (string) $this->parser_version;
@@ -187,25 +191,14 @@ class HouseRollCallVotes extends EventScraper_Abstract
                     $_tmp_events[] = array_merge($other_events, $events);;
                 }
         }
-
-
-
             
                 //creating new field (bool)
                 /*
-                if($event_arr[6] == 'F') {
-                    $status = 'Failed';
-                    $events[$i]['vote_status'] = false;
-                }
-                else if($event_arr[6] == 'P') {
-                    $status = 'Passed';
-                    $events[$i]['vote_status'] = true;
-                }*/
+                 */
                 
         return $_tmp_events;
     }
 }
-
 
 $parser = new HouseRollCallVotes;
 $parser->run();
