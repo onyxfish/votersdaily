@@ -19,7 +19,7 @@ class WhiteHouseNominations extends EventScraper_Abstract
     
     protected $url = 'http://www.socrata.com/views/n5m4-mism/rows.xml?accessType=API';
     public $parser_name = 'White House Nominations Scraper';
-    public $parser_version = '0.1';
+    public $parser_version = '1.0';
     public $parser_frequency = '6.0';
 
 

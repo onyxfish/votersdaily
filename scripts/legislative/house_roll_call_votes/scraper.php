@@ -18,7 +18,7 @@ class HouseRollCallVotes extends EventScraper_Abstract
     
     protected $url = 'http://clerk.house.gov/evs/2009/index.asp';
     public $parser_name = 'House Roll Call Votes Scraper';
-    public $parser_version = '0.1';
+    public $parser_version = '1.0';
     public $parser_frequency = '6.0';
 
     public function __construct()

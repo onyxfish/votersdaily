@@ -18,7 +18,7 @@ class SenateLegislativeSchedule extends EventScraper_Abstract
     
     protected $url = 'http://www.senate.gov/pagelayout/legislative/one_item_and_teasers/2009_schedule.htm';
     public $parser_name = 'Senate Legislative Schedule Scraper';
-    public $parser_version = '0.1';
+    public $parser_version = '1.0';
     public $parser_frequency = '6.0';
 
     public function __construct()

@@ -17,7 +17,7 @@ class PresidentialRemarks extends EventScraper_Abstract
 {
     protected $url = 'http://www.whitehouse.gov/briefing_room/Remarks/';
     public $parser_name = 'Presidential Remarks Scraper';
-    public $parser_version = '0.1';
+    public $parser_version = '1.0';
     public $parser_frequency = '6.0';
 
     public function __construct()

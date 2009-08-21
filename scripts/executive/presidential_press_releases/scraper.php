@@ -18,7 +18,7 @@ class PresidentialPressReleases extends EventScraper_Abstract
 {
     protected $url = 'http://www.whitehouse.gov/briefing_room/PressReleases/';
     public $parser_name = 'Presidential Press Releases Scraper';
-    public $parser_version = '0.1';
+    public $parser_version = '1.0';
     public $parser_frequency = '6.0';
 
     public function __construct()

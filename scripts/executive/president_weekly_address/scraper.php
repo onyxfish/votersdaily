@@ -20,7 +20,7 @@ class PresidentWeeklyAddress extends EventScraper_Abstract
     
     protected $url = 'http://www.whitehouse.gov/feed/blog/';
     public $parser_name = 'President Weekly Address Scraper';
-    public $parser_version = '0.1';
+    public $parser_version = '1.0';
     public $parser_frequency = '6.0';
 
     public function __construct()

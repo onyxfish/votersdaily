@@ -17,7 +17,7 @@ class SupremeCourtOrders extends EventScraper_Abstract
 {
     protected $url = 'http://www.supremecourtus.gov/orders/08ordersofthecourt.html';
     public $parser_name = 'Supreme Court 2008 Court Orders Scraper';
-    public $parser_version = '0.1';
+    public $parser_version = '1.0';
     public $parser_frequency = '6.0';
 
     public function __construct()

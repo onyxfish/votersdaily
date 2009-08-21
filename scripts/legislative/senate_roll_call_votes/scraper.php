@@ -17,7 +17,7 @@ class SenateRollCallVotes extends EventScraper_Abstract
 {
     protected $url = 'http://www.senate.gov/legislative/LIS/roll_call_lists/vote_menu_111_1.xml';
     public $parser_name = 'Senate Roll Call Votes Scraper';
-    public $parser_version = '0.1';
+    public $parser_version = '1.0';
     public $parser_frequency = '6.0';
     
     public function __construct()
