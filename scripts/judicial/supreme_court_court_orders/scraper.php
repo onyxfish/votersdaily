@@ -102,3 +102,4 @@ class SupremeCourtOrders extends EventScraper_Abstract
 //main
 $parser = new SupremeCourtOrders;
 $parser->run();
+exit(0);

@@ -134,4 +134,4 @@ class SenateRollCallVotes extends EventScraper_Abstract
 
 $parser = new SenateRollCallVotes;
 $parser->run();
-
+exit(0);

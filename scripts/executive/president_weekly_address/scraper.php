@@ -73,3 +73,4 @@ class PresidentWeeklyAddress extends EventScraper_Abstract
 
 $parser = new PresidentWeeklyAddress;
 $parser->run();
+exit(0);

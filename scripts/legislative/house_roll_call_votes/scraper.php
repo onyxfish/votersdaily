@@ -214,3 +214,4 @@ class HouseRollCallVotes extends EventScraper_Abstract
 
 $parser = new HouseRollCallVotes;
 $parser->run();
+exit(0);

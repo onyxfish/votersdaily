@@ -69,3 +69,4 @@ class PresidentialActions extends EventScraper_Abstract
 
 $parser = new PresidentialActions;
 $parser->run();
+exit(0);

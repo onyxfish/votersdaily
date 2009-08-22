@@ -104,3 +104,4 @@ class SenateLegislativeSchedule extends EventScraper_Abstract
 
 $parser = new SenateLegislativeSchedule;
 $parser->run();
+exit(0);
