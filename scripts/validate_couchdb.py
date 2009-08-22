@@ -11,6 +11,7 @@ import urllib2
 
 import couchdb
 from couchdb.schema import *
+from dateutil.parser import parse
 
 # Previous versions will yield erroneous 409 responses from CouchDB
 if couchdb.__version__ < "0.7":
@@ -22,8 +23,25 @@ class CouchDBValidator(object):
     """
     TODO
     """
-    error_index = 0
+    
+    def __init__(self):
+        self.error_index = 0
         
+        self.required_fields = {
+            'datetime': datetime.datetime, 
+            'title': unicode, 
+            'description': unicode, 
+            'end_datetime': datetime.datetime,
+            'branch': unicode, 
+            'entity': unicode, 
+            'source_url': unicode, 
+            'source_text': unicode,
+            'access_datetime': datetime.datetime, 
+            'parser_name': unicode, 
+            'parser_version': unicode }
+        
+        self.nullable_fields = ['description', 'end_datetime']
+
     def _init_couchdb(self):
         """
         Setup CouchDB.  Encapsulated for clarity.
@@ -81,13 +99,71 @@ class CouchDBValidator(object):
         Validate that the event includes every required field.
         """
         name = 'validate_required_fields'
-        required_fields = ['datetime', 'title', 'description', 'end_datetime',
-                           'branch', 'entity', 'source_url', 'source_text',
-                           'access_datetime', 'parser_name', 'parser_version']
         
-        for field in required_fields:
+        for field in self.required_fields.keys():
             if field not in event:
-                self.error(name, event, 'missing %s' % field)
+                self.error(name, event, 'Missing \"%s\"' % field)
+                
+    def validate_field_types(self, event):
+        """
+        Validate that the required fields in the event are of the correct type.
+        """
+        name = 'validate_field_types'
+        
+        for field, cls in self.required_fields.items():
+            # Handled by validate_required_fields
+            if field not in event:
+                continue
+            
+            if cls == datetime.datetime:
+                if not isinstance(event[field], unicode):
+                    # Ignore fields which are null and may be
+                    if field in self.nullable_fields:
+                        continue
+                        
+                    self.error(
+                        name, event, 
+                        'Field \"%s\" was not properly encoded as unicode' % field)
+            else:
+                if not isinstance(event[field], cls):
+                    # Ignore fields which are null and may be
+                    if field in self.nullable_fields:
+                        continue
+                     
+                    self.error(
+                        name, event, 
+                        'Field \"%s\" is type %s not an instance of %s' % (
+                            field, type(event[field]), cls))
+                    
+    def validate_datetime_format(self, event):
+        """
+        Validate that all datetime strings are encoded in the proper format
+        and are valid for decoding.
+        """
+        name = 'validate_datetime_format'
+        
+        for field, cls in self.required_fields.items():
+            # Handled by validate_required_fields
+            if field not in event:
+                continue
+            
+            if cls == datetime.datetime:
+                # Handled by validate_field_types 
+                if not isinstance(event[field], unicode):
+                    continue
+                
+                try:
+                    value = parse(event[field])
+                except ValueError:
+                    self.error(
+                        name, event, 
+                        'Field \"%s\" is not properly encoded as an ISO 8601 date string' % field)
+                    continue
+                
+                if not isinstance(value, datetime.datetime):
+                    self.error(
+                        name, event, 
+                        'Field \"%s\" is not properly encoded as an ISO 8601 date string' % field)
                 
     def error(self, validator, event, message):
         """
@@ -98,7 +174,7 @@ class CouchDBValidator(object):
         except KeyError:
             parser_name = 'unknown'
             
-        print 'Issue %i - %s - %s - \"%s\" is %s' % (
+        print 'Issue %i - %s - %s - \"%s\" - %s' % (
             self.error_index, parser_name, validator, event.id, message)
         
         self.error_index = self.error_index + 1
