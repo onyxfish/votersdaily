@@ -106,7 +106,9 @@ class HouseRollCallVotes extends EventScraper_Abstract
                     $toppage_events[$i]['source_url'] = (string) $this->url;
                     
                     $toppage_events[$i]['source_text'] = (string) $_source_text;
-                    $toppage_events[$i]['access_datetime'] = (string) $this->access_time;
+
+                    $_access_time = date('D, d M Y H:i:s T', $this->access_time);
+                    $toppage_events[$i]['access_datetime'] = (string) $this->_vd_date_format($_access_time);
                     $toppage_events[$i]['parser_name'] = (string) $this->parser_name;
                     $toppage_events[$i]['parser_version'] = (string) $this->parser_version;
                     $i++;
@@ -119,6 +121,7 @@ class HouseRollCallVotes extends EventScraper_Abstract
             //get all the other pages for current year.
             $_current_year = date('Y');
             preg_match_all('#<A HREF="ROLL(.*?)">#is',$response, $otherLinks);
+
             foreach($otherLinks[1] as $otherLink) {
 
                 $_voteLink = 'http://clerk.house.gov/evs/'.$_current_year.'/ROLL'.$otherLink;
@@ -192,7 +195,9 @@ class HouseRollCallVotes extends EventScraper_Abstract
                         $other_events[$i]['entity'] = (string) EntityName::$house;
                         $other_events[$i]['source_url'] = (string) $this->url;
                         $other_events[$i]['source_text'] = (string) $_source_text;
-                        $other_events[$i]['access_datetime'] = (string) $this->access_time;
+
+                        $_access_time = date('D, d M Y H:i:s T', $this->access_time);
+                        $other_events[$i]['access_datetime'] = (string) $this->_vd_date_format($_access_time);
                         $other_events[$i]['parser_name'] = (string) $this->parser_name;
                         $other_events[$i]['parser_version'] = (string) $this->parser_version;
                 

@@ -59,7 +59,9 @@ class PresidentWeeklyAddress extends EventScraper_Abstract
             $events[$i]['entity'] = (string) EntityName::$whitehouse;
             $events[$i]['source_url'] = (string) $this->url;
             $events[$i]['source_text'] = (string) trim($weeklyaddress);
-            $events[$i]['access_datetime'] = (string) $this->access_time;
+
+            $_access_time = date('D, d M Y H:i:s T', $this->access_time);
+            $events[$i]['access_datetime'] = (string) $this->_vd_date_format($_access_time);
             $events[$i]['parser_name'] = (string) $this->parser_name;
             $events[$i]['parser_version'] = (string) $this->parser_version;             
             $i++;
