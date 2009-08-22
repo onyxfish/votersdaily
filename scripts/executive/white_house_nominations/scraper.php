@@ -50,6 +50,10 @@ class WhiteHouseNominations extends EventScraper_Abstract
         $total_nominations = sizeof($nominations->row);
 
         for($i=0; $i < $total_nominations; $i++) {
+            $row_id = $nominations->row[$i]->attributes()->_id;
+            $row_uuid = $nominations->row[$i]->attributes()->_uuid;
+            $row_position = $nominations->row[$i]->attributes()->_position;
+
             $description_str = 'Nomination: ' .$nominations->row[$i]->name . ' ' . $nominations->row[$i]->agency->attributes()->description;
             $description_str .= $nominations->row[$i]->position . ' confirmed: (' . $nominations->row[$i]->confirmed . ')';
             $description_str .= ' holdover:  (' . $nominations->row[$i]->holdover.')';
@@ -89,7 +93,18 @@ class WhiteHouseNominations extends EventScraper_Abstract
                 }
 
                 $events[$i]['source_url'] = (string) $this->url;
-                $events[$i]['source_text'] = null;
+
+$_xml_string = '
+<row _id="'.$row_id.'" _uuid="'.$row_uuid.'" _position="'.$row_position.'">
+<name>' .$nominations->row[$i]->name . '</name>
+<agency url="http://whitehouse.gov/" description="NCH"/>
+<position>'.$nominations->row[$i]->position.'</position>
+<formal_nomination_date>'.$nominations->row[$i]->formal_nomination_date.'</formal_nomination_date>
+<confirmed>'.$nominations->row[$i]->confirmed.'</confirmed>
+<holdover>'.$nominations->row[$i]->holdover.'</holdover>
+<_tags/>
+</row>';                
+                $events[$i]['source_text'] = trim($_xml_string);
 
                 $_access_time = date('D, d M Y H:i:s T', $this->access_time);
                 $events[$i]['access_datetime'] = (string) $this->_vd_date_format($_access_time);
