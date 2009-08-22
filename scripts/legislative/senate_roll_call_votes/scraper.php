@@ -52,7 +52,7 @@ class SenateRollCallVotes extends EventScraper_Abstract
             $source_text = '';
             $_votes = $votes[$i];
             foreach($_votes as $origin) {
-                $source_text .= $origin;  
+                $source_text .= trim($origin);  
             }
 
             $description_str = 'Vote Number '.$votes[$i]->vote_number.' Issue ' . $votes[$i]->issue->A;
@@ -107,7 +107,17 @@ class SenateRollCallVotes extends EventScraper_Abstract
             $events[$i]['yes_votes'] = (int) trim($votes[$i]->vote_tally->yeas);
             $events[$i]['no_votes'] =  (int) trim($votes[$i]->vote_tally->nays);
             $events[$i]['source_url'] = $this->url;
-            $events[$i]['source_text'] = (string) $source_text;
+
+            //ensure we don't have an empty field.
+            //issue#21 fix
+            $source_text = trim($source_text);
+            if(!empty($source_text)) {
+                $events[$i]['source_text'] = (string) $source_text;
+            }
+            else {
+                $events[$i]['source_text'] = null;
+            }
+
             $events[$i]['access_datetime'] = (string) $this->access_time;
             $events[$i]['parser_name'] = $this->parser_name;
             $events[$i]['parser_version'] = $this->parser_version; 
