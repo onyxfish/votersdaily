@@ -55,6 +55,7 @@ class SenateRollCallVotes extends EventScraper_Abstract
                 $source_text .= trim($origin);  
             }
 
+
             $description_str = 'Vote Number '.$votes[$i]->vote_number.' Issue ' . $votes[$i]->issue->A;
             $description_str .= ' Answering: ' . $votes[$i]->question . ' Results: ' .$votes[$i]->result;
             $description_str .=  ' Votes - yeas: ' .$votes[$i]->vote_tally->yeas. ' nays: ' .$votes[$i]->vote_tally->nays;
@@ -79,7 +80,12 @@ class SenateRollCallVotes extends EventScraper_Abstract
                     break;
                 case 'SAmdt' :
                     $_part1_str = 'SP';
-                    default :
+                    break;
+                case 'HR' : 
+                    $_part1_str = 'HR';
+                    break;
+
+                default :
             }
 
             
@@ -91,6 +97,20 @@ class SenateRollCallVotes extends EventScraper_Abstract
             else {
                 $_vote_issue_url = null; 
             }
+
+            $_xml_source = '
+<vote>
+<vote_number>'.$votes[$i]->vote_number.'</vote_number>
+<vote_date>'.$votes[$i]->vote_date.'</vote_date>
+<issue><A HREF="'.$_vote_issue_url.'">'.$votes[$i]->issue->A.'</A></issue>
+<question>'.$votes[$i]->question.'</question>
+<result>'.$votes[$i]->result.'</result>
+<vote_tally>
+<yeas>'.$votes[$i]->vote_tally->yeas.'</yeas>
+<nays>'.$votes[$i]->vote_tally->yeas.'</nays>
+</vote_tally>
+<title>'.trim($votes[$i]->title).'</title>
+</vote>';
 
             $events[$i]['couchdb_id'] = (string)  $this->_vd_date_format($date_str) . ' - '.BranchName::$legislative.' - '.EntityName::$senate.' - ' . trim($votes[$i]->title);
             $events[$i]['datetime'] = $this->_vd_date_format($date_str);
@@ -110,7 +130,10 @@ class SenateRollCallVotes extends EventScraper_Abstract
 
             //ensure we don't have an empty field.
             //issue#21 fix
-            $source_text = trim($source_text);
+            
+            
+            
+            $source_text = trim($_xml_source);
             if(!empty($source_text)) {
                 $events[$i]['source_text'] = (string) $source_text;
             }
