@@ -22,6 +22,7 @@ class CouchDBValidator(object):
     """
     TODO
     """
+    error_index = 0
         
     def _init_couchdb(self):
         """
@@ -79,8 +80,29 @@ class CouchDBValidator(object):
         """
         Validate that the event includes every required field.
         """
-        pass
+        name = 'validate_required_fields'
+        required_fields = ['datetime', 'title', 'description', 'end_datetime',
+                           'branch', 'entity', 'source_url', 'source_text',
+                           'access_datetime', 'parser_name', 'parser_version']
+        
+        for field in required_fields:
+            if field not in event:
+                self.error(name, event, 'missing %s' % field)
+                
+    def error(self, validator, event, message):
+        """
+        Write out an error.
+        """
+        try:
+            parser_name = event['parser_name']
+        except KeyError:
+            parser_name = 'unknown'
             
+        print 'Issue %i - %s - %s - \"%s\" is %s' % (
+            self.error_index, parser_name, validator, event.id, message)
+        
+        self.error_index = self.error_index + 1
+               
     def run(self):
         """
         Run this scraper and log the results.
@@ -99,6 +121,8 @@ class CouchDBValidator(object):
             
             for v in validators:
                 v(event)
+                
+        print 'Validation complete.'
 
 if __name__ == '__main__':
     CouchDBValidator().run()
