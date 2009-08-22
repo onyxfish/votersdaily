@@ -21,7 +21,8 @@ if couchdb.__version__ < "0.7":
     
 class CouchDBValidator(object):
     """
-    TODO
+    Executes a series of validation methods over the data that exists in the
+    CouchDB database.
     """
     
     def __init__(self):
@@ -209,9 +210,11 @@ class CouchDBValidator(object):
             parser_name = event['parser_name']
         except KeyError:
             parser_name = 'unknown'
-            
-        print 'Issue %i - %s - %s - \"%s\" - %s' % (
+        
+        unicode_message = 'Issue %i - %s - %s - \"%s\" - %s' % (
             self.error_index, parser_name, validator, event.id, message)
+        
+        print unicode_message.encode('latin-1')
         
         self.error_index = self.error_index + 1
                
