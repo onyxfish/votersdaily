@@ -8,6 +8,7 @@ import sys
 import time
 import traceback
 import urllib2
+import urlparse
 
 import couchdb
 from couchdb.schema import *
@@ -199,8 +200,12 @@ class CouchDBValidator(object):
                 continue
             
             if field in self.url_fields:
-                pass
-        
+                result = urlparse.urlparse(event[field])
+                
+                if not result.scheme or not result.netloc:
+                    self.error(
+                        name, event, 
+                        'Field \"%s\" is not an absolute URL' % field)
                 
     def error(self, validator, event, message):
         """
@@ -214,7 +219,7 @@ class CouchDBValidator(object):
         unicode_message = 'Issue %i - %s - %s - \"%s\" - %s' % (
             self.error_index, parser_name, validator, event.id, message)
         
-        print unicode_message.encode('latin-1')
+        print unicode_message.encode('utf-8')
         
         self.error_index = self.error_index + 1
                
