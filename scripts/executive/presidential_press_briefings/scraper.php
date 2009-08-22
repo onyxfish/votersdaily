@@ -74,3 +74,4 @@ class PresidentialPressBriefings extends EventScraper_Abstract
 
 $parser = new PresidentialPressBriefings;
 $parser->run();
+exit(0);

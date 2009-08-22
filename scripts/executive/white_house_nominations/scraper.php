@@ -104,3 +104,4 @@ class WhiteHouseNominations extends EventScraper_Abstract
 
 $parser = new WhiteHouseNominations;
 $parser->run();
+exit(0);

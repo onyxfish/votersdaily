@@ -72,3 +72,4 @@ class PresidentialRemarks extends EventScraper_Abstract
 
 $parser = new PresidentialRemarks;
 $parser->run();
+exit(0);

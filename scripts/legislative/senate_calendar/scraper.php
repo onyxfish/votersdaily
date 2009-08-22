@@ -90,3 +90,4 @@ class SenateCalendar extends EventScraper_Abstract
 
 $parser = new SenateCalendar;
 $parser->run();
+exit(0);
