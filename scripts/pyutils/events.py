@@ -52,6 +52,41 @@ class EventScraper(object):
 
         if not hasattr(self, 'version'):
             raise Exception('EventScrapers must have a version attribute')
+    
+    def _parse_cli_options(self):
+        """
+        Parse any command line options that were passed to the script.
+        """
+        parser = optparse.OptionParser()
+        
+        parser.add_option('--engine', 
+                          dest='engine',
+                          help='storage engine to scrape data into', 
+                          default='couchdb')
+        parser.add_option('--server',
+                          dest='server',
+                          help='ip or hostname of the server where the storage engine resides', 
+                          default='localhost')
+        parser.add_option('--port',
+                          dest='port',
+                          help='port on the server where the storage engine connects', 
+                          default='5984')
+        parser.add_option('--eventdb',
+                          dest='eventdb',
+                          help='name of the events database on the storage engine', 
+                          default='vd_events')
+        parser.add_option('--logdb',
+                          dest='logdb',
+                          help='name of the logs database on the storage engine', 
+                          default='vd_logs')
+        
+        parser.add_option('--debug',
+                          dest='debug',
+                          action='store_true',
+                          help='drop current databases at startup', 
+                          default=False)
+        
+        (self.options, self.args) = parser.parse_args()
         
     def _init_couchdb(self):
         """
@@ -189,53 +224,12 @@ class EventScraper(object):
         This method must be overriden by each derived scraper.
         """
         pass
-    
-    def parse_cli_options(self):
-        """
-        Parse any command line options that were passed to the script.
-        """
-        parser = optparse.OptionParser()
-        
-        parser.add_option('--engine', 
-                          dest='engine',
-                          help='storage engine to scrape data into', 
-                          default='couchdb')
-        parser.add_option('--server',
-                          dest='server',
-                          help='ip or hostname of the server where the storage engine resides', 
-                          default='localhost')
-        parser.add_option('--port',
-                          dest='port',
-                          help='port on the server where the storage engine connects', 
-                          default='5984')
-        parser.add_option('--eventdb',
-                          dest='eventdb',
-                          help='name of the events database on the storage engine', 
-                          default='vd_events')
-        parser.add_option('--logdb',
-                          dest='logdb',
-                          help='name of the logs database on the storage engine', 
-                          default='vd_logs')
-        
-        parser.add_option('--debug',
-                          dest='debug',
-                          action='store_true',
-                          help='drop current databases at startup', 
-                          default=False)
-        
-        parser.add_option('--nodaemon',
-                          dest='nodaemon',
-                          action='store_true',
-                          help='ignored', 
-                          default=False)
-        
-        (self.options, self.args) = parser.parse_args()
             
     def run(self):
         """
         Run this scraper and log the results.
         """
-        self.parse_cli_options()
+        self._parse_cli_options()
         
         self._init_couchdb()
         
