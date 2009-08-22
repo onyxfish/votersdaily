@@ -91,7 +91,7 @@ class HouseRollCallVotes extends EventScraper_Abstract
                     $_issue_ = trim($issue_str[1]);
                     if(!empty($_rollnumber) && !empty($_issue_)) {
 
-                        $toppage_events[$i]['couchdb_id'] = (string) strftime('%Y-%m-%dT%H:%M:%SZ', strtotime($date_str[1] .' 2009')) . ' - Legislative - House of Representives - ' . $title_str[1];
+                        $toppage_events[$i]['couchdb_id'] = (string) strftime('%Y-%m-%dT%H:%M:%SZ', strtotime($date_str[1] .' 2009')) . ' - Legislative - House of Representives - ' . $this->_escape_str($title_str[1], 'title');
                         $toppage_events[$i]['datetime'] = (string) strftime('%Y-%m-%dT%H:%M:%SZ', strtotime($date_str[1] .' 2009'));
                         $toppage_events[$i]['end_datetime'] = null;
                         $toppage_events[$i]['roll_call'] = (string) trim($rollnumber_str[1]);
@@ -103,7 +103,7 @@ class HouseRollCallVotes extends EventScraper_Abstract
                         $toppage_events[$i]['title'] = (string) trim($title_str[1]);
                     
                         $description_str = 'Roll Call # '.$rollnumber_str[1] . ' ' . $issue_str[1] . ' - ' . $question_str[1] . '  ('.$result_str[1].')';
-                        $toppage_events[$i]['description'] = (string) trim($description_str);
+                        $toppage_events[$i]['description'] = (string) $this->_escape_str($description_str);
                         $toppage_events[$i]['branch'] = (string) BranchName::$legislative;
                         $toppage_events[$i]['entity'] = (string) EntityName::$house;
                         $toppage_events[$i]['source_url'] = (string) $this->url;

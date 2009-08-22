@@ -50,11 +50,11 @@ class PresidentWeeklyAddress extends EventScraper_Abstract
         $i=0;
         foreach($xml->entry as $weeklyaddress) {
             $description_str = 'Author: '.$weeklyaddress->author->name.' <a href="'.$weeklyaddress->link->attributes()->href.'">'.$weeklyaddress->title.'</a>';
-            $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($weeklyaddress->updated) . ' - '.BranchName::$executive.' - '.EntityName::$whitehouse.' - ' . trim($weeklyaddress->title);
+            $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($weeklyaddress->updated) . ' - '.BranchName::$executive.' - '.EntityName::$whitehouse.' - ' . $this->_escape_str($weeklyaddress->title, 'title');
             $events[$i]['datetime'] = (string) $this->_vd_date_format($weeklyaddress->updated);
             $events[$i]['end_datetime'] = null;
             $events[$i]['title'] = (string) trim($weeklyaddress->title);
-            $events[$i]['description'] = (string) trim($description_str);
+            $events[$i]['description'] = (string) $this->_escape_str($description_str);
             $events[$i]['branch'] = (string) BranchName::$executive;
             $events[$i]['entity'] = (string) EntityName::$whitehouse;
             $events[$i]['source_url'] = (string) $this->url;

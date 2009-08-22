@@ -103,6 +103,21 @@ abstract class EventScraper_Abstract
         return strftime('%Y-%m-%dT%H:%M:%SZ',strtotime($date_str));
     }
 
+    //central location for escaping strings
+    protected function _escape_str($str, $fieldtype="desc") 
+    {
+        switch($fieldtype) {
+            case 'title' :
+                $result_str =  str_replace('\'','&#039;',trim(strip_tags($str)));
+                break;
+            default :
+                $result_str =  addslashes(trim(strip_tags($str)));
+        }
+
+        return $result_str;
+
+    }
+
     //get CLI params passed by run.py if any
     //FIXME: restrict to only deal with predefined params.
     public function getRunTimeParams($arr)
