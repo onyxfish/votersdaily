@@ -23,12 +23,16 @@ abstract class EventScraper_Abstract
     //default runtime params
     //these value may be changed via cli by run.py
     
-    public $storageEngine = 'couchdb';
-    public $couchdbName = 'vd_events';
-    public $couchdbServer = 'localhost';
-    public $couchdbPort = 5984;
-    public $couchdbLogDb = 'vd_logs';
+    
+    public $storageEngine = 'couchdb'; // --engine
 
+    public $couchdbServer = 'localhost'; // --server
+    public $couchdbPort = 5984; // --port
+
+    public $couchdbName = 'vd_events'; // --eventdb
+    public $couchdbLogDb = 'vd_logs'; // --logdb
+
+    public $appDebug = false; // --debug
    
     //each scraper must have parser_name and parser_version
     //FIXME: parser_frequency is required in config remove it from scrapers
@@ -135,7 +139,12 @@ abstract class EventScraper_Abstract
 
         //default vd_logs
         if($param === '--logdb') {
-           $this->couchdbLogdb = $value;
+           $this->couchdbLogDb = $value;
+        }
+
+        //default vd_logs
+        if($param === '--debug') {
+           $this->appDebug = true;
         }
     }
 
