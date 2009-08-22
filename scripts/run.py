@@ -74,6 +74,10 @@ class ScraperScheduler(object):
         scraper_args = [scraper]
         scraper_args.extend(sys.argv[1:])
         subprocess.Popen(scraper_args, shell=False)
+        
+        # If in 'nodaemon' mode then skip scheduling
+        if '--nodaemon' in sys.argv:
+            return
                         
         print 'Scheduling %s to run again in %i hours.' % (name, frequency)
         

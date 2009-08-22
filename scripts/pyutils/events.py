@@ -189,7 +189,7 @@ class EventScraper(object):
     def parse_cli_options(self):
         """
         Parse any command line options that were passed to the script.
-        """       
+        """
         parser = optparse.OptionParser()
         
         parser.add_option('--engine', 
@@ -217,6 +217,12 @@ class EventScraper(object):
                           dest='debug',
                           action='store_true',
                           help='drop current databases at startup', 
+                          default=False)
+        
+        parser.add_option('--nodaemon',
+                          dest='nodaemon',
+                          action='store_true',
+                          help='ignored', 
                           default=False)
         
         (self.options, self.args) = parser.parse_args()
