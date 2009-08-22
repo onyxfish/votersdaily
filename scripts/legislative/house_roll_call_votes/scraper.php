@@ -34,7 +34,6 @@ class HouseRollCallVotes extends EventScraper_Abstract
         //we have a number of pages so we're going to execute
         //add_events numemous of times.
         foreach($_events as $events) {
-            //print_r($events);
             $this->add_events($events);
         }
     }
@@ -87,36 +86,40 @@ class HouseRollCallVotes extends EventScraper_Abstract
                     //title
                     preg_match('#<FONT[^>]*>(.+)<\/FONT>#is', $data2_pages[1][5], $title_str);
 
+                    //issue
+                    $_rollnumber = trim($rollnumber_str[1]);
+                    $_issue_ = trim($issue_str[1]);
+                    if(!empty($_rollnumber) && !empty($_issue_)) {
 
-                    $toppage_events[$i]['couchdb_id'] = (string) strftime('%Y-%m-%dT%H:%M:%SZ', strtotime($date_str[1] .' 2009')) . ' - Legislative - House of Representives - ' . $title_str[1];
-                    $toppage_events[$i]['datetime'] = (string) strftime('%Y-%m-%dT%H:%M:%SZ', strtotime($date_str[1] .' 2009'));
-                    $toppage_events[$i]['end_datetime'] = null;
-                    $toppage_events[$i]['roll_call'] = (string) trim($rollnumber_str[1]);
-                    $toppage_events[$i]['roll_call_url'] = (string) trim(str_replace('"','',$rollnumber_url_str[1]));
-                    $toppage_events[$i]['issue'] = (string) trim($issue_str[1]);
-                    $toppage_events[$i]['issue_url'] = (string) trim(str_replace('"','',$issue_url_str[1]));
-                    $toppage_events[$i]['question'] = (string) trim($question_str[1]);
-                    $toppage_events[$i]['result'] = (string) trim($result_str[1]);
-                    $toppage_events[$i]['title'] = (string) trim($title_str[1]);
+                        $toppage_events[$i]['couchdb_id'] = (string) strftime('%Y-%m-%dT%H:%M:%SZ', strtotime($date_str[1] .' 2009')) . ' - Legislative - House of Representives - ' . $title_str[1];
+                        $toppage_events[$i]['datetime'] = (string) strftime('%Y-%m-%dT%H:%M:%SZ', strtotime($date_str[1] .' 2009'));
+                        $toppage_events[$i]['end_datetime'] = null;
+                        $toppage_events[$i]['roll_call'] = (string) trim($rollnumber_str[1]);
+                        $toppage_events[$i]['roll_call_url'] = (string) trim(str_replace('"','',$rollnumber_url_str[1]));
+                        $toppage_events[$i]['issue'] = (string) trim($issue_str[1]);
+                        $toppage_events[$i]['issue_url'] = (string) trim(str_replace('"','',$issue_url_str[1]));
+                        $toppage_events[$i]['question'] = (string) trim($question_str[1]);
+                        $toppage_events[$i]['result'] = (string) trim($result_str[1]);
+                        $toppage_events[$i]['title'] = (string) trim($title_str[1]);
                     
-                    $description_str = 'Roll Call # '.$rollnumber_str[1] . ' ' . $issue_str[1] . ' - ' . $question_str[1] . '  ('.$result_str[1].')';
-                    $toppage_events[$i]['description'] = (string) trim($description_str);
-                    $toppage_events[$i]['branch'] = (string) BranchName::$legislative;
-                    $toppage_events[$i]['entity'] = (string) EntityName::$house;
-                    $toppage_events[$i]['source_url'] = (string) $this->url;
+                        $description_str = 'Roll Call # '.$rollnumber_str[1] . ' ' . $issue_str[1] . ' - ' . $question_str[1] . '  ('.$result_str[1].')';
+                        $toppage_events[$i]['description'] = (string) trim($description_str);
+                        $toppage_events[$i]['branch'] = (string) BranchName::$legislative;
+                        $toppage_events[$i]['entity'] = (string) EntityName::$house;
+                        $toppage_events[$i]['source_url'] = (string) $this->url;
                     
-                    $toppage_events[$i]['source_text'] = (string) $_source_text;
+                        $toppage_events[$i]['source_text'] = (string) $_source_text;
 
-                    $_access_time = date('D, d M Y H:i:s T', $this->access_time);
-                    $toppage_events[$i]['access_datetime'] = (string) $this->_vd_date_format($_access_time);
-                    $toppage_events[$i]['parser_name'] = (string) $this->parser_name;
-                    $toppage_events[$i]['parser_version'] = (string) $this->parser_version;
-                    $i++;
+                        $_access_time = date('D, d M Y H:i:s T', $this->access_time);
+                        $toppage_events[$i]['access_datetime'] = (string) $this->_vd_date_format($_access_time);
+                        $toppage_events[$i]['parser_name'] = (string) $this->parser_name;
+                        $toppage_events[$i]['parser_version'] = (string) $this->parser_version;
+                        $i++;
+                    }
                 }
-
-                //merge into events array
-                $_tmp_events[] = array_merge($toppage_events,$events);
             }
+            //merge into events array
+            $_tmp_events[] = array_merge($toppage_events,$events);
 
             //get all the other pages for current year.
             $_current_year = date('Y');
@@ -168,6 +171,10 @@ class HouseRollCallVotes extends EventScraper_Abstract
                         //title
                         preg_match('#<FONT[^>]*>(.+)<\/FONT>#is', $data2_pages[1][5], $title_str);
 
+                        $_rollnumber = trim($rollnumber_str[1]);
+                        $_issue_ = trim($issue_str[1]);
+                        if(!empty($_rollnumber) && !empty($_issue_)) {
+
                         $other_events[$i]['couchdb_id'] = (string) strftime('%Y-%m-%dT%H:%M:%SZ', strtotime($date_str[1] .' 2009')) . ' - Legislative - House of Representives - ' . $title_str[1];
                         $other_events[$i]['datetime'] = (string) strftime('%Y-%m-%dT%H:%M:%SZ', strtotime($date_str[1] .' 2009'));
                         $other_events[$i]['end_datetime'] = null;
@@ -179,10 +186,10 @@ class HouseRollCallVotes extends EventScraper_Abstract
                 
                          
                         if($result_str[1] == 'F') {
-                            $events[$i]['vote_status'] = false;
+                            $other_events[$i]['vote_status'] = false;
                         }
                         else if($result_str[1] == 'P') {
-                            $events[$i]['vote_status'] = true;
+                            $other_events[$i]['vote_status'] = true;
                         }
 
                         $other_events[$i]['title'] = (string) $title_str[1];
@@ -203,9 +210,10 @@ class HouseRollCallVotes extends EventScraper_Abstract
                 
                     }
 
-                    //merge into events array
-                    $_tmp_events[] = array_merge($other_events, $events);;
+                    }
                 }
+                    //merge into events array
+                    $_tmp_events[] = array_merge($other_events, $events);
         }
         
         return $_tmp_events;
