@@ -3,23 +3,21 @@
 import ConfigParser
 import os
 import re
-import subprocess
 import sys
-import threading
 
-class ScraperScheduler(object):
+class ConfigPrinter(object):
     """
-    This class functions like a poor man's cron for all scrapers that exist in
-    the directory tree.  It searches the branch directories for all scraper
-    scripts and runs at their specified intervals, each in its own process.
+    Dumps configuration information for all scraper scripts.
     """
+    
+    print_index = 1
     
     def run(self):
         """
-        Mine the directory tree for EventScrapers and schedule their first
-        instance.
+        Loop through the available scripts and parse their configuration.
         """
-                
+        self.script_configs = {}
+        
         # Loop through branch-level folders
         for branch in ['executive', 'judicial', 'legislative', 'other']:
             runner_path = os.path.dirname(os.path.abspath(__file__))
@@ -50,42 +48,34 @@ class ScraperScheduler(object):
                 # Read out the configuration information for this scraper
                 config_parser = ConfigParser.ConfigParser()
                 config_parser.read(config_file)
-
                 name = config_parser.get('Scraper', 'name')
-                frequency = config_parser.getfloat('Scraper', 'frequency')
-                enabled = config_parser.getboolean('Scraper', 'enabled')
-                
-                # Schedule the first run
-                if enabled:
-                    self.start_scraper(scraper_file, name, frequency)
-                else:
-                    print '%s is disabled.' % name
+                    
+                self.script_configs[name] = {}
 
-    def start_scraper(self, scraper, name, frequency):
+                self.script_configs[name]['name'] = name
+                self.script_configs[name]['language'] = \
+                    config_parser.get('Scraper', 'language')
+                self.script_configs[name]['version'] = \
+                    config_parser.get('Scraper', 'version')
+                self.script_configs[name]['frequency'] = \
+                    config_parser.getfloat('Scraper', 'frequency')
+                self.script_configs[name]['enabled'] = \
+                    config_parser.getboolean('Scraper', 'enabled')
+        
+        names = self.script_configs.keys()
+        names.sort()
+        
+        for name in names:
+            self.print_config(**self.script_configs[name])
+                    
+    def print_config(self, name, language, version, frequency, enabled):
         """
-        Run the specified scraper and then reschedule it to run at its next 
-        interval.
+        Print the configuration for a script.
         """
+        print '%i - %s - %s - %s - %s - %s' % (
+            self.print_index, name, language, version, frequency, enabled)
         
-        print 'Running %s.' % name
-        
-        # Spin off a new process (using any passed CLI options)
-        scraper_args = [scraper]
-        scraper_args.extend(sys.argv[1:])
-        subprocess.Popen(scraper_args, shell=False)
-        
-        # If in 'nodaemon' mode then skip scheduling
-        if '--nodaemon' in sys.argv:
-            return
-                        
-        print 'Scheduling %s to run again in %i hours.' % (name, frequency)
-        
-        # Schedule next run
-        t = threading.Timer(
-            frequency * 60.0 * 60.0, 
-            self.start_scraper, 
-            (scraper, name, frequency))
-        t.start()
+        self.print_index = self.print_index + 1
 
 if __name__ == '__main__':
-    ScraperScheduler().run()
+    ConfigPrinter().run()

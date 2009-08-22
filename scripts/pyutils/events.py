@@ -64,16 +64,20 @@ class EventScraper(object):
         if self.options.eventdb not in self.server:
             self.server.create(self.options.eventdb)
         elif self.options.debug:
-            del self.server[self.options.eventdb]
-            self.server.create(self.options.eventdb)
+            if self.options.eventdb != 'vd_events':
+                del self.server[self.options.eventdb]
+                self.server.create(self.options.eventdb)
+            else:
+                print 'Ignoring --debug since the production events database name was specified.'
             
         self.event_db = self.server[self.options.eventdb]
         
         if self.options.logdb not in self.server:
             self.server.create(self.options.logdb)
         elif self.options.debug:
-            del self.server[self.options.logdb]
-            self.server.create(self.options.logdb)
+            if self.options.eventdb != 'vd_logs':
+                del self.server[self.options.logdb]
+                self.server.create(self.options.logdb)
             
         self.log_db = self.server[self.options.logdb]
 
