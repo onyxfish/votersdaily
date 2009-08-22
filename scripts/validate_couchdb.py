@@ -41,6 +41,8 @@ class CouchDBValidator(object):
             'parser_version': unicode }
         
         self.nullable_fields = ['description', 'end_datetime']
+        self.empty_allowed_fields = ['description']
+        self.url_fields = ['source_url']
 
     def _init_couchdb(self):
         """
@@ -164,6 +166,40 @@ class CouchDBValidator(object):
                     self.error(
                         name, event, 
                         'Field \"%s\" is not properly encoded as an ISO 8601 date string' % field)
+                    
+    def validate_empty_strings(self, event):
+        """
+        Validate that only specifically allowed fields hold empty strings.
+        """
+        name = 'validate_datetime_format'
+        
+        for field, cls in self.required_fields.items():
+            # Handled by validate_required_fields
+            if field not in event:
+                continue
+            
+            if cls == unicode:
+                # Handled by validate_field_types 
+                if not isinstance(event[field], unicode):
+                    continue
+                
+                if event[field] == u'' and field not in self.empty_allowed_fields:
+                    self.error(
+                        name, event, 
+                        'Field \"%s\" is not allowed to contain an empty string' % field)
+                    
+    def validate_urls(self, event):
+        """
+        Validate the fields contain only absolute urls.
+        """
+        for field, cls in self.required_fields.items():
+            # Handled by validate_required_fields
+            if field not in event:
+                continue
+            
+            if field in self.url_fields:
+                pass
+        
                 
     def error(self, validator, event, message):
         """
