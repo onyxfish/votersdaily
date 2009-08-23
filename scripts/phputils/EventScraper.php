@@ -108,10 +108,11 @@ abstract class EventScraper_Abstract
     {
         switch($fieldtype) {
             case 'title' :
-                $result_str =  str_replace('\'','&#039;',trim(strip_tags($str)));
+                //$result_str =  str_replace('\'','&#039;',trim(strip_tags($str)));
+                $result_str =  htmlspecialchars(trim(strip_tags($str)));
                 break;
             default :
-                $result_str =  addslashes(trim(strip_tags($str)));
+                $result_str =  htmlspecialchars(trim(strip_tags($str)));
         }
 
         return $result_str;

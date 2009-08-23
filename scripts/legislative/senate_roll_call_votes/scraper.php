@@ -112,10 +112,10 @@ class SenateRollCallVotes extends EventScraper_Abstract
 <title>'.trim($votes[$i]->title).'</title>
 </vote>';
 
-            $events[$i]['couchdb_id'] = (string)  $this->_vd_date_format($date_str) . ' - '.BranchName::$legislative.' - '.EntityName::$senate.' - ' . $this->_escape_str($votes[$i]->title);
+            $events[$i]['couchdb_id'] = (string)  $this->_vd_date_format($date_str) . ' - '.BranchName::$legislative.' - '.EntityName::$senate.' - ' . $this->_escape_str($votes[$i]->title, 'title');
             $events[$i]['datetime'] = $this->_vd_date_format($date_str);
             $events[$i]['end_datetime'] = null;
-            $events[$i]['title'] = (string) trim($votes[$i]->title);
+            $events[$i]['title'] = (string) $this->_escape_str($votes[$i]->title);
             $events[$i]['description'] = $this->_escape_str($description_str);
             $events[$i]['branch'] = BranchName::$legislative;
             $events[$i]['entity'] = EntityName::$senate;

@@ -54,7 +54,7 @@ class PresidentialRemarks extends EventScraper_Abstract
             $events[$i]['couchdb_id'] = (string) $_date_str . ' - '.BranchName::$executive.' - '.EntityName::$whitehouse.' - '. $this->_escape_str($title[1], 'title');
             $events[$i]['datetime'] = (string) $_date_str; //issue
             $events[$i]['end_datetime'] = null;
-            $events[$i]['title'] = (string) trim($title[1]);
+            $events[$i]['title'] = (string) $this->_escape_str($title[1]);
             $events[$i]['description'] = (string) $this->_escape_str($data_arr[0]['description'][$i]);
             $events[$i]['branch'] = (string) BranchName::$executive;
             $events[$i]['entity'] = (string) EntityName::$whitehouse;

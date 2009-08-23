@@ -100,7 +100,7 @@ class HouseRollCallVotes extends EventScraper_Abstract
                         $toppage_events[$i]['issue_url'] = (string) trim(str_replace('"','',$issue_url_str[1]));
                         $toppage_events[$i]['question'] = (string) trim($question_str[1]);
                         $toppage_events[$i]['result'] = (string) trim($result_str[1]);
-                        $toppage_events[$i]['title'] = (string) trim($title_str[1]);
+                        $toppage_events[$i]['title'] = (string) $this->_escape_str($title_str[1]);
                     
                         $description_str = 'Roll Call # '.$rollnumber_str[1] . ' ' . $issue_str[1] . ' - ' . $question_str[1] . '  ('.$result_str[1].')';
                         $toppage_events[$i]['description'] = (string) $this->_escape_str($description_str);
@@ -157,7 +157,7 @@ class HouseRollCallVotes extends EventScraper_Abstract
                         preg_match('#<A HREF="(.*?)">#is',$data2_pages[1][0], $rollnumber_url_str);
 
                         //issue url
-                        preg_match('#<A HREF=(.*?)>#is', $data2_pages[1][2], $issue_url_str);
+                        preg_match('#<A HREF="(.*?)">#is', $data2_pages[1][2], $issue_url_str);
 
                         //ussue
                         preg_match('#<A[^>]*>(.+?)<\/A>#is',$data2_pages[1][2], $issue_str);
@@ -175,7 +175,7 @@ class HouseRollCallVotes extends EventScraper_Abstract
                         $_issue_ = trim($issue_str[1]);
                         if(!empty($_rollnumber) && !empty($_issue_)) {
 
-                        $other_events[$i]['couchdb_id'] = (string) strftime('%Y-%m-%dT%H:%M:%SZ', strtotime($date_str[1] .' 2009')) . ' - Legislative - House of Representives - ' . $title_str[1];
+                        $other_events[$i]['couchdb_id'] = (string) strftime('%Y-%m-%dT%H:%M:%SZ', strtotime($date_str[1] .' 2009')) . ' - Legislative - House of Representives - ' . $this->_escape_str($title_str[1], 'title');
                         $other_events[$i]['datetime'] = (string) strftime('%Y-%m-%dT%H:%M:%SZ', strtotime($date_str[1] .' 2009'));
                         $other_events[$i]['end_datetime'] = null;
                         $other_events[$i]['roll_call'] = (string) trim($rollnumber_str[1]);
@@ -192,8 +192,7 @@ class HouseRollCallVotes extends EventScraper_Abstract
                             $other_events[$i]['vote_status'] = true;
                         }
 
-                        $other_events[$i]['title'] = (string) $title_str[1];
-                        $i++;
+                        $other_events[$i]['title'] = (string) $this->_escape_str($title_str[1]);
                 
                         $description_str = 'Roll Call # '.$rollnumber_str[1] . ' ' . $issue_str[1] . ' - ' . $question_str[1] . '  ('.$result_str[1].')';
 
@@ -208,6 +207,7 @@ class HouseRollCallVotes extends EventScraper_Abstract
                         $other_events[$i]['parser_name'] = (string) $this->parser_name;
                         $other_events[$i]['parser_version'] = (string) $this->parser_version;
                 
+                        $i++;
                     }
 
                     }

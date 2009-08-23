@@ -79,10 +79,10 @@ class SenateLegislativeSchedule extends EventScraper_Abstract
 
             if(!empty($tdTmp[1][1])) {
 
-            $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($start_date) . ' - '.BranchName::$legislative.' - '.EntityName::$house.' - '.$this->_escape_str($tdTmp[1][1] . ' ' . $tdTmp[2]);
+            $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($start_date) . ' - '.BranchName::$legislative.' - '.EntityName::$house.' - '.$this->_escape_str($tdTmp[1][1] . ' ' . $tdTmp[2], 'title');
             $events[$i]['datetime'] = $this->_vd_date_format($start_date);
             $events[$i]['end_datetime'] = $end_date;
-            $events[$i]['title'] = (string) trim($tdTmp[1][1] . ' ' . $tdTmp[2]);
+            $events[$i]['title'] = (string) $this->_escape_str($tdTmp[1][1] . ' ' . $tdTmp[2]);
             $events[$i]['description'] = null;
             $events[$i]['branch'] = BranchName::$legislative;
             $events[$i]['entity'] = EntityName::$senate;

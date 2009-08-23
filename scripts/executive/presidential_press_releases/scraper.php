@@ -48,7 +48,7 @@ class PresidentialPressReleases extends EventScraper_Abstract
         $total_timestamps = sizeof($data_arr[0]['timestamp']);
         for($i=0; $i < $total_timestamps; $i++) {
             preg_match('#<a[^>]*>(.*?)</a>#is', $data_arr[0]['description'][$i], $title);
-            $events[$i]['couchdb_id'] = (string) $this->_escape_str($this->_vd_date_format($data_arr[0]['timestamp'][$i]) . ' - '.BranchName::$executive.' - '.EntityName::$whitehouse.' - '. $this->_escape_str($title[1], 'title'));
+            $events[$i]['couchdb_id'] = (string) $this->_escape_str($this->_vd_date_format($data_arr[0]['timestamp'][$i]) . ' - '.BranchName::$executive.' - '.EntityName::$whitehouse.' - '. $this->_escape_str(str_replace('"','',$title[1]), 'title'));
             $events[$i]['datetime'] = (string) $this->_vd_date_format($data_arr[0]['timestamp'][$i]);
             $events[$i]['end_datetime'] = null;
             $events[$i]['title'] = (string) trim($title[1]);

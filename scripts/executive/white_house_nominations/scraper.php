@@ -71,7 +71,7 @@ class WhiteHouseNominations extends EventScraper_Abstract
                 $events[$i]['couchdb_id'] = (string) $final_date_str . ' -  ' .BranchName::$executive.'  - '.EntityName::$whitehouse.' - Nomination of '.$nominations->row[$i]->name.' for ' . $this->_escape_str($nominations->row[$i]->position, 'title');
                 $events[$i]['datetime'] = (string) $final_date_str;
                 $events[$i]['end_datetime'] = (string) $end_date_value;
-                $events[$i]['title'] = (string) 'Nomination: ' . trim($nominations->row[$i]->position);
+                $events[$i]['title'] = (string) 'Nomination: ' . $this->_escape_str($nominations->row[$i]->position);
                 $events[$i]['description'] = (string) $this->_escape_str($description_str);
                 $events[$i]['branch'] = (string) BranchName::$executive;
                 $events[$i]['entity'] = (string) EntityName::$whitehouse;
