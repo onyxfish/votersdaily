@@ -68,11 +68,11 @@ class WhiteHouseNominations extends EventScraper_Abstract
                 list($e_year, $e_month, $e_day) =  explode('-', date('Y-m-d', (int) $nominations->row[$i]->confirmation_vote));
                 
                 $end_date_value = strftime('%Y-%m-%dT%H:%M:%SZ', mktime(0,0,0,$e_month, $e_day,$e_year));
-                $events[$i]['couchdb_id'] = (string) $final_date_str . ' -  ' .BranchName::$executive.'  - '.EntityName::$whitehouse.' - Nomination of '.$nominations->row[$i]->name.' for ' . trim($nominations->row[$i]->position);
+                $events[$i]['couchdb_id'] = (string) $final_date_str . ' -  ' .BranchName::$executive.'  - '.EntityName::$whitehouse.' - Nomination of '.$nominations->row[$i]->name.' for ' . $this->_escape_str($nominations->row[$i]->position, 'title');
                 $events[$i]['datetime'] = (string) $final_date_str;
                 $events[$i]['end_datetime'] = (string) $end_date_value;
-                $events[$i]['title'] = (string) 'Nomination: ' . trim($nominations->row[$i]->position);
-                $events[$i]['description'] = (string) trim($description_str);
+                $events[$i]['title'] = (string) 'Nomination: ' . $this->_escape_str($nominations->row[$i]->position);
+                $events[$i]['description'] = (string) $this->_escape_str($description_str);
                 $events[$i]['branch'] = (string) BranchName::$executive;
                 $events[$i]['entity'] = (string) EntityName::$whitehouse;
                 $events[$i]['nominee'] = (string) $nominations->row[$i]->name;

@@ -74,11 +74,11 @@ class SupremeCourtOrders extends EventScraper_Abstract
                         $description = strip_tags($matches[1], '<a>');
                         $description = strip_tags($description, '<a>');
                         $description = str_replace(array('<a name='.$calendar_day[1].'></a>','\r'),'',$description);
-                        $events[$i]['couchdb_id'] = (string) $date_str . ' - '.BranchName::$judicial.' - '.EntityName::$sup.' - '. trim($title);
+                        $events[$i]['couchdb_id'] = (string) $date_str . ' - '.BranchName::$judicial.' - '.EntityName::$sup.' - '. $this->_escape_str($title, 'title');
                         $events[$i]['datetime'] = (string) $date_str;
                         $events[$i]['end_datetime'] = null;
-                        $events[$i]['title'] = (string) trim($title);
-                        $events[$i]['description'] = (string) trim($title_url);
+                        $events[$i]['title'] = (string) $this->_escape_str($title);
+                        $events[$i]['description'] = (string) $this->_escape_str($title_url);
                         $events[$i]['branch'] = (string) BranchName::$judicial;
                         $events[$i]['entity'] = (string) EntityName::$sup;
                         $events[$i]['source_url'] = (string) $this->url;
