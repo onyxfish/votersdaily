@@ -221,9 +221,11 @@ class EventScraper(object):
 
     def scrape(self):
         """
-        This method must be overriden by each derived scraper.
+        This method must be overriden by each derived scraper and must return
+        a dictionary with document id's as keys and Event objects as
+        corresponding values.
         """
-        pass
+        return {}
             
     def run(self):
         """
@@ -234,7 +236,11 @@ class EventScraper(object):
         self._init_couchdb()
         
         try:
-            self.scrape()
+            events = self.scrape()
+            
+            for id, event in events.items():
+                self.add_event(id, event)
+            
             self.add_log(result='success')
         except:
             # Log exception to the database

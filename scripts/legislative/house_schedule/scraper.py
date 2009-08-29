@@ -36,6 +36,8 @@ class HouseScheduleScraper(EventScraper):
         else:
             raise ScrapeError(
                 'This script needs to be updated for a new congress.')
+            
+        events = {}
         
         rows = primary_div.findAll('tr')
         
@@ -99,7 +101,9 @@ class HouseScheduleScraper(EventScraper):
                 new_event['entity'],
                 new_event['title'])
             
-            self.add_event(id, new_event)
+            events[id] = new_event
+            
+        return events
                 
 if __name__ == '__main__':
     HouseScheduleScraper().run()
