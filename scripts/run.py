@@ -23,6 +23,8 @@ class ScraperScheduler(object):
     scripts and runs at their specified intervals, each in its own process.
     """
     
+    timers = []
+    
     def _parse_cli_options(self):
         """
         Parse any command line options that were passed to the script.
@@ -144,12 +146,26 @@ class ScraperScheduler(object):
                     self.start_scraper(scraper_file, name, frequency)
                 else:
                     print '%s is disabled.' % name
+        
+        # Poll until killed     
+        while True:
+            # Allow user to kill process 
+            # (keyboard interrupt won't work due to threads)
+            answer = raw_input('Kill all timers?  Type "Q" and then return.')
+            
+            if answer in [ 'Q', 'q' ]:
+                for t in self.timers:
+                    t.cancel()
+                break
 
-    def start_scraper(self, scraper, name, frequency):
+    def start_scraper(self, scraper, name, frequency, timer=None):
         """
         Run the specified scraper and then reschedule it to run at its next 
         interval.
         """
+        # If run from a timer, remove that timer from the list of active timers
+        if timer:
+            self.timers.remove(timer)
         
         print 'Running %s.' % name
         
@@ -167,9 +183,12 @@ class ScraperScheduler(object):
         # Schedule next run
         t = threading.Timer(
             frequency * 60.0 * 60.0, 
-            self.start_scraper, 
-            (scraper, name, frequency))
+            self.start_scraper)
+        t.args = (scraper, name, frequency, t)
         t.start()
+        
+        # Add timer to the list of active timers
+        self.timers.append(t)
 
 if __name__ == '__main__':
     ScraperScheduler().run()
