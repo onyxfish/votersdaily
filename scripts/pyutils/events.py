@@ -110,7 +110,7 @@ class EventScraper(object):
         if self.options.logdb not in self.server:
             self.server.create(self.options.logdb)
         elif self.options.debug:
-            if self.options.eventdb != 'vd_logs':
+            if self.options.logdb != 'vd_logs':
                 del self.server[self.options.logdb]
                 self.server.create(self.options.logdb)
             
@@ -178,11 +178,7 @@ class EventScraper(object):
     def add_event(self, id, event):
         """
         Add scraped Event object to the database.
-        """
-        # Skip duplicates
-        if self.event_exists(id):
-            return
-        
+        """        
         # Append common properties
         event['parser_name'] = self.name
         event['parser_version'] = self.version
@@ -193,7 +189,7 @@ class EventScraper(object):
         # Store
         self.event_db[id] = self.encode_dict(event)
     
-    def add_log(self, result, traceback=None, runtime=None):
+    def add_log(self, result, traceback=None, runtime=None, insert_count=None):
         """
         Add a log entry to the database.
         """
@@ -201,14 +197,12 @@ class EventScraper(object):
         scrape_log = ScrapeLog(
             self.name,
             self.version,
+            runtime,
             self.source_url,
             self.source_text,
             self.access_datetime,
+            insert_count,
             result)
-        
-        # If available, attach runtime
-        if runtime:
-            scrape_log['parser_runtime'] = runtime
         
         # If appropriate, attach traceback
         if traceback:
@@ -243,15 +237,21 @@ class EventScraper(object):
             start_time = time.time()
             events = self.scrape()
             runtime = time.time() - start_time
-            
+
+            # Remove duplicates
+            for id in events.keys():
+                if self.event_exists(id):
+                    del events[id]   
+                    
             for id, event in events.items():
                 self.add_event(id, event)
             
-            self.add_log(result='success', runtime=runtime)
+            self.add_log(
+                result='success', runtime=runtime, insert_count=len(events))
         except:
             # Log exception to the database
             cls, exc, trace = sys.exc_info()
-            self.add_log(cls.__name__, traceback.format_tb(trace))
+            self.add_log(cls.__name__, traceback=traceback.format_tb(trace))
             
             # Make exception visible on command line
             raise
@@ -287,15 +287,18 @@ class ScrapeLog(dict):
     A represenation of a scrape attempt log entry for storage in the database.
     """
     
-    def __init__(self, parser_name, parser_version, source_url, source_text,
-                 access_datetime, result, **kwargs):
+    def __init__(self, parser_name, parser_version, parser_runtime,
+                 source_url, source_text,
+                 access_datetime, insert_count, result, **kwargs):
         """
         Setup attribute defaults.
         """
         self['parser_name'] = parser_name
         self['parser_version'] = parser_version
+        self['parser_runtime'] = parser_runtime
         self['source_url'] = source_url
         self['source_text'] = source_text
         self['access_datetime'] = access_datetime
+        self['insert_count'] = insert_count
         self['result'] = result
         self.update(kwargs)

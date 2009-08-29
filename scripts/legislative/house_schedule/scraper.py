@@ -101,8 +101,7 @@ class HouseScheduleScraper(EventScraper):
                 new_event['entity'],
                 new_event['title'])
             
-            if not self.event_exists(id):
-                events[id] = new_event
+            events[id] = new_event
             
         return events
                 
