@@ -193,7 +193,7 @@ class EventScraper(object):
         # Store
         self.event_db[id] = self.encode_dict(event)
     
-    def add_log(self, result, traceback=None):
+    def add_log(self, result, traceback=None, runtime=None):
         """
         Add a log entry to the database.
         """
@@ -205,6 +205,10 @@ class EventScraper(object):
             self.source_text,
             self.access_datetime,
             result)
+        
+        # If available, attach runtime
+        if runtime:
+            scrape_log['parser_runtime'] = runtime
         
         # If appropriate, attach traceback
         if traceback:
@@ -236,12 +240,14 @@ class EventScraper(object):
         self._init_couchdb()
         
         try:
+            start_time = time.time()
             events = self.scrape()
+            runtime = time.time() - start_time
             
             for id, event in events.items():
                 self.add_event(id, event)
             
-            self.add_log(result='success')
+            self.add_log(result='success', runtime=runtime)
         except:
             # Log exception to the database
             cls, exc, trace = sys.exc_info()
