@@ -83,8 +83,17 @@ class ExampleScraper(EventScraper):
                 source_text=str(row),
                 access_datetime=self.access_datetime)
             
-            # Store this event in the database
-            self.add_event(new_event)
+            # Createa unique idea for the document.  This should be in the
+            # format "datetime - parser_name - whatever_value_makes_field_unique.
+            # For more details, see
+            # http://wiki.github.com/bouvard/votersdaily/database-planning
+            id = '%s - %s - %s' % (
+                self.encode_datetime(new_event['datetime']),
+                self.name,
+                new_event['title'])
+            
+            # Add this event to the dictionary to be stored
+            events[id] = new_event
 
 # Scrapers should specify the following main block so that they can be run as 
 # stand-alone scripts

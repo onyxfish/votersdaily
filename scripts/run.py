@@ -1,11 +1,20 @@
 #!/usr/bin/env python
 
 import ConfigParser
+import optparse
 import os
 import re
 import subprocess
 import sys
 import threading
+
+import couchdb
+from couchdb.schema import *
+
+# Previous versions will yield erroneous 409 responses from CouchDB
+if couchdb.__version__ < "0.7":
+    print 'couchdb-python version 0.7 or greater is required.'
+    sys.exit()
 
 class ScraperScheduler(object):
     """
@@ -14,13 +23,89 @@ class ScraperScheduler(object):
     scripts and runs at their specified intervals, each in its own process.
     """
     
+    timers = []
+    
+    def _parse_cli_options(self):
+        """
+        Parse any command line options that were passed to the script.
+        """       
+        parser = optparse.OptionParser()
+        
+        parser.add_option('--engine', 
+                          dest='engine',
+                          help='storage engine to scrape data into', 
+                          default='couchdb')
+        parser.add_option('--server',
+                          dest='server',
+                          help='ip or hostname of the server where the storage engine resides', 
+                          default='localhost')
+        parser.add_option('--port',
+                          dest='port',
+                          help='port on the server where the storage engine connects', 
+                          default='5984')
+        parser.add_option('--eventdb',
+                          dest='eventdb',
+                          help='name of the events database on the storage engine', 
+                          default='vd_events')
+        parser.add_option('--logdb',
+                          dest='logdb',
+                          help='name of the logs database on the storage engine', 
+                          default='vd_logs')
+        
+        parser.add_option('--debug',
+                          dest='debug',
+                          action='store_true',
+                          help='ignored', 
+                          default=False)
+        
+        parser.add_option('--nodaemon',
+                          dest='nodaemon',
+                          action='store_true',
+                          help='drop existing databases and recreate, do not schedule future runs', 
+                          default=False)
+        
+        (self.options, self.args) = parser.parse_args()
+        
+        # Strip --nodaemon from sys.argv so it does not get passed to scrapers
+        if '--nodaemon' in sys.argv: sys.argv.remove('--nodaemon')
+
+    def _init_couchdb(self):
+        """
+        Setup CouchDB.  Encapsulated for clarity.
+        """
+        self.server_uri = 'http://%s:%s' % (
+            self.options.server, self.options.port)
+        self.server = couchdb.Server(self.server_uri)
+        
+        if self.options.eventdb not in self.server:
+            self.server.create(self.options.eventdb)
+        elif self.options.debug:
+            if self.options.eventdb != 'vd_events':
+                del self.server[self.options.eventdb]
+                self.server.create(self.options.eventdb)
+            else:
+                print 'Ignoring --debug since the production events database name was specified.'
+            
+        self.event_db = self.server[self.options.eventdb]
+        
+        if self.options.logdb not in self.server:
+            self.server.create(self.options.logdb)
+        elif self.options.debug:
+            if self.options.eventdb != 'vd_logs':
+                del self.server[self.options.logdb]
+                self.server.create(self.options.logdb)
+            
+        self.log_db = self.server[self.options.logdb]
+        
     def run(self):
         """
         Mine the directory tree for EventScrapers and schedule their first
         instance.
         """
-        self.cli_options = ' '.join(sys.argv[1:])
+        self._parse_cli_options()
         
+        self._init_couchdb()
+                
         # Loop through branch-level folders
         for branch in ['executive', 'judicial', 'legislative', 'other']:
             runner_path = os.path.dirname(os.path.abspath(__file__))
@@ -61,12 +146,26 @@ class ScraperScheduler(object):
                     self.start_scraper(scraper_file, name, frequency)
                 else:
                     print '%s is disabled.' % name
+        
+        # Poll until killed     
+        while True:
+            # Allow user to kill process 
+            # (keyboard interrupt won't work due to threads)
+            answer = raw_input('Kill all timers?  Type "Q" and then return.')
+            
+            if answer in [ 'Q', 'q' ]:
+                for t in self.timers:
+                    t.cancel()
+                break
 
-    def start_scraper(self, scraper, name, frequency):
+    def start_scraper(self, scraper, name, frequency, timer=None):
         """
         Run the specified scraper and then reschedule it to run at its next 
         interval.
         """
+        # If run from a timer, remove that timer from the list of active timers
+        if timer:
+            self.timers.remove(timer)
         
         print 'Running %s.' % name
         
@@ -76,7 +175,7 @@ class ScraperScheduler(object):
         subprocess.Popen(scraper_args, shell=False)
         
         # If in 'nodaemon' mode then skip scheduling
-        if '--nodaemon' in sys.argv:
+        if self.options.nodaemon:
             return
                         
         print 'Scheduling %s to run again in %i hours.' % (name, frequency)
@@ -84,9 +183,12 @@ class ScraperScheduler(object):
         # Schedule next run
         t = threading.Timer(
             frequency * 60.0 * 60.0, 
-            self.start_scraper, 
-            (scraper, name, frequency))
+            self.start_scraper)
+        t.args = (scraper, name, frequency, t)
         t.start()
+        
+        # Add timer to the list of active timers
+        self.timers.append(t)
 
 if __name__ == '__main__':
     ScraperScheduler().run()

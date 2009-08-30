@@ -52,6 +52,41 @@ class EventScraper(object):
 
         if not hasattr(self, 'version'):
             raise Exception('EventScrapers must have a version attribute')
+    
+    def _parse_cli_options(self):
+        """
+        Parse any command line options that were passed to the script.
+        """
+        parser = optparse.OptionParser()
+        
+        parser.add_option('--engine', 
+                          dest='engine',
+                          help='storage engine to scrape data into', 
+                          default='couchdb')
+        parser.add_option('--server',
+                          dest='server',
+                          help='ip or hostname of the server where the storage engine resides', 
+                          default='localhost')
+        parser.add_option('--port',
+                          dest='port',
+                          help='port on the server where the storage engine connects', 
+                          default='5984')
+        parser.add_option('--eventdb',
+                          dest='eventdb',
+                          help='name of the events database on the storage engine', 
+                          default='vd_events')
+        parser.add_option('--logdb',
+                          dest='logdb',
+                          help='name of the logs database on the storage engine', 
+                          default='vd_logs')
+        
+        parser.add_option('--debug',
+                          dest='debug',
+                          action='store_true',
+                          help='drop current databases at startup', 
+                          default=False)
+        
+        (self.options, self.args) = parser.parse_args()
         
     def _init_couchdb(self):
         """
@@ -64,16 +99,20 @@ class EventScraper(object):
         if self.options.eventdb not in self.server:
             self.server.create(self.options.eventdb)
         elif self.options.debug:
-            del self.server[self.options.eventdb]
-            self.server.create(self.options.eventdb)
+            if self.options.eventdb != 'vd_events':
+                del self.server[self.options.eventdb]
+                self.server.create(self.options.eventdb)
+            else:
+                print 'Ignoring --debug since the production events database name was specified.'
             
         self.event_db = self.server[self.options.eventdb]
         
         if self.options.logdb not in self.server:
             self.server.create(self.options.logdb)
         elif self.options.debug:
-            del self.server[self.options.logdb]
-            self.server.create(self.options.logdb)
+            if self.options.logdb != 'vd_logs':
+                del self.server[self.options.logdb]
+                self.server.create(self.options.logdb)
             
         self.log_db = self.server[self.options.logdb]
 
@@ -139,11 +178,7 @@ class EventScraper(object):
     def add_event(self, id, event):
         """
         Add scraped Event object to the database.
-        """
-        # Skip duplicates
-        if self.event_exists(id):
-            return
-        
+        """        
         # Append common properties
         event['parser_name'] = self.name
         event['parser_version'] = self.version
@@ -154,7 +189,7 @@ class EventScraper(object):
         # Store
         self.event_db[id] = self.encode_dict(event)
     
-    def add_log(self, result, traceback=None):
+    def add_log(self, result, traceback=None, runtime=None, insert_count=None):
         """
         Add a log entry to the database.
         """
@@ -162,9 +197,11 @@ class EventScraper(object):
         scrape_log = ScrapeLog(
             self.name,
             self.version,
+            runtime,
             self.source_url,
             self.source_text,
             self.access_datetime,
+            insert_count,
             result)
         
         # If appropriate, attach traceback
@@ -182,66 +219,39 @@ class EventScraper(object):
 
     def scrape(self):
         """
-        This method must be overriden by each derived scraper.
+        This method must be overriden by each derived scraper and must return
+        a dictionary with document id's as keys and Event objects as
+        corresponding values.
         """
-        pass
-    
-    def parse_cli_options(self):
-        """
-        Parse any command line options that were passed to the script.
-        """
-        parser = optparse.OptionParser()
-        
-        parser.add_option('--engine', 
-                          dest='engine',
-                          help='storage engine to scrape data into', 
-                          default='couchdb')
-        parser.add_option('--server',
-                          dest='server',
-                          help='ip or hostname of the server where the storage engine resides', 
-                          default='localhost')
-        parser.add_option('--port',
-                          dest='port',
-                          help='port on the server where the storage engine connects', 
-                          default='5984')
-        parser.add_option('--eventdb',
-                          dest='eventdb',
-                          help='name of the events database on the storage engine', 
-                          default='vd_events')
-        parser.add_option('--logdb',
-                          dest='logdb',
-                          help='name of the logs database on the storage engine', 
-                          default='vd_logs')
-        
-        parser.add_option('--debug',
-                          dest='debug',
-                          action='store_true',
-                          help='drop current databases at startup', 
-                          default=False)
-        
-        parser.add_option('--nodaemon',
-                          dest='nodaemon',
-                          action='store_true',
-                          help='ignored', 
-                          default=False)
-        
-        (self.options, self.args) = parser.parse_args()
+        return {}
             
     def run(self):
         """
         Run this scraper and log the results.
         """
-        self.parse_cli_options()
+        self._parse_cli_options()
         
         self._init_couchdb()
         
         try:
-            self.scrape()
-            self.add_log(result='success')
+            start_time = time.time()
+            events = self.scrape()
+            runtime = time.time() - start_time
+
+            # Remove duplicates
+            for id in events.keys():
+                if self.event_exists(id):
+                    del events[id]   
+                    
+            for id, event in events.items():
+                self.add_event(id, event)
+            
+            self.add_log(
+                result='success', runtime=runtime, insert_count=len(events))
         except:
             # Log exception to the database
             cls, exc, trace = sys.exc_info()
-            self.add_log(cls.__name__, traceback.format_tb(trace))
+            self.add_log(cls.__name__, traceback=traceback.format_tb(trace))
             
             # Make exception visible on command line
             raise
@@ -277,15 +287,18 @@ class ScrapeLog(dict):
     A represenation of a scrape attempt log entry for storage in the database.
     """
     
-    def __init__(self, parser_name, parser_version, source_url, source_text,
-                 access_datetime, result, **kwargs):
+    def __init__(self, parser_name, parser_version, parser_runtime,
+                 source_url, source_text,
+                 access_datetime, insert_count, result, **kwargs):
         """
         Setup attribute defaults.
         """
         self['parser_name'] = parser_name
         self['parser_version'] = parser_version
+        self['parser_runtime'] = parser_runtime
         self['source_url'] = source_url
         self['source_text'] = source_text
         self['access_datetime'] = access_datetime
+        self['insert_count'] = insert_count
         self['result'] = result
         self.update(kwargs)
