@@ -34,6 +34,8 @@ class PresidentialActions extends EventScraper_Abstract
 
     protected function scrape()
     {
+        $scrape_start = microtime_float();
+
         $events = array();
         $this->source_url = $this->url;
         $response = $this->urlopen($this->url);
@@ -63,8 +65,13 @@ class PresidentialActions extends EventScraper_Abstract
             $events[$i]['parser_name'] = (string) $this->parser_name;
             $events[$i]['parser_version'] = (string) $this->parser_version;
         }
+    
+        $scrape_end = microtime_float();
+        $this->parser_runtime = round(($scrape_end - $scrape_start), 4);
+
         return $events;
     }
+    
 }
 
 $parser = new PresidentialActions;

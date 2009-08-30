@@ -39,6 +39,8 @@ class WhiteHouseNominations extends EventScraper_Abstract
     {
         $events['couchdb'] = array();
 
+        $scrape_start = microtime_float();
+
         $this->source_url = $this->url;
         $response = $this->urlopen($this->url);
         $this->access_time = time();
@@ -112,6 +114,9 @@ $_xml_string = '
                 $events[$i]['parser_version'] = (string) $this->parser_version;            
             } //if 
         }
+        
+        $scrape_end = microtime_float();
+        $this->parser_runtime = round(($scrape_end - $scrape_start), 4);
 
         return $events;
     }

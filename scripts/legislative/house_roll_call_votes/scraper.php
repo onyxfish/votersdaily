@@ -41,6 +41,9 @@ class HouseRollCallVotes extends EventScraper_Abstract
     protected function scrape()
     {
         $events = array();
+
+        $scrape_start = microtime_float();
+
         $this->source_url = $this->url;
         $response = $this->urlopen($this->url);
         $this->source_text = $response;
@@ -216,6 +219,9 @@ class HouseRollCallVotes extends EventScraper_Abstract
                     $_tmp_events[] = array_merge($other_events, $events);
         }
         
+        $scrape_end = microtime_float();
+        $this->parser_runtime = round(($scrape_end - $scrape_start), 4);
+
         return $_tmp_events;
     }
 }

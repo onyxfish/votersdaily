@@ -39,6 +39,8 @@ class PresidentWeeklyAddress extends EventScraper_Abstract
     {
         $events = array();
 
+        $scrape_start = microtime_float();
+
         $this->source_url = $this->url;
         $response = $this->urlopen($this->url);
         $this->access_time = time();
@@ -75,6 +77,9 @@ class PresidentWeeklyAddress extends EventScraper_Abstract
             $events[$i]['parser_version'] = (string) $this->parser_version;             
             $i++;
         }
+
+        $scrape_end = microtime_float();
+        $this->parser_runtime = round(($scrape_end - $scrape_start), 4);
 
         return $events;
     }

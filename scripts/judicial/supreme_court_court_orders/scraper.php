@@ -35,6 +35,8 @@ class SupremeCourtOrders extends EventScraper_Abstract
     {
         $events = array();
 
+        $scrape_start = microtime_float();
+
         $this->source_url = $this->url;
         $response = $this->urlopen($this->url);
         $this->access_time = time();
@@ -95,6 +97,10 @@ class SupremeCourtOrders extends EventScraper_Abstract
                  }
             }
         }
+
+        $scrape_end = microtime_float();
+        $this->parser_runtime = round(($scrape_end - $scrape_start), 4);
+
         return $events;
     }
 }
