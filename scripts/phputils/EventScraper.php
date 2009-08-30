@@ -109,6 +109,7 @@ abstract class EventScraper_Abstract
         
         $current_doc_count = StorageEngine::couchDbDocCount($dbprefix.$eventdb, $server, $port);
         $resp = StorageEngine::couchDbStore($arr, $dbprefix.$eventdb, $server, $port);
+        //var_dump($resp);
         $new_doc_count = StorageEngine::couchDbDocCount($dbprefix.$eventdb, $server, $port);
         
         $doc_count = ($new_doc_count - $current_doc_count);
@@ -123,8 +124,10 @@ abstract class EventScraper_Abstract
         list($_month, $_day, $_year) = explode('-',date("m-d-Y", $this->access_time));
         $final_date_str = strftime('%Y-%m-%dT%H:%M:%SZ', mktime(0, 0, 0, $_month, $_day, $_year));
         $scrape_log['access_datetime'] = (string) $final_date_str;
-        $scrape_log['parser_runtime'] = $this->parser_runtime;
-        $scrape_log['insert_count'] = $doc_count;
+        $scrape_log['parser_runtime'] = (float) $this->parser_runtime;
+        $scrape_log['insert_count'] = (int) $doc_count;
+        $scrape_log['result'] = (string) 'Import was successful.';
+        $scrape_log['traceback'] = null;
 
 
         if($this->appDebug) { 
