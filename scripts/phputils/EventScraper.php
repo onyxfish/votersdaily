@@ -325,7 +325,7 @@ class StorageEngine
 
         $_data = json_encode($arr);
         $right_now = date('D, d M Y H:i:s T');
-        $logdb_id = strftime('%Y-%m-%dT%H:%M:%SZ',strtotime($right_now)) . ' - ' .$arr['parser_name']. ' - ' . $arr['parser_version']. ' - Execution time: '.$arr['parser_runtime'];
+        $logdb_id = strftime('%Y-%m-%dT%H:%M:%SZ',strtotime($right_now)) . ' - ' .$arr['parser_name']. ' - ' . $arr['parser_version'];
         $resp = $couchDB->send("PUT", "/".$logdb."/".rawurlencode($logdb_id), $_data);
         //var_dump($resp);
 
