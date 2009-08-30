@@ -50,7 +50,7 @@ class PresidentialActions extends EventScraper_Abstract
         for($i=0; $i < $total_timestamps; $i++) {
             preg_match('#<a[^>]*>(.*?)</a>#is', $data_arr[0]['description'][$i], $title);
 
-            $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($data_arr[0]['timestamp'][$i]) . '- '.BranchName::$executive.' - '.EntityName::$whitehouse.' - '.$this->_escape_str($title[1], 'title');
+            $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($data_arr[0]['timestamp'][$i]) . ' - ' .$this->parser_name. ' - '.BranchName::$executive.' - '.EntityName::$whitehouse.' - '.$this->_escape_str($title[1], 'title');
             $events[$i]['datetime'] = (string) $this->_vd_date_format($data_arr[0]['timestamp'][$i]);
             $events[$i]['end_datetime'] = null;
             $events[$i]['title'] = (string) $this->_escape_str($title[1]);

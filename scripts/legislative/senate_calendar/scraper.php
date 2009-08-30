@@ -64,7 +64,7 @@ class SenateCalendar extends EventScraper_Abstract
                         $description = strip_tags($matches[1], '<a>');
                         $description = strip_tags($description, '<a>');
                         $description = str_replace(array('<a name='.$calendar_day[1].'></a>','\r','\n'),' ',$description);
-                        $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($date_str.'-'.$calendar_day[1]) . ' -  '.BranchName::$legislative.' -  - Senate Calendar'; 
+                        $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($date_str.'-'.$calendar_day[1]) . ' -  ' .$this->parser_name. ' - '.BranchName::$legislative.' -  - Senate Calendar'; 
 
                         $events[$i]['datetime'] = $this->_vd_date_format($date_str.'-'.$calendar_day[1]);
                         $events[$i]['end_datetime'] = null;
