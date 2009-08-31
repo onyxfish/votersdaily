@@ -36,6 +36,8 @@ class PresidentialPressReleases extends EventScraper_Abstract
     {
         $events = array();
 
+        $scrape_start = microtime_float();
+
         $this->source_url = $this->url;
         $response = $this->urlopen($this->url);
         $this->access_time = time();
@@ -48,7 +50,7 @@ class PresidentialPressReleases extends EventScraper_Abstract
         $total_timestamps = sizeof($data_arr[0]['timestamp']);
         for($i=0; $i < $total_timestamps; $i++) {
             preg_match('#<a[^>]*>(.*?)</a>#is', $data_arr[0]['description'][$i], $title);
-            $events[$i]['couchdb_id'] = (string) $this->_escape_str($this->_vd_date_format($data_arr[0]['timestamp'][$i]) . ' - '.BranchName::$executive.' - '.EntityName::$whitehouse.' - '. $this->_escape_str(str_replace('"','',$title[1]), 'title'));
+            $events[$i]['couchdb_id'] = (string) $this->_escape_str($this->_vd_date_format($data_arr[0]['timestamp'][$i]) . ' -  ' .$this->parser_name. ' - '.BranchName::$executive.' - '.EntityName::$whitehouse.' - '. $this->_escape_str(str_replace('"','',$title[1]), 'title'));
             $events[$i]['datetime'] = (string) $this->_vd_date_format($data_arr[0]['timestamp'][$i]);
             $events[$i]['end_datetime'] = null;
             $events[$i]['title'] = (string) trim($title[1]);
@@ -63,6 +65,10 @@ class PresidentialPressReleases extends EventScraper_Abstract
             $events[$i]['parser_name'] = (string) $this->parser_name;
             $events[$i]['parser_version'] = (string) $this->parser_version;
         }
+        
+        $scrape_end = microtime_float();
+        $this->parser_runtime = round(($scrape_end - $scrape_start), 4);
+
         return $events;
     }
 }//end of class

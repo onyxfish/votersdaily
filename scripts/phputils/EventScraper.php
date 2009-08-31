@@ -20,11 +20,19 @@ abstract class EventScraper_Abstract
     public $source_text;
     public $parser_frequency;
 
+    //do not edit these values
+    
+    public $defaultEventsDbName = 'vd_events';
+    public $defaultLogsDbName = 'vd_logs';
+
+    //end of do not edit these values
+
     //default runtime params
     //these value may be changed via cli by run.py
     
     
     public $storageEngine = 'couchdb'; // --engine
+    public $dbprefix = null; // --dbprefix
 
     public $couchdbServer = 'localhost'; // --server
     public $couchdbPort = 5984; // --port
@@ -32,7 +40,7 @@ abstract class EventScraper_Abstract
     public $couchdbName = 'vd_events'; // --eventdb
     public $couchdbLogDb = 'vd_logs'; // --logdb
 
-    public $appDebug = false; // --debug
+    public $appDebug = 'false'; // --debug
    
     //each scraper must have parser_name and parser_version
     //FIXME: parser_frequency is required in config remove it from scrapers
@@ -79,19 +87,66 @@ abstract class EventScraper_Abstract
         $eventdb = $this->couchdbName;
         $server = $this->couchdbServer;
         $port = $this->couchdbPort;
+        $dbprefix = $this->dbPrefix;
 
-        StorageEngine::couchDbStore($arr, $eventdb, $server, $port);
+        //DEBUGMODE
+        if($this->appDebug) {
+
+            if($dbprefix.$eventdb != $this->defaultEventsDbName) {
+
+                if(StorageEngine::couchDb_EXISTS($dbprefix.$eventdb, $server, $port)) {
+
+                    StorageEngine::couchDb_DROP($dbprefix.$eventdb, $server, $port);
+                    StorageEngine::couchDb_CREATE($dbprefix.$eventdb, $server, $port);
+
+                }
+                else {
+
+                    StorageEngine::couchDb_CREATE($dbprefix.$eventdb, $server, $port);
+                }
+            }
+        } 
+        
+        $current_doc_count = StorageEngine::couchDbDocCount($dbprefix.$eventdb, $server, $port);
+        $resp = StorageEngine::couchDbStore($arr, $dbprefix.$eventdb, $server, $port);
+        //var_dump($resp);
+        $new_doc_count = StorageEngine::couchDbDocCount($dbprefix.$eventdb, $server, $port);
+        
+        $doc_count = ($new_doc_count - $current_doc_count);
 
         //logging.
+
         $logdb = $this->couchdbLogDb;
         $scrape_log['parser_name'] = (string) $this->parser_name;
         $scrape_log['parser_version'] = (string) $this->parser_version;
         $scrape_log['url'] = (string) $this->source_url;
         $scrape_log['source_text'] = (string) $this->source_text;
-        $scrape_log['access_datetime'] = (string) $this->access_time;
-        $scrape_log['parser_runtime'] = $this->parser_runtime;
+        list($_month, $_day, $_year) = explode('-',date("m-d-Y", $this->access_time));
+        $final_date_str = strftime('%Y-%m-%dT%H:%M:%SZ', mktime(0, 0, 0, $_month, $_day, $_year));
+        $scrape_log['access_datetime'] = (string) $final_date_str;
+        $scrape_log['parser_runtime'] = (float) $this->parser_runtime;
+        $scrape_log['insert_count'] = (int) $doc_count;
+        $scrape_log['result'] = (string) 'Import was successful.';
+        $scrape_log['traceback'] = null;
 
-        StorageEngine::couchDbLog($scrape_log, $logdb, $server, $port); 
+
+        if($this->appDebug) { 
+            if($logdb != $this->defaultLogsDbName) {
+                if(StorageEngine::couchDb_EXISTS($dbprefix.$eventdb, $server, $port)) {
+
+                    StorageEngine::couchDb_DROP($dbprefix.$logdb, $server, $port);
+                    StorageEngine::couchDb_CREATE($dbprefix.$logdb, $server, $port);
+
+                }
+                else {
+
+                    StorageEngine::couchDb_CREATE($dbprefix.$logdb, $server, $port);
+                }
+            }
+
+        }
+
+        StorageEngine::couchDbLog($scrape_log, $dbprefix.$logdb, $server, $port); 
 
     }
 
@@ -158,9 +213,14 @@ abstract class EventScraper_Abstract
            $this->couchdbLogDb = $value;
         }
 
-        //default vd_logs
+        //default debug
         if($param === '--debug') {
            $this->appDebug = true;
+        }
+
+        //default dbprefix
+        if($param === '--dbprefix') {
+           $this->dbPrefix = $value;
         }
     }
 
@@ -174,7 +234,52 @@ abstract class EventScraper_Abstract
 }
 
 
-class StorageEngine {
+class StorageEngine 
+{
+    public static function couchDbDocCount($dbname, $server, $port)
+    {
+        $options['host'] = $server;
+        $options['port'] = $port;
+
+        $couchDB = new CouchDbSimple($options);
+        $resp = $couchDB->send("GET", "/".$dbname."/");
+        $results = json_decode($resp);
+        return $results->doc_count;
+    }
+
+
+    public static function couchDb_EXISTS($dbname, $server, $port)
+    {
+        $options['host'] = $server;
+        $options['port'] = $port;
+
+        $couchDB = new CouchDbSimple($options);
+        $resp = $couchDB->send("GET", "/".$dbname."/");
+        //var_dump($resp);
+        
+    }
+
+    public static function couchDb_CREATE($dbname, $server, $port)
+    {
+        $options['host'] = $server;
+        $options['port'] = $port;
+
+        $couchDB = new CouchDbSimple($options);
+        $resp = $couchDB->send("PUT", "/".$dbname."/");
+        //var_dump($resp);
+        
+    }
+
+    public static function couchDb_DROP($dbname, $server, $port)
+    {
+        $options['host'] = $server;
+        $options['port'] = $port;
+
+        $couchDB = new CouchDbSimple($options);
+        $resp = $couchDB->send("DELETE", "/".$dbname."/");
+        //var_dump($resp);
+
+    }
 
     public static function couchDbStore($arr, $dbname, $server, $port)
     {
@@ -182,7 +287,7 @@ class StorageEngine {
         $options['port'] = $port;
 
         $couchDB = new CouchDbSimple($options);
-        $resp = $couchDB->send("GET", "/".$dbname."/");
+        //$resp = $couchDB->send("GET", "/".$dbname."/");
         //var_dump($resp);
 
         //need to check to see if couchDB database is available before excuting
@@ -203,10 +308,12 @@ class StorageEngine {
 
             //store the data
             $resp = $couchDB->send("PUT", "/".$dbname."/".rawurlencode($couchdb_id), $_data);
+            //var_dump($resp);
            
             //for debug will remove once we have all data inserting as expected.
-            //var_dump($resp);
+            //$_results[] = de($resp);
         }        
+            return $resp;
     }
 
     public static function couchDbLog($arr, $logdb, $server, $port)
@@ -214,14 +321,14 @@ class StorageEngine {
         $options['host'] = $server;
         $options['port'] = $port;
         $couchDB = new CouchDbSimple($options);
-        $resp = $couchDB->send("GET", "/".$logdb."/");
+        //$resp = $couchDB->send("GET", "/".$logdb."/");
         //var_dump($resp);
 
         $resp = $couchDB->send("PUT", "/".$logdb);
 
         $_data = json_encode($arr);
         $right_now = date('D, d M Y H:i:s T');
-        $logdb_id = strftime('%Y-%m-%dT%H:%M:%SZ',strtotime($right_now)) . ' - ' .$arr['parser_name']. ' - ' . $arr['parser_version']. ' - Execution time: '.$arr['parser_runtime'];
+        $logdb_id = strftime('%Y-%m-%dT%H:%M:%SZ',strtotime($right_now)) . ' - ' .$arr['parser_name']. ' - ' . $arr['parser_version'];
         $resp = $couchDB->send("PUT", "/".$logdb."/".rawurlencode($logdb_id), $_data);
         //var_dump($resp);
 

@@ -37,6 +37,8 @@ class SenateLegislativeSchedule extends EventScraper_Abstract
     {
         $events = array();
 
+        $scrape_start = microtime_float();
+
         $this->source_url = $this->url;
         $response = $this->urlopen($this->url);
         $this->access_time = time();
@@ -79,7 +81,7 @@ class SenateLegislativeSchedule extends EventScraper_Abstract
 
             if(!empty($tdTmp[1][1])) {
 
-            $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($start_date) . ' - '.BranchName::$legislative.' - '.EntityName::$house.' - '.$this->_escape_str($tdTmp[1][1] . ' ' . $tdTmp[2], 'title');
+            $events[$i]['couchdb_id'] = (string) $this->_vd_date_format($start_date) . ' -  ' .$this->parser_name. ' - '.BranchName::$legislative.' - '.EntityName::$house.' - '.$this->_escape_str($tdTmp[1][1] . ' ' . $tdTmp[2], 'title');
             $events[$i]['datetime'] = $this->_vd_date_format($start_date);
             $events[$i]['end_datetime'] = $end_date;
             $events[$i]['title'] = (string) $this->_escape_str($tdTmp[1][1] . ' ' . $tdTmp[2]);
@@ -97,6 +99,9 @@ class SenateLegislativeSchedule extends EventScraper_Abstract
 
             $i++;
         }
+
+        $scrape_end = microtime_float();
+        $this->parser_runtime = round(($scrape_end - $scrape_start), 4);
 
         return $events;
     }

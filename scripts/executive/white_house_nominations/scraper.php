@@ -39,6 +39,8 @@ class WhiteHouseNominations extends EventScraper_Abstract
     {
         $events['couchdb'] = array();
 
+        $scrape_start = microtime_float();
+
         $this->source_url = $this->url;
         $response = $this->urlopen($this->url);
         $this->access_time = time();
@@ -68,7 +70,7 @@ class WhiteHouseNominations extends EventScraper_Abstract
                 list($e_year, $e_month, $e_day) =  explode('-', date('Y-m-d', (int) $nominations->row[$i]->confirmation_vote));
                 
                 $end_date_value = strftime('%Y-%m-%dT%H:%M:%SZ', mktime(0,0,0,$e_month, $e_day,$e_year));
-                $events[$i]['couchdb_id'] = (string) $final_date_str . ' -  ' .BranchName::$executive.'  - '.EntityName::$whitehouse.' - Nomination of '.$nominations->row[$i]->name.' for ' . $this->_escape_str($nominations->row[$i]->position, 'title');
+                $events[$i]['couchdb_id'] = (string) $final_date_str . ' -  ' .$this->parser_name. ' - ' .BranchName::$executive.'  - '.EntityName::$whitehouse.' - Nomination of '.$nominations->row[$i]->name.' for ' . $this->_escape_str($nominations->row[$i]->position, 'title');
                 $events[$i]['datetime'] = (string) $final_date_str;
                 $events[$i]['end_datetime'] = (string) $end_date_value;
                 $events[$i]['title'] = (string) 'Nomination: ' . $this->_escape_str($nominations->row[$i]->position);
@@ -112,6 +114,9 @@ $_xml_string = '
                 $events[$i]['parser_version'] = (string) $this->parser_version;            
             } //if 
         }
+        
+        $scrape_end = microtime_float();
+        $this->parser_runtime = round(($scrape_end - $scrape_start), 4);
 
         return $events;
     }

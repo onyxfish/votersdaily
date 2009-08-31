@@ -41,6 +41,9 @@ class HouseRollCallVotes extends EventScraper_Abstract
     protected function scrape()
     {
         $events = array();
+
+        $scrape_start = microtime_float();
+
         $this->source_url = $this->url;
         $response = $this->urlopen($this->url);
         $this->source_text = $response;
@@ -91,7 +94,7 @@ class HouseRollCallVotes extends EventScraper_Abstract
                     $_issue_ = trim($issue_str[1]);
                     if(!empty($_rollnumber) && !empty($_issue_)) {
 
-                        $toppage_events[$i]['couchdb_id'] = (string) strftime('%Y-%m-%dT%H:%M:%SZ', strtotime($date_str[1] .' 2009')) . ' - Legislative - House of Representives - ' . $this->_escape_str($title_str[1], 'title');
+                        $toppage_events[$i]['couchdb_id'] = (string) strftime('%Y-%m-%dT%H:%M:%SZ', strtotime($date_str[1] .' 2009')) . ' -  ' .$this->parser_name. ' - Legislative - House of Representives - ' . $this->_escape_str($title_str[1], 'title');
                         $toppage_events[$i]['datetime'] = (string) strftime('%Y-%m-%dT%H:%M:%SZ', strtotime($date_str[1] .' 2009'));
                         $toppage_events[$i]['end_datetime'] = null;
                         $toppage_events[$i]['roll_call'] = (string) trim($rollnumber_str[1]);
@@ -175,7 +178,7 @@ class HouseRollCallVotes extends EventScraper_Abstract
                         $_issue_ = trim($issue_str[1]);
                         if(!empty($_rollnumber) && !empty($_issue_)) {
 
-                        $other_events[$i]['couchdb_id'] = (string) strftime('%Y-%m-%dT%H:%M:%SZ', strtotime($date_str[1] .' 2009')) . ' - Legislative - House of Representives - ' . $this->_escape_str($title_str[1], 'title');
+                        $other_events[$i]['couchdb_id'] = (string) strftime('%Y-%m-%dT%H:%M:%SZ', strtotime($date_str[1] .' 2009')) . ' -  ' .$this->parser_name. ' - Legislative - House of Representives - ' . $this->_escape_str($title_str[1], 'title');
                         $other_events[$i]['datetime'] = (string) strftime('%Y-%m-%dT%H:%M:%SZ', strtotime($date_str[1] .' 2009'));
                         $other_events[$i]['end_datetime'] = null;
                         $other_events[$i]['roll_call'] = (string) trim($rollnumber_str[1]);
@@ -216,6 +219,9 @@ class HouseRollCallVotes extends EventScraper_Abstract
                     $_tmp_events[] = array_merge($other_events, $events);
         }
         
+        $scrape_end = microtime_float();
+        $this->parser_runtime = round(($scrape_end - $scrape_start), 4);
+
         return $_tmp_events;
     }
 }
