@@ -9,7 +9,7 @@
  */
 ini_set("display_errors", true);
 error_reporting(E_ALL & ~E_NOTICE);
-
+//date_default_timezone_set('UTC');
 
 abstract class EventScraper_Abstract
 {
@@ -126,7 +126,7 @@ abstract class EventScraper_Abstract
         $scrape_log['access_datetime'] = (string) $final_date_str;
         $scrape_log['parser_runtime'] = (float) $this->parser_runtime;
         $scrape_log['insert_count'] = (int) $doc_count;
-        $scrape_log['result'] = (string) 'Import was successful.';
+        $scrape_log['result'] = (string) 'success';
         $scrape_log['traceback'] = null;
 
 
