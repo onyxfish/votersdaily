@@ -94,7 +94,7 @@ class HouseRollCallVotes extends EventScraper_Abstract
                     $_issue_ = trim($issue_str[1]);
                     if(!empty($_rollnumber) && !empty($_issue_)) {
 
-                        $toppage_events[$i]['couchdb_id'] = (string) strftime('%Y-%m-%dT%H:%M:%SZ', strtotime($date_str[1] .' 2009')) . ' -  ' .$this->parser_name. ' - Legislative - House of Representives - ' . $this->_escape_str($title_str[1], 'title');
+                        $toppage_events[$i]['couchdb_id'] = (string) strftime('%Y-%m-%dT%H:%M:%SZ', strtotime($date_str[1] .' 2009')) . ' -  ' .$this->parser_name. ' - ' . $this->_escape_str($title_str[1], 'title');
                         $toppage_events[$i]['datetime'] = (string) strftime('%Y-%m-%dT%H:%M:%SZ', strtotime($date_str[1] .' 2009'));
                         $toppage_events[$i]['end_datetime'] = null;
                         $toppage_events[$i]['roll_call'] = (string) trim($rollnumber_str[1]);

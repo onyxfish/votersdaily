@@ -49,7 +49,7 @@ class ScraperName extends EventScraper_Abstract
                 list($month, $day, $year) = explode('/',$_date_tmp);
                 $_date_str = strftime('%Y-%m-%dT%H:%M:%SZ', mktime(0, 0, 0, $month, $day, $year));
 
-                $events[$i]['couchdb_id'] = (string) $_date_str . ' -  ' .$this->parser_name;        
+                $events[$i]['couchdb_id'] = (string) $_date_str . ' -  ' .$this->parser_name . 'CSPAN Senate Schedule';        
                 $events[$i]['datetime'] = (string) $_date_str;
                 $events[$i]['end_datetime'] = null;
                 $events[$i]['title'] = (string) 'CSPAN Senate Schedule';
