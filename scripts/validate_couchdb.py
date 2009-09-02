@@ -237,6 +237,9 @@ class CouchDBValidator(object):
             len(self.event_db), self.options.eventdb, len(validators))
         
         for id in self.event_db:
+            if id.find('_design') == 0:
+                continue
+            
             event = self.event_db[id]
             
             for v in validators:
