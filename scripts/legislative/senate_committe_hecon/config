@@ -1,5 +1,5 @@
 [Scraper]
-name: Event Scraper
+name: SenateCommitteeEducationLabor Scraper
 language: php
 version: 0.1
 # Frequency at which scraping attempts should be made, in hours.
