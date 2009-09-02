@@ -8,8 +8,8 @@ require $PATH_TO_INCLUDES.'/phputils/couchdb.php';
 
 ini_set("display_errors", true);
 error_reporting(E_ALL & ~E_NOTICE);
-/* change class name from ScraperName */
-class ScraperName extends EventScraper_Abstract 
+
+class SenateCommitteeHouseAdministration extends EventScraper_Abstract 
 {
     
     protected $url = 'http://www3.capwiz.com/c-span/dbq/officials/schedule.dbq?committee=hover&command=committee_schedules&chambername=Senate&chamber=S&period=';
@@ -72,5 +72,5 @@ class ScraperName extends EventScraper_Abstract
         return $events;
     }
 }
-$parser = new ScraperName;
+$parser = new SenateCommitteeHouseAdministration;
 $parser->run();

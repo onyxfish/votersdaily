@@ -4,12 +4,10 @@ $PATH_TO_INCLUDES = dirname(dirname(dirname(__FILE__)));
 require $PATH_TO_INCLUDES.'/phputils/EventScraper.php';
 require $PATH_TO_INCLUDES.'/phputils/couchdb.php';
  
-//$script_start = microtime_float();
-
 ini_set("display_errors", true);
 error_reporting(E_ALL & ~E_NOTICE);
-/* change class name from ScraperName */
-class ScraperName extends EventScraper_Abstract 
+
+class SenateCommitteeStandardsOfficialConduct extends EventScraper_Abstract 
 {
     
     protected $url = 'http://www3.capwiz.com/c-span/dbq/officials/schedule.dbq?committee=hethi&command=committee_schedules&chambername=Senate&chamber=S&period=';
@@ -72,5 +70,5 @@ class ScraperName extends EventScraper_Abstract
         return $events;
     }
 }
-$parser = new ScraperName;
+$parser = new SenateCommitteeStandardsOfficialConduct;
 $parser->run();
