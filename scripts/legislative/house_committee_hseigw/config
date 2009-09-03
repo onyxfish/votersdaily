@@ -1,5 +1,5 @@
 [Scraper]
-name: Event Scraper
+name: C-SPAN House Select Committee on Energy Independence and Global Warming Schedule Scraper
 language: php
 version: 0.1
 # Frequency at which scraping attempts should be made, in hours.
