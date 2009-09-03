@@ -147,16 +147,17 @@ class ScraperScheduler(object):
                 else:
                     print '%s is disabled.' % name
         
-        # Poll until killed     
-        while True:
-            # Allow user to kill process 
-            # (keyboard interrupt won't work due to threads)
-            answer = raw_input('Kill all timers?  Type "Q" and then return.')
-            
-            if answer in [ 'Q', 'q' ]:
-                for t in self.timers:
-                    t.cancel()
-                break
+        # Poll until killed
+        if not self.options.nodaemon: 
+            while True:
+                # Allow user to kill process 
+                # (keyboard interrupt won't work due to threads)
+                answer = raw_input('Kill all timers?  Type "Q" and then return.')
+                
+                if answer in [ 'Q', 'q' ]:
+                    for t in self.timers:
+                        t.cancel()
+                    break
 
     def start_scraper(self, scraper, name, frequency, timer=None):
         """
