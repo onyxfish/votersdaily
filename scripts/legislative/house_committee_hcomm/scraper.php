@@ -67,6 +67,8 @@ class HouseCommitteeEnergyCommerce extends EventScraper_Abstract
         }
 
         $scrape_end = microtime_float();
+        $this->parser_runtime = round(($scrape_end - $scrape_start), 4);
+
         return $events;
     }
 }
