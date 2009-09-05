@@ -47,10 +47,10 @@ class SenateCommitteeRules extends EventScraper_Abstract
                 list($month, $day, $year) = explode('/',$_date_tmp);
                 $_date_str = strftime('%Y-%m-%dT%H:%M:%SZ', mktime(0, 0, 0, $month, $day, $year));
 
-                $events[$i]['couchdb_id'] = (string) $_date_str . ' -  ' .$this->parser_name;        
+                $events[$i]['couchdb_id'] = (string) $_date_str . ' - ' .$this->parser_name;        
                 $events[$i]['datetime'] = (string) $_date_str;
                 $events[$i]['end_datetime'] = null;
-                $events[$i]['title'] = (string) 'CSPAN Senate Schedule';
+                $events[$i]['title'] = (string) 'Senate Rules and Administration Committee Schedule';
                 $events[$i]['description'] = (string) strip_tags(trim($span[1][1]));
                 $events[$i]['branch'] = BranchName::$legislative;
                 $events[$i]['entity'] = EntityName::$senate;

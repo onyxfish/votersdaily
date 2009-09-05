@@ -50,7 +50,7 @@ class SenateCommitteeFinance extends EventScraper_Abstract
                 $events[$i]['couchdb_id'] = (string) $_date_str . ' -  ' .$this->parser_name .' Finance';        
                 $events[$i]['datetime'] = (string) $_date_str;
                 $events[$i]['end_datetime'] = null;
-                $events[$i]['title'] = (string) 'CSPAN Senate Finance Schedule';
+                $events[$i]['title'] = (string) 'Senate Finance Committee Schedule';
                 $events[$i]['description'] = (string) strip_tags(trim($span[1][1]));
                 $events[$i]['branch'] = BranchName::$legislative;
                 $events[$i]['entity'] = EntityName::$senate;
