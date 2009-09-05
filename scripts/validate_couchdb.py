@@ -4,6 +4,7 @@ import datetime
 import hashlib
 import optparse
 import os
+import re
 import sys
 import time
 import traceback
@@ -156,18 +157,23 @@ class CouchDBValidator(object):
                 if not isinstance(event[field], unicode):
                     continue
                 
+                if not re.match('[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z', event[field]):
+                    self.error(
+                        name, event, 
+                        'Field \"%s\" is not properly encoded as an ISO 8601 date string' % field)                    
+                
                 try:
                     value = parse(event[field])
                 except ValueError:
                     self.error(
                         name, event, 
-                        'Field \"%s\" is not properly encoded as an ISO 8601 date string' % field)
+                        'Field \"%s\" is not parseable as a datetime' % field)
                     continue
                 
                 if not isinstance(value, datetime.datetime):
                     self.error(
                         name, event, 
-                        'Field \"%s\" is not properly encoded as an ISO 8601 date string' % field)
+                        'Field \"%s\" is not parseable as a datetime' % field)
                     
     def validate_empty_strings(self, event):
         """
