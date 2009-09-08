@@ -9,7 +9,7 @@
  */
 ini_set("display_errors", true);
 error_reporting(E_ALL & ~E_NOTICE);
-//date_default_timezone_set('UTC');
+date_default_timezone_set('UTC');
 
 abstract class EventScraper_Abstract
 {
