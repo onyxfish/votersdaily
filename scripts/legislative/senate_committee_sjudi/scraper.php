@@ -50,8 +50,8 @@ class SenateCommitteeJudiciary extends EventScraper_Abstract
                 $events[$i]['couchdb_id'] = (string) $_date_str . ' -  ' .$this->parser_name;        
                 $events[$i]['datetime'] = (string) $_date_str;
                 $events[$i]['end_datetime'] = null;
-                $events[$i]['title'] = (string) 'Senate Judiciary Committee Schedule';
-                $events[$i]['description'] = (string) strip_tags(trim($span[1][1]));
+                $events[$i]['title'] = (string) strip_tags(trim($span[1][1]));
+                $events[$i]['description'] = null;
                 $events[$i]['branch'] = BranchName::$legislative;
                 $events[$i]['entity'] = EntityName::$senate;
                 $events[$i]['source_url'] = $this->url;
