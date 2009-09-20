@@ -11,7 +11,7 @@ class SenateCommitteeUsSenate extends EventScraper_Abstract
 {
     
     protected $url = 'http://www3.capwiz.com/c-span/dbq/officials/schedule.dbq?committee=us_house&command=committee_schedules&chambername=Senate&chamber=S&period=';
-    public $parser_name = 'C-SPAN US Senate Schedule';
+    public $parser_name = 'C-SPAN US Senate Schedule Scraper';
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
 

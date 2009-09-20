@@ -12,7 +12,7 @@ class SenateCommitteeIndianAffairs extends EventScraper_Abstract
 {
     
     protected $url = 'http://www3.capwiz.com/c-span/dbq/officials/schedule.dbq?committee=sindi&command=committee_schedules&chambername=Senate&chamber=S&period=';
-    public $parser_name = 'C-SPAN Senate Indian Affairs Schedule';
+    public $parser_name = 'C-SPAN Senate Indian Affairs Schedule Scraper';
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
 

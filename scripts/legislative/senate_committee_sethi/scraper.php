@@ -13,7 +13,7 @@ class SenateCommitteeSelectCommitteeEthics extends EventScraper_Abstract
 {
     
     protected $url = 'http://www3.capwiz.com/c-span/dbq/officials/schedule.dbq?committee=sethi&command=committee_schedules&chambername=Senate&chamber=S&period=';
-    public $parser_name = 'C-SPAN Senate Select Committee on Ethics Schedule';
+    public $parser_name = 'C-SPAN Senate Select Committee on Ethics Schedule Scraper';
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
 

@@ -11,7 +11,7 @@ class HouseCommitteeAppropriations extends EventScraper_Abstract
 {
     
     protected $url = 'http://www3.capwiz.com/c-span/dbq/officials/schedule.dbq?committee=sappr&command=committee_schedules&chambername=House&chamber=H&period=';
-    public $parser_name = 'C-SPAN House Appropriations Schedule';
+    public $parser_name = 'C-SPAN House Appropriations Schedule Scraper';
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
 

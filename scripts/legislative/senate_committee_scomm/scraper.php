@@ -11,7 +11,7 @@ class SenateCommitteeEnergyCommerce extends EventScraper_Abstract
 {
     
     protected $url = 'http://www3.capwiz.com/c-span/dbq/officials/schedule.dbq?committee=scomm&command=committee_schedules&chambername=Senate&chamber=S&period=';
-    public $parser_name = 'C-SPAN Senate Energy and Commerce Committee Schedule';
+    public $parser_name = 'C-SPAN Senate Energy and Commerce Committee Schedule Scraper';
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
 

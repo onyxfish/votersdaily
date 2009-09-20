@@ -12,7 +12,7 @@ class SenateCommitteeEnvironmentPublicWorks extends EventScraper_Abstract
 {
     
     protected $url = 'http://www3.capwiz.com/c-span/dbq/officials/schedule.dbq?committee=senvir&command=committee_schedules&chambername=Senate&chamber=S&period=';
-    public $parser_name = 'C-SPAN Senate Environment and Public Works Committee Schedule';
+    public $parser_name = 'C-SPAN Senate Environment and Public Works Committee Schedule Scraper';
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
 

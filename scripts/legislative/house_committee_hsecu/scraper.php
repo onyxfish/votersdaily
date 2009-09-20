@@ -13,7 +13,7 @@ class HouseCommitteeArmedServices extends EventScraper_Abstract
 {
     
     protected $url = 'http://www3.capwiz.com/c-span/dbq/officials/schedule.dbq?committee=hsecu&command=committee_schedules&chambername=House&chamber=S&period=';
-    public $parser_name = 'C-SPAN House Armed Services Committee Schedule';
+    public $parser_name = 'C-SPAN House Armed Services Committee Schedule Scraper';
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
 

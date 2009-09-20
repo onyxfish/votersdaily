@@ -11,7 +11,7 @@ class SenateCommitteeFinance extends EventScraper_Abstract
 {
     
     protected $url = 'http://www3.capwiz.com/c-span/dbq/officials/schedule.dbq?committee=sfina&command=committee_schedules&chambername=Senate&chamber=S&period=';
-    public $parser_name = 'C-SPAN Senate Finance Committee Schedule';
+    public $parser_name = 'C-SPAN Senate Finance Committee Schedule Scraper';
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
 
