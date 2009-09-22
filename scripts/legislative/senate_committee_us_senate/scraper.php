@@ -35,6 +35,9 @@ class SenateCommitteeUsSenate extends EventScraper_Abstract
         $scrape_start = microtime_float();
         $response = $this->urlopen($this->url);
 
+		$this->source_url = $this->url;
+		$this->source_text = $response;
+		
         $this->access_time = time();
 
         preg_match_all('#<li>(.+?)<\/li>#is', $response, $li);
@@ -42,6 +45,7 @@ class SenateCommitteeUsSenate extends EventScraper_Abstract
         $i=0;
         foreach($li[1] as $li_str) {
             if(!preg_match('/<a href=/is',$li_str)) {
+            	
                 preg_match_all('#<span[^>]*>(.+?)<\/span>#is', $li_str, $span);
                 $_date_tmp = date("m/d/Y", strtotime(strip_tags($span[1][0])));
                 list($month, $day, $year) = explode('/',$_date_tmp);
@@ -54,8 +58,8 @@ class SenateCommitteeUsSenate extends EventScraper_Abstract
                 $events[$i]['description'] = null;
                 $events[$i]['branch'] = BranchName::$legislative;
                 $events[$i]['entity'] = EntityName::$senate;
-                $events[$i]['source_url'] = $this->url;
-                $events[$i]['source_text'] = (string) trim($li_str);
+                $events[$i]['source_url'] = urlencode(str_replace('&','&amp;',$this->url));
+                $events[$i]['source_text'] = (string) trim(addslashes($li_str));
 
                 $_access_time = date('D, d M Y H:i:s T', $this->access_time);
                 $events[$i]['access_datetime'] = $this->_vd_date_format($_access_time);

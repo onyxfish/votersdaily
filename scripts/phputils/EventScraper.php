@@ -128,7 +128,7 @@ abstract class EventScraper_Abstract
         $scrape_log['insert_count'] = (int) $doc_count;
         $scrape_log['result'] = (string) 'success';
         $scrape_log['traceback'] = null;
-
+		//print_r($scrape_log);
 
         if($this->appDebug) { 
             if($logdb != $this->defaultLogsDbName) {

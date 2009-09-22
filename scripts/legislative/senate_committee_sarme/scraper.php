@@ -36,6 +36,9 @@ class SenateCommitteeArmedServices extends EventScraper_Abstract
         $scrape_start = microtime_float();
         $response = $this->urlopen($this->url);
 
+		$this->source_url = $this->url;
+		$this->source_text = $response;
+
         $this->access_time = time();
 
         preg_match_all('#<li>(.+?)<\/li>#is', $response, $li);
