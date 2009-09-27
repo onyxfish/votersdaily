@@ -200,6 +200,8 @@ class CouchDBValidator(object):
         """
         Validate the fields contain only absolute urls.
         """
+        name = 'validate_urls'
+        
         for field, cls in self.required_fields.items():
             # Handled by validate_required_fields
             if field not in event:
