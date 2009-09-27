@@ -9,7 +9,7 @@
  */
 ini_set("display_errors", true);
 error_reporting(E_ALL & ~E_NOTICE);
-//date_default_timezone_set('UTC');
+date_default_timezone_set('UTC');
 
 abstract class EventScraper_Abstract
 {
@@ -128,7 +128,7 @@ abstract class EventScraper_Abstract
         $scrape_log['insert_count'] = (int) $doc_count;
         $scrape_log['result'] = (string) 'success';
         $scrape_log['traceback'] = null;
-
+		//print_r($scrape_log);
 
         if($this->appDebug) { 
             if($logdb != $this->defaultLogsDbName) {

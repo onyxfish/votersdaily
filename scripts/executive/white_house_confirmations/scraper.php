@@ -18,7 +18,7 @@ class WhiteHouseNominations extends EventScraper_Abstract
 {
     
     protected $url = 'http://www.socrata.com/views/n5m4-mism/rows.xml?accessType=API';
-    public $parser_name = 'White House Nominations Scraper';
+    public $parser_name = 'White House Confirmations Scraper';
     public $parser_version = '1.0';
     public $parser_frequency = '6.0';
 
@@ -56,9 +56,15 @@ class WhiteHouseNominations extends EventScraper_Abstract
             $row_uuid = $nominations->row[$i]->attributes()->_uuid;
             $row_position = $nominations->row[$i]->attributes()->_position;
 
-            $description_str = $nominations->row[$i]->name . ' was nominated to be ' . $nominations->row[$i]->position;
-            $description_str .=  ' ' .$nominations->row[$i]->agency->attributes()->description;
-            //$description_str .= $nominations->row[$i]->position . ' confirmed: (' . $nominations->row[$i]->confirmed . ')';
+            if($nominations->row[$i]->confirmed == 'true') {
+                $confirmed_str = ' was confirmed';
+            }
+            else {
+                $confirmed_str = ' was not confirmed';
+            }
+
+            $description_str = $nominations->row[$i]->name . ' ' .$confirmed_str. ' ' .$nominations->row[$i]->position. ' ' . $nominations->row[$i]->agency->attributes()->description;
+            //$description_str .=  ' confirmed: (' . $nominations->row[$i]->confirmed . ')';
             //$description_str .= ' holdover:  (' . $nominations->row[$i]->holdover.')';
            
             $_date_str = (string) $nominations->row[$i]->formal_nomination_date;
@@ -68,14 +74,13 @@ class WhiteHouseNominations extends EventScraper_Abstract
 
                 $_year = (int) $_year;
                 $final_date_str = strftime('%Y-%m-%dT%H:%M:%SZ', mktime(0, 0, 0, $_month, $_day, $_year));
+                list($e_year, $e_month, $e_day) =  explode('-', date('Y-m-d', (int) $nominations->row[$i]->confirmation_vote));
                 
-                //list($e_year, $e_month, $e_day) =  explode('-', date('Y-m-d', (int) $nominations->row[$i]->confirmation_vote));
-                //$end_date_value = strftime('%Y-%m-%dT%H:%M:%SZ', mktime(0,0,0,$e_month, $e_day,$e_year));
-
+                $end_date_value = strftime('%Y-%m-%dT%H:%M:%SZ', mktime(0,0,0,$e_month, $e_day,$e_year));
                 $events[$i]['couchdb_id'] = (string) $final_date_str . ' -  ' .$this->parser_name. ' -  '.$nominations->row[$i]->name.' - ' . $this->_escape_str($nominations->row[$i]->position, 'title');
-                $events[$i]['datetime'] = (string) $final_date_str;
+                $events[$i]['datetime'] = (string) $end_date_value;
                 $events[$i]['end_datetime'] = null;
-                $events[$i]['title'] = (string) 'Formal nomination for ' . $this->_escape_str($nominations->row[$i]->position);
+                $events[$i]['title'] = (string) 'Confirmation Vote for ' . $this->_escape_str($nominations->row[$i]->position);
                 $events[$i]['description'] = (string) $this->_escape_str($description_str);
                 $events[$i]['branch'] = (string) BranchName::$executive;
                 $events[$i]['entity'] = (string) EntityName::$whitehouse;

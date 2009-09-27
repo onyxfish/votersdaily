@@ -11,7 +11,7 @@ class HouseCommitteeFinancialServices extends EventScraper_Abstract
 {
     
     protected $url = 'http://www3.capwiz.com/c-span/dbq/officials/schedule.dbq?committee=hbank&command=committee_schedules&chambername=House&chamber=H&period=';
-    public $parser_name = 'C-SPAN House Committee Financial Services Schedule';
+    public $parser_name = 'C-SPAN House Committee Financial Services Schedule Scraper';
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
 
@@ -35,6 +35,9 @@ class HouseCommitteeFinancialServices extends EventScraper_Abstract
         $scrape_start = microtime_float();
         $response = $this->urlopen($this->url);
 
+		$this->source_url = $this->url;
+		$this->source_text = $response;
+
         $this->access_time = time();
 
         preg_match_all('#<li>(.+?)<\/li>#is', $response, $li);
@@ -47,13 +50,13 @@ class HouseCommitteeFinancialServices extends EventScraper_Abstract
                 list($month, $day, $year) = explode('/',$_date_tmp);
                 $_date_str = strftime('%Y-%m-%dT%H:%M:%SZ', mktime(0, 0, 0, $month, $day, $year));
 
-                $events[$i]['couchdb_id'] = (string) $_date_str . ' -  ' .$this->parser_name;        
+                $events[$i]['couchdb_id'] = (string) $_date_str . ' -  ' .$this->parser_name .'  House Committee Financial Services Schedule';        
                 $events[$i]['datetime'] = (string) $_date_str;
                 $events[$i]['end_datetime'] = null;
-                $events[$i]['title'] = (string) 'CSPAN House Schedule';
-                $events[$i]['description'] = (string) strip_tags(trim($span[1][1]));
+                $events[$i]['title'] = (string) strip_tags(trim($span[1][1]));
+                $events[$i]['description'] = null;
                 $events[$i]['branch'] = BranchName::$legislative;
-                $events[$i]['entity'] = EntityName::$senate;
+                $events[$i]['entity'] = EntityName::$house;
                 $events[$i]['source_url'] = $this->url;
                 $events[$i]['source_text'] = (string) trim($li_str);
 
@@ -67,6 +70,8 @@ class HouseCommitteeFinancialServices extends EventScraper_Abstract
         }
 
         $scrape_end = microtime_float();
+        $this->parser_runtime = round(($scrape_end - $scrape_start), 4);
+
         return $events;
     }
 }

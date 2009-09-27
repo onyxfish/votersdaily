@@ -16,7 +16,7 @@ require $PATH_TO_INCLUDES.'/phputils/couchdb.php';
 class SupremeCourtOrders extends EventScraper_Abstract
 {
     protected $url = 'http://www.supremecourtus.gov/orders/08ordersofthecourt.html';
-    public $parser_name = 'Supreme Court 2008 Court Orders Scraper';
+    public $parser_name = 'Supreme Court Orders Scraper';
     public $parser_version = '1.0';
     public $parser_frequency = '6.0';
 
@@ -80,7 +80,7 @@ class SupremeCourtOrders extends EventScraper_Abstract
                         $events[$i]['datetime'] = (string) $date_str;
                         $events[$i]['end_datetime'] = null;
                         $events[$i]['title'] = (string) $this->_escape_str($title);
-                        $events[$i]['description'] = (string) $this->_escape_str($title_url);
+                        $events[$i]['description'] = null;
                         $events[$i]['branch'] = (string) BranchName::$judicial;
                         $events[$i]['entity'] = (string) EntityName::$sup;
                         $events[$i]['source_url'] = (string) $this->url;

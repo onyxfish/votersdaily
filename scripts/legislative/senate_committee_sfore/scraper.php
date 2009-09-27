@@ -13,7 +13,7 @@ class SenateCommitteeForeignRelations extends EventScraper_Abstract
 {
     
     protected $url = 'http://www3.capwiz.com/c-span/dbq/officials/schedule.dbq?committee=sfore&command=committee_schedules&chambername=Senate&chamber=S&period=';
-    public $parser_name = 'C-SPAN Senate Foreign Relations Committee Schedule';
+    public $parser_name = 'C-SPAN Senate Foreign Relations Committee Schedule Scraper';
     public $parser_version = '0.1';
     public $parser_frequency = '6.0';
 
@@ -37,6 +37,9 @@ class SenateCommitteeForeignRelations extends EventScraper_Abstract
         $scrape_start = microtime_float();
         $response = $this->urlopen($this->url);
 
+		$this->source_url = $this->url;
+		$this->source_text = $response;
+
         $this->access_time = time();
 
         preg_match_all('#<li>(.+?)<\/li>#is', $response, $li);
@@ -52,8 +55,8 @@ class SenateCommitteeForeignRelations extends EventScraper_Abstract
                 $events[$i]['couchdb_id'] = (string) $_date_str . ' -  ' .$this->parser_name;        
                 $events[$i]['datetime'] = (string) $_date_str;
                 $events[$i]['end_datetime'] = null;
-                $events[$i]['title'] = (string) 'CSPAN Senate Schedule';
-                $events[$i]['description'] = (string) strip_tags(trim($span[1][1]));
+                $events[$i]['title'] = (string) strip_tags(trim($span[1][1]));
+                $events[$i]['description'] = null;
                 $events[$i]['branch'] = BranchName::$legislative;
                 $events[$i]['entity'] = EntityName::$senate;
                 $events[$i]['source_url'] = $this->url;
@@ -69,6 +72,8 @@ class SenateCommitteeForeignRelations extends EventScraper_Abstract
         }
 
         $scrape_end = microtime_float();
+        $this->parser_runtime = round(($scrape_end - $scrape_start), 4);
+
         return $events;
     }
 }
