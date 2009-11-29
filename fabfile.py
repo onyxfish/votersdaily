@@ -47,7 +47,7 @@ def setup():
     sudo('mkdir -p %(path)s; chown %(user)s:%(user)s %(path)s;' % env, pty=True)
     
     with cd(env.path):
-        run('virtualenv .;', pty=True)
+        run('virtualenv --no-site-packages .;', pty=True)
 
 def deploy():
     """
