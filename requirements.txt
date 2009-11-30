@@ -1,2 +1,4 @@
-CouchDB
+-e svn+http://couchdb-python.googlecode.com/svn/branches/experimental/httplib@195#egg=CouchDB-dev_r195
 python-dateutil
+html5lib
+BeautifulSoup

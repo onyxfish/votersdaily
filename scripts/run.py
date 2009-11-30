@@ -7,6 +7,7 @@ import re
 import subprocess
 import sys
 import threading
+import time
 
 import couchdb
 from couchdb.schema import *
@@ -23,6 +24,7 @@ class ScraperScheduler(object):
     scripts and runs at their specified intervals, each in its own process.
     """
     
+    open_subprocesses = {}
     timers = []
     
     def _parse_cli_options(self):
@@ -107,7 +109,7 @@ class ScraperScheduler(object):
         self._init_couchdb()
                 
         # Loop through branch-level folders
-        for branch in ['executive', 'judicial', 'legislative', 'other']:
+        for branch in ['executive', 'judicial', 'legislative']:
             runner_path = os.path.dirname(os.path.abspath(__file__))
             branch_path = os.path.join(runner_path, branch)
             
@@ -147,17 +149,15 @@ class ScraperScheduler(object):
                 else:
                     print '%s is disabled.' % name
         
-        # Poll until killed
+        # Poll for return code from each subprocess
         if not self.options.nodaemon: 
             while True:
-                # Allow user to kill process 
-                # (keyboard interrupt won't work due to threads)
-                answer = raw_input('Kill all timers?  Type "Q" and then return.')
-                
-                if answer in [ 'Q', 'q' ]:
-                    for t in self.timers:
-                        t.cancel()
-                    break
+                for k, v in self.open_subprocesses.items():
+                    v.poll()
+                    if v.returncode != None:
+                        del self.open_subprocesses[k]
+                    
+                time.sleep(15)
 
     def start_scraper(self, scraper, name, frequency, timer=None):
         """
@@ -168,12 +168,20 @@ class ScraperScheduler(object):
         if timer:
             self.timers.remove(timer)
         
+        # Kill old subprocess if its still running
+        if name in self.open_subprocesses:
+            print 'Killing %s (starting next instance).'
+            
+            self.open_subprocesses[name].kill()
+            del self.open_subprocesses[name]
+        
         print 'Running %s.' % name
         
         # Spin off a new process (using any passed CLI options)
         scraper_args = [scraper]
-        scraper_args.extend(sys.argv[1:])
-        subprocess.Popen(scraper_args, shell=False)
+        scraper_args.extend(sys.argv[1:])        
+        sub = subprocess.Popen(scraper_args, shell=False)
+        self.open_subprocesses[name] = sub
         
         # If in 'nodaemon' mode then skip scheduling
         if self.options.nodaemon:

@@ -16,7 +16,7 @@ def testenv():
     env.user = 'sk'
     env.path = '/home/%(user)s/%(project_name)s' % env
     
-    env.scripts_path = '/home/%(user)s/%(project_name)s/scripts' % env
+    env.virtualenvs_path = '/home/%(user)s/.virtualenvs' % env
     env.public_couchdb = True
 
 # COMMANDS
@@ -28,13 +28,16 @@ def setup():
     """
     require('hosts', provided_by=[testenv])
     require('path', provided_by=[testenv])
+    require('virtualenvs_path', provided_by=[testenv])
     require('public_couchdb', provided_by=[testenv])
     
-    apt_install('php5 php5-cgi')
+    apt_install('php5 php5-cgi php5-cli')
+    apt_install('subversion')
     
     apt_install('python-setuptools')
     easy_install('pip')
     pip_install('virtualenv')
+    pip_install('virtualenvwrapper')
     
     apt_install('couchdb')
     
@@ -44,10 +47,10 @@ def setup():
             sudo("sed 's/;bind_address = 127.0.0.1/bind_address = 0.0.0.0/' <local.ini.bak > local.ini")
             sudo('/etc/init.d/couchdb restart')
     
-    sudo('mkdir -p %(path)s; chown %(user)s:%(user)s %(path)s;' % env, pty=True)
+    run('mkdir -p %(path)s' % env)
+    run('mkdir -p %(virtualenvs_path)s' % env)
     
-    with cd(env.path):
-        run('virtualenv --no-site-packages .;', pty=True)
+    run('source /usr/local/bin/virtualenvwrapper_bashrc && mkvirtualenv --no-site-packages %(project_name)s' % env)
 
 def deploy():
     """
@@ -56,14 +59,9 @@ def deploy():
     """
     require('hosts', provided_by=[testenv])
     require('path', provided_by=[testenv])
-    require('scripts_path', provided_by=[testenv])
     
     upload_tar_from_git()
     install_requirements()
-    
-    with cd(env.path):
-        run('source bin/activate')
-        run('python scripts/run.py --nodaemon')
     
 # UTILITIES
 
@@ -84,6 +82,12 @@ def pip_install(package):
     Install a single package on the remote server with pip.
     """
     sudo('pip install %s' % package)
+    
+def with_virtualenv(command):
+    """
+    Executes a command in this project's virtual environment.
+    """
+    run('source /usr/local/bin/virtualenvwrapper_bashrc && workon %s && %s' % (env.project_name, command))
 
 def upload_tar_from_git():
     """
@@ -102,4 +106,4 @@ def install_requirements():
     Install the required packages from the requirements file using pip.
     """    
     with cd(env.path):
-        run('pip install -E . -r requirements.txt', pty=True)
+        with_virtualenv('pip install -r requirements.txt')
